@@ -1,0 +1,51 @@
+apiVersion: kbld.k14s.io/v1alpha1
+kind: Sources
+sources:
+- image: emailservice
+  path: src/emailservice
+- image: productcatalogservice
+  path: src/productcatalogservice
+- image: recommendationservice
+  path: src/recommendationservice
+- image: shippingservice
+  path: src/shippingservice
+- image: checkoutservice
+  path: src/checkoutservice
+- image: paymentservice
+  path: src/paymentservice
+- image: currencyservice
+  path: src/currencyservice
+- image: cartservice
+  path: src/cartservice
+- image: frontend
+  path: src/frontend
+- image: loadgenerator
+  path: src/loadgenerator
+- image: adservice
+  path: src/adservice
+---
+apiVersion: kbld.k14s.io/v1alpha1
+kind: ImageDestinations
+destinations:
+- image: emailservice
+  newImage: docker.io/dkalinin/microservices-demo-emailservice
+- image: checkoutservice
+  newImage: docker.io/dkalinin/microservices-demo-checkoutservice
+- image: recommendationservice
+  newImage: docker.io/dkalinin/microservices-demo-recommendationservice
+- image: frontend
+  newImage: docker.io/dkalinin/microservices-demo-frontend
+- image: paymentservice
+  newImage: docker.io/dkalinin/microservices-demo-paymentservice
+- image: productcatalogservice
+  newImage: docker.io/dkalinin/microservices-demo-productcatalogservice
+- image: cartservice
+  newImage: docker.io/dkalinin/microservices-demo-cartservice
+- image: loadgenerator
+  newImage: docker.io/dkalinin/microservices-demo-loadgenerator
+- image: currencyservice
+  newImage: docker.io/dkalinin/microservices-demo-currencyservice
+- image: shippingservice
+  newImage: docker.io/dkalinin/microservices-demo-shippingservice
+- image: adservice
+  newImage: docker.io/dkalinin/microservices-demo-adservice

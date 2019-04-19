@@ -1,0 +1,25 @@
+apiVersion: kbld.k14s.io/v1alpha1
+kind: ImageOverrides
+overrides:
+- image: emailservice
+  newImage: gcr.io/google-samples/microservices-demo/emailservice:v0.1.0
+- image: checkoutservice
+  newImage: gcr.io/google-samples/microservices-demo/checkoutservice:v0.1.0
+- image: recommendationservice
+  newImage: gcr.io/google-samples/microservices-demo/recommendationservice:v0.1.0
+- image: frontend
+  newImage: gcr.io/google-samples/microservices-demo/frontend:v0.1.0
+- image: paymentservice
+  newImage: gcr.io/google-samples/microservices-demo/paymentservice:v0.1.0
+- image: productcatalogservice
+  newImage: gcr.io/google-samples/microservices-demo/productcatalogservice:v0.1.0
+- image: cartservice
+  newImage: gcr.io/google-samples/microservices-demo/cartservice:v0.1.0
+- image: loadgenerator
+  newImage: gcr.io/google-samples/microservices-demo/loadgenerator:v0.1.0
+- image: currencyservice
+  newImage: gcr.io/google-samples/microservices-demo/currencyservice:v0.1.0
+- image: shippingservice
+  newImage: gcr.io/google-samples/microservices-demo/shippingservice:v0.1.0
+- image: adservice
+  newImage: gcr.io/google-samples/microservices-demo/adservice:v0.1.0

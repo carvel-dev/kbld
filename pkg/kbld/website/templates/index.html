@@ -1,0 +1,190 @@
+<!DOCTYPE html >
+<html>
+  <head>
+    <title class="title">kbld - Kubernetes Build helper for container images</title>
+    <link rel="stylesheet" href="js/app.css"></link>
+    <!-- google analytics -->
+  </head>
+  <body>
+    <div id="k14s-tools">
+      <p>Part of <a href="https://github.com/k14s">github.com/k14s</a> collection: <a href="https://get-ytt.io">ytt</a> | kbld | <a href="https://get-kapp.io">kapp</a> | <a href="https://github.com/k14s/kwt">kwt</a></p>
+    </div>
+
+    <div class="content">
+      <div class="header">
+        <h1><span class="logo">$ kbld</span></h1>
+
+        <p class="hero"><code>kbld</code> is a tool centered around <em>immutable</em><br/>
+        Docker image references (i.e. digests) for Kubernetes configuration.</p>
+
+        <p class="hero">
+          <a class="link-button" href="https://github.com/k14s/kbld">Github</a>
+          <a class="link-button" href="https://github.com/k14s/kbld/tree/master/docs/README.md">Docs</a>
+          <a class="link-button" href="https://github.com/k14s/kbld/releases">Download Binary</a>
+        </p>
+      </div>
+
+      <div id="intro">
+        <div id="why">
+          <h2>Why?</h2>
+
+          <p>Docker images can be referenced by their name (<code>nginx</code>), name-tag pair (<code>nginx:1.14</code>), or a digest (<code>nginx@sha256:c398dc3f2...</code>). Using non-digest methods may lead to hard to find deployment inconsistencies, hence it's a good practice to use image digests as they uniquely represent a particular image and cannot change.</p>
+
+          <p>kbld helps Kubernetes users convert non-digest image references to their digest form so that it's easier to track which images are used and how they change over time.</p>
+
+          <p>Additionally, kbld can orchestrate image building (delegates to tools like Docker) and pushing (to registries) and capture digest references of built images.</p>
+        </div>
+
+        <div id="basic-usage">
+          <h2>Basic Usage</h2>
+          <pre class="terminal">
+<span class="gray"># Configurations picked up from a directory</span>
+$ kbld apply -R -f examples/cassandra/ <strong>|</strong> kubectl apply -f -
+
+<span class="gray"># Can be used with helm charts</span>
+$ helm template my-chart --values my-vals.yml | kbld apply -f - | kubectl apply -f -
+
+<span class="gray"># ... and with kustomize</span>
+$ kustomize build ./some-app | kbld apply -f - | kubectl apply -f -
+
+<span class="gray"># ... or templated with ytt and deployed with kapp</span>
+$ ytt template -R -f ./some-app | kbld apply -f - | kapp -y deploy -a some-app -f -</pre>
+        </div>
+
+        <div id="before-after">
+          <h2>Examples</h2>
+          <table>
+            <tbody>
+              <tr>
+                <td colspan="2"><p>Resolves name-tag pair reference (<code>nginx:1.7.9</code>) into digest reference (<code>index.docker.io/library/nginx@sha256:c398dc3f2...</code>)</p></td>
+              </tr>
+              <tr>
+                <td class="before">
+                  <pre>
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  labels:
+    app: nginx
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        <span class="green">image: nginx:1.7.9</span>
+        ports:
+        - containerPort: 80</pre>
+                </td>
+                <td class="after">
+                  <pre>
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  labels:
+    app: nginx
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        <span class="green">image: index.docker.io/library/nginx@sha256:c398dc3f2...</span>
+        ports:
+        - containerPort: 80</pre>
+                </td>
+              </tr>
+              <tr>
+                <td colspan="2"><p>Builds app from local directory (configured via <code>Sources</code>), pushes image as <code>docker.io/dkalinin/simple-app</code> (configured via <code>ImageDestinations</code>), and finally resolves it to a digest reference <code>index.docker.io/dkalinin/simple-app@sha256:e932e46fd...</code>.</p></td>
+              </tr>
+              <tr>
+                <td class="before">
+                  <pre>
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app1-deployment
+  labels:
+    app: app1
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: app1
+  template:
+    metadata:
+      labels:
+        app: app1
+    spec:
+      containers:
+      - name: app1
+        <span class="green">image: app1</span>
+        ports:
+        - containerPort: 80
+
+<span class="gray">#! Specifies where to find app1 image source</span>
+<span class="green">---
+apiVersion: kbld.k14s.io/v1alpha1
+kind: Sources
+sources:
+- image: app1
+  path: .</span>
+
+<span class="gray">#! Specifies where to push app1 image</span>
+<span class="green">---
+apiVersion: kbld.k14s.io/v1alpha1
+kind: ImageDestinations
+destinations:
+- image: app1
+  newImage: docker.io/dkalinin/simple-app
+</span>
+</pre>
+                </td>
+                <td class="after">
+                  <pre>
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app1-deployment
+  labels:
+    app: app1
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: app1
+  template:
+    metadata:
+      labels:
+        app: app1
+    spec:
+      containers:
+      - name: app1
+        <span class="green">image: index.docker.io/dkalinin/simple-app@sha256:e932e46fd...</span>
+        ports:
+        - containerPort: 80</pre>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div id="footer">&#8718;</div>
+    </div>
+  </body>
+</html>
