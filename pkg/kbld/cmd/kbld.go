@@ -32,8 +32,8 @@ func NewDefaultKbldCmd(ui *ui.ConfUI) *cobra.Command {
 
 func NewKbldCmd(o *KbldOptions, flagsFactory cmdcore.FlagsFactory) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "kapp",
-		Short: "kapp helps to manage applications on your Kubernetes cluster",
+		Use:   "kbld",
+		Short: "kbld prepares Docker images to deploy to Kubernetes",
 
 		RunE: cobrautil.ShowHelp,
 

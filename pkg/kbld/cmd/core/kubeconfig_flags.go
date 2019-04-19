@@ -15,10 +15,10 @@ type KubeconfigFlags struct {
 
 func (f *KubeconfigFlags) Set(cmd *cobra.Command, flagsFactory FlagsFactory) {
 	f.Path = NewKubeconfigPathFlag()
-	cmd.PersistentFlags().Var(f.Path, "kubeconfig", "Path to the kubeconfig file ($KAPP_KUBECONFIG)")
+	cmd.PersistentFlags().Var(f.Path, "kubeconfig", "Path to the kubeconfig file ($KBLD_KUBECONFIG)")
 
 	f.Context = NewKubeconfigContextFlag()
-	cmd.PersistentFlags().Var(f.Context, "kubeconfig-context", "Kubeconfig context override ($KAPP_KUBECONFIG_CONTEXT)")
+	cmd.PersistentFlags().Var(f.Context, "kubeconfig-context", "Kubeconfig context override ($KBLD_KUBECONFIG_CONTEXT)")
 }
 
 type KubeconfigPathFlag struct {
@@ -60,7 +60,7 @@ func (s *KubeconfigPathFlag) Resolve() error {
 }
 
 func (s *KubeconfigPathFlag) resolveValue() string {
-	path := os.Getenv("KAPP_KUBECONFIG")
+	path := os.Getenv("KBLD_KUBECONFIG")
 	if len(path) > 0 {
 		return path
 	}
@@ -101,7 +101,7 @@ func (s *KubeconfigContextFlag) Resolve() error {
 		return nil
 	}
 
-	s.value = os.Getenv("KAPP_KUBECONFIG_CONTEXT")
+	s.value = os.Getenv("KBLD_KUBECONFIG_CONTEXT")
 
 	return nil
 }

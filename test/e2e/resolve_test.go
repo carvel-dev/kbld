@@ -7,7 +7,7 @@ import (
 
 func TestResolveSuccessful(t *testing.T) {
 	env := BuildEnv(t)
-	kapp := Kbld{t, env.Namespace, Logger{}}
+	kbld := Kbld{t, env.Namespace, Logger{}}
 
 	input := `
 kind: Object
@@ -19,7 +19,7 @@ spec:
 - image: nginx@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 `
 
-	out, _ := kapp.RunWithOpts([]string{"apply", "-f", "-"}, RunOpts{
+	out, _ := kbld.RunWithOpts([]string{"apply", "-f", "-"}, RunOpts{
 		StdinReader: strings.NewReader(input),
 	})
 
@@ -39,7 +39,7 @@ spec:
 
 func TestResolveInvalidDigest(t *testing.T) {
 	env := BuildEnv(t)
-	kapp := Kbld{t, env.Namespace, Logger{}}
+	kbld := Kbld{t, env.Namespace, Logger{}}
 
 	input := `
 kind: Object
@@ -47,7 +47,7 @@ spec:
 - image: nginx@sha256:digest
 `
 
-	_, err := kapp.RunWithOpts([]string{"apply", "-f", "-"}, RunOpts{
+	_, err := kbld.RunWithOpts([]string{"apply", "-f", "-"}, RunOpts{
 		StdinReader: strings.NewReader(input),
 		AllowError:  true,
 	})
@@ -61,7 +61,7 @@ spec:
 
 func TestResolveUnknownImage(t *testing.T) {
 	env := BuildEnv(t)
-	kapp := Kbld{t, env.Namespace, Logger{}}
+	kbld := Kbld{t, env.Namespace, Logger{}}
 
 	input := `
 kind: Object
@@ -69,7 +69,7 @@ spec:
 - image: unknown
 `
 
-	_, err := kapp.RunWithOpts([]string{"apply", "-f", "-"}, RunOpts{
+	_, err := kbld.RunWithOpts([]string{"apply", "-f", "-"}, RunOpts{
 		StdinReader: strings.NewReader(input),
 		AllowError:  true,
 	})
@@ -83,7 +83,7 @@ spec:
 
 func TestResolveWithOverride(t *testing.T) {
 	env := BuildEnv(t)
-	kapp := Kbld{t, env.Namespace, Logger{}}
+	kbld := Kbld{t, env.Namespace, Logger{}}
 
 	input := `
 kind: Object
@@ -97,7 +97,7 @@ overrides:
   newImage: docker.io/library/nginx:1.14.2
 `
 
-	out, _ := kapp.RunWithOpts([]string{"apply", "-f", "-"}, RunOpts{
+	out, _ := kbld.RunWithOpts([]string{"apply", "-f", "-"}, RunOpts{
 		StdinReader: strings.NewReader(input),
 	})
 

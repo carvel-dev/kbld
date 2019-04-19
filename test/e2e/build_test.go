@@ -8,7 +8,7 @@ import (
 
 func TestBuildSuccessful(t *testing.T) {
 	env := BuildEnv(t)
-	kapp := Kbld{t, env.Namespace, Logger{}}
+	kbld := Kbld{t, env.Namespace, Logger{}}
 
 	input := `
 kind: Object
@@ -35,7 +35,7 @@ overrides:
   newImage: simple-app-two
 `
 
-	out, _ := kapp.RunWithOpts([]string{"apply", "-f", "-"}, RunOpts{
+	out, _ := kbld.RunWithOpts([]string{"apply", "-f", "-"}, RunOpts{
 		StdinReader: strings.NewReader(input),
 	})
 
@@ -55,7 +55,7 @@ spec:
 
 func TestBuildAndPushSuccessful(t *testing.T) {
 	env := BuildEnv(t)
-	kapp := Kbld{t, env.Namespace, Logger{}}
+	kbld := Kbld{t, env.Namespace, Logger{}}
 
 	input := `
 kind: Object
@@ -92,7 +92,7 @@ overrides:
   newImage: simple-app-two
 `
 
-	out, _ := kapp.RunWithOpts([]string{"apply", "-f", "-"}, RunOpts{
+	out, _ := kbld.RunWithOpts([]string{"apply", "-f", "-"}, RunOpts{
 		StdinReader: strings.NewReader(input),
 	})
 
