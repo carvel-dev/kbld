@@ -8,6 +8,8 @@
 
 ... so that output can be used with other Kubernetes deployment tools.
 
+![](docs/kbld-screenshot.png)
+
 For example, one could use [ytt](https://github.com/k14s/ytt) + kbld + [kapp](https://github.com/k14s/kapp) to deploy an application:
 
 ```bash
