@@ -13,7 +13,7 @@
 For example, one could use [ytt](https://github.com/k14s/ytt) + kbld + [kapp](https://github.com/k14s/kapp) to deploy an application:
 
 ```bash
-ytt template -R -f kubernetes-manifests/ | kbld apply -f- | kapp -y deploy -a app1 -f-
+ytt template -R -f kubernetes-manifests/ | kbld -f- | kapp -y deploy -a app1 -f-
 ```
 
 ## Docs

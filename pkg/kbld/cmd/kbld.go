@@ -31,22 +31,19 @@ func NewDefaultKbldCmd(ui *ui.ConfUI) *cobra.Command {
 }
 
 func NewKbldCmd(o *KbldOptions, flagsFactory cmdcore.FlagsFactory) *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "kbld",
-		Short: "kbld prepares Docker images to deploy to Kubernetes",
+	cmd := NewApplyCmd(NewApplyOptions(o.ui, o.depsFactory), flagsFactory)
 
-		RunE: cobrautil.ShowHelp,
+	cmd.Use = "kbld"
+	cmd.Short = "kbld prepares Docker images to deploy to Kubernetes"
 
-		// Affects children as well
-		SilenceErrors: true,
-		SilenceUsage:  true,
+	// Affects children as well
+	cmd.SilenceErrors = true
+	cmd.SilenceUsage = true
 
-		// Disable docs header
-		DisableAutoGenTag: true,
+	// Disable docs header
+	cmd.DisableAutoGenTag = true
 
-		// TODO bash completion
-	}
-
+	// TODO bash completion
 	cmd.SetOutput(uiBlockWriter{o.ui}) // setting output for cmd.Help()
 
 	o.UIFlags.Set(cmd, flagsFactory)
@@ -56,7 +53,6 @@ func NewKbldCmd(o *KbldOptions, flagsFactory cmdcore.FlagsFactory) *cobra.Comman
 	o.configFactory.ConfigureContextResolver(o.KubeconfigFlags.Context.Value)
 
 	cmd.AddCommand(NewVersionCmd(NewVersionOptions(o.ui), flagsFactory))
-	cmd.AddCommand(NewApplyCmd(NewApplyOptions(o.ui, o.depsFactory), flagsFactory))
 	cmd.AddCommand(NewWebsiteCmd(NewWebsiteOptions()))
 
 	// Last one runs first

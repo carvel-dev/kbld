@@ -39,16 +39,16 @@
           <h2>Basic Usage</h2>
           <pre class="terminal">
 <span class="gray"># Configurations picked up from a directory</span>
-$ kbld apply -R -f examples/cassandra/ <strong>|</strong> kubectl apply -f -
+$ kbld -R -f examples/cassandra/ <strong>|</strong> kubectl apply -f -
 
 <span class="gray"># Can be used with helm charts</span>
-$ helm template my-chart --values my-vals.yml | kbld apply -f - | kubectl apply -f -
+$ helm template my-chart --values my-vals.yml | kbld -f - | kubectl apply -f -
 
 <span class="gray"># ... and with kustomize</span>
-$ kustomize build ./some-app | kbld apply -f - | kubectl apply -f -
+$ kustomize build ./some-app | kbld -f - | kubectl apply -f -
 
 <span class="gray"># ... or templated with ytt and deployed with kapp</span>
-$ ytt template -R -f ./some-app | kbld apply -f - | kapp -y deploy -a some-app -f -</pre>
+$ ytt template -R -f ./some-app | kbld -f - | kapp -y deploy -a some-app -f -</pre>
         </div>
 
         <div id="before-after">
