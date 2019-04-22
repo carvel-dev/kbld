@@ -14,6 +14,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
+const (
+	imageKey = "image"
+)
+
 type ApplyOptions struct {
 	ui          ui.UI
 	depsFactory cmdcore.DepsFactory
@@ -38,65 +42,31 @@ func NewApplyCmd(o *ApplyOptions, flagsFactory cmdcore.FlagsFactory) *cobra.Comm
 }
 
 func (o *ApplyOptions) Run() error {
-	const imageKey = "image"
-
 	nonConfigRs, conf, err := o.resourcesAndConfig()
 	if err != nil {
 		return err
 	}
 
 	logger := ctlimg.NewLogger(os.Stderr)
-	inputImages := map[string]struct{}{}
 
-	for _, res := range nonConfigRs {
-		visitValues(res.DeepCopyRaw(), imageKey, func(val interface{}) (interface{}, bool) {
-			if img, ok := val.(string); ok {
-				inputImages[img] = struct{}{}
-			}
-			return nil, false
-		})
-	}
-
-	outputImages, err := NewImageBuildQueue(ctlimg.NewFactory(conf, logger)).Run(inputImages, o.BuildConcurrency)
+	outputImages, err := o.resolveImages(nonConfigRs, conf, logger)
 	if err != nil {
 		return err
 	}
 
+	// Record final image transformation
 	prefixedLogger := logger.NewPrefixedWriter("apply | ")
 
 	for img, outputImg := range outputImages {
 		prefixedLogger.Write([]byte(fmt.Sprintf("final: %s -> %s\n", img, outputImg)))
 	}
 
-	var missingImageErrs []error
-	var resBss [][]byte
-
-	for _, res := range nonConfigRs {
-		resContents := res.DeepCopyRaw()
-
-		visitValues(resContents, imageKey, func(val interface{}) (interface{}, bool) {
-			if img, ok := val.(string); ok {
-				if outputImg, found := outputImages[img]; found {
-					return outputImg, true
-				}
-				missingImageErrs = append(missingImageErrs, fmt.Errorf("Expected to find image for '%s'", img))
-			}
-			return nil, false
-		})
-
-		resBs, err := yaml.Marshal(resContents)
-		if err != nil {
-			return err
-		}
-
-		resBss = append(resBss, resBs)
-	}
-
-	err = errFromErrs(missingImageErrs)
+	resBss, err := o.buildResources(nonConfigRs, outputImages)
 	if err != nil {
 		return err
 	}
 
+	// Print all resources as one YAML stream
 	for i, resBs := range resBss {
 		if i != 0 {
 			resBs = append([]byte("---\n"), resBs...)
@@ -129,6 +99,65 @@ func (o *ApplyOptions) resourcesAndConfig() ([]ctlres.Resource, ctlconf.Conf, er
 	}
 
 	return ctlconf.NewConfFromResources(rs)
+}
+
+func (o *ApplyOptions) resolveImages(
+	nonConfigRs []ctlres.Resource, conf ctlconf.Conf, logger ctlimg.Logger) (map[string]string, error) {
+
+	inputImages := map[string]struct{}{}
+
+	for _, res := range nonConfigRs {
+		visitValues(res.DeepCopyRaw(), imageKey, func(val interface{}) (interface{}, bool) {
+			if img, ok := val.(string); ok {
+				inputImages[img] = struct{}{}
+			}
+			return nil, false
+		})
+	}
+
+	queue := NewImageBuildQueue(ctlimg.NewFactory(conf, logger))
+
+	outputImages, err := queue.Run(inputImages, o.BuildConcurrency)
+	if err != nil {
+		return nil, err
+	}
+
+	return outputImages, nil
+}
+
+func (o *ApplyOptions) buildResources(
+	nonConfigRs []ctlres.Resource, outputImages map[string]string) ([][]byte, error) {
+
+	var missingImageErrs []error
+	var resBss [][]byte
+
+	for _, res := range nonConfigRs {
+		resContents := res.DeepCopyRaw()
+
+		visitValues(resContents, imageKey, func(val interface{}) (interface{}, bool) {
+			if img, ok := val.(string); ok {
+				if outputImg, found := outputImages[img]; found {
+					return outputImg, true
+				}
+				missingImageErrs = append(missingImageErrs, fmt.Errorf("Expected to find image for '%s'", img))
+			}
+			return nil, false
+		})
+
+		resBs, err := yaml.Marshal(resContents)
+		if err != nil {
+			return nil, err
+		}
+
+		resBss = append(resBss, resBs)
+	}
+
+	err := errFromErrs(missingImageErrs)
+	if err != nil {
+		return nil, err
+	}
+
+	return resBss, nil
 }
 
 func errFromErrs(errs []error) error {
