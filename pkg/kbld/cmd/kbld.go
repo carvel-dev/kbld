@@ -52,8 +52,10 @@ func NewKbldCmd(o *KbldOptions, flagsFactory cmdcore.FlagsFactory) *cobra.Comman
 	o.configFactory.ConfigurePathResolver(o.KubeconfigFlags.Path.Value)
 	o.configFactory.ConfigureContextResolver(o.KubeconfigFlags.Context.Value)
 
-	cmd.AddCommand(NewVersionCmd(NewVersionOptions(o.ui), flagsFactory))
+	cmd.AddCommand(NewPackageCmd(NewPackageOptions(o.ui, o.depsFactory), flagsFactory))
+	cmd.AddCommand(NewUnpackageCmd(NewUnpackageOptions(o.ui, o.depsFactory), flagsFactory))
 	cmd.AddCommand(NewWebsiteCmd(NewWebsiteOptions()))
+	cmd.AddCommand(NewVersionCmd(NewVersionOptions(o.ui), flagsFactory))
 
 	// Last one runs first
 	cobrautil.VisitCommands(cmd, cobrautil.ReconfigureCmdWithSubcmd)

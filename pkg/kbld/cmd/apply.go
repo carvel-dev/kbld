@@ -24,6 +24,10 @@ type ApplyOptions struct {
 
 	FileFlags        FileFlags
 	BuildConcurrency int
+
+	ExportImages     string
+	ImportImages     string
+	ImportRepository string
 }
 
 func NewApplyOptions(ui ui.UI, depsFactory cmdcore.DepsFactory) *ApplyOptions {
@@ -42,26 +46,25 @@ func NewApplyCmd(o *ApplyOptions, flagsFactory cmdcore.FlagsFactory) *cobra.Comm
 }
 
 func (o *ApplyOptions) Run() error {
-	nonConfigRs, conf, err := o.resourcesAndConfig()
+	logger := ctlimg.NewLogger(os.Stderr)
+	prefixedLogger := logger.NewPrefixedWriter("apply | ")
+
+	nonConfigRs, conf, err := o.FileFlags.ResourcesAndConfig()
 	if err != nil {
 		return err
 	}
 
-	logger := ctlimg.NewLogger(os.Stderr)
-
-	outputImages, err := o.resolveImages(nonConfigRs, conf, logger)
+	resolvedImages, err := o.resolveImages(nonConfigRs, conf, logger)
 	if err != nil {
 		return err
 	}
 
 	// Record final image transformation
-	prefixedLogger := logger.NewPrefixedWriter("apply | ")
-
-	for img, outputImg := range outputImages {
-		prefixedLogger.Write([]byte(fmt.Sprintf("final: %s -> %s\n", img, outputImg)))
+	for img, outputImg := range resolvedImages {
+		prefixedLogger.WriteStr("final: %s -> %s\n", img, outputImg)
 	}
 
-	resBss, err := o.buildResources(nonConfigRs, outputImages)
+	resBss, err := o.updateRefsInResources(nonConfigRs, resolvedImages)
 	if err != nil {
 		return err
 	}
@@ -77,39 +80,15 @@ func (o *ApplyOptions) Run() error {
 	return nil
 }
 
-func (o *ApplyOptions) resourcesAndConfig() ([]ctlres.Resource, ctlconf.Conf, error) {
-	var rs []ctlres.Resource
-
-	for _, file := range o.FileFlags.Files {
-		fileRs, err := ctlres.NewFileResources(file, o.FileFlags.Recursive)
-		if err != nil {
-			return nil, ctlconf.Conf{}, err
-		}
-
-		for _, fileRes := range fileRs {
-			resources, err := fileRes.Resources()
-			if err != nil {
-				return nil, ctlconf.Conf{}, err
-			}
-
-			for _, res := range resources {
-				rs = append(rs, res)
-			}
-		}
-	}
-
-	return ctlconf.NewConfFromResources(rs)
-}
-
 func (o *ApplyOptions) resolveImages(
 	nonConfigRs []ctlres.Resource, conf ctlconf.Conf, logger ctlimg.Logger) (map[string]string, error) {
 
-	inputImages := map[string]struct{}{}
+	foundImages := map[string]struct{}{}
 
 	for _, res := range nonConfigRs {
 		visitValues(res.DeepCopyRaw(), imageKey, func(val interface{}) (interface{}, bool) {
 			if img, ok := val.(string); ok {
-				inputImages[img] = struct{}{}
+				foundImages[img] = struct{}{}
 			}
 			return nil, false
 		})
@@ -117,16 +96,16 @@ func (o *ApplyOptions) resolveImages(
 
 	queue := NewImageBuildQueue(ctlimg.NewFactory(conf, logger))
 
-	outputImages, err := queue.Run(inputImages, o.BuildConcurrency)
+	resolvedImages, err := queue.Run(foundImages, o.BuildConcurrency)
 	if err != nil {
 		return nil, err
 	}
 
-	return outputImages, nil
+	return resolvedImages, nil
 }
 
-func (o *ApplyOptions) buildResources(
-	nonConfigRs []ctlres.Resource, outputImages map[string]string) ([][]byte, error) {
+func (o *ApplyOptions) updateRefsInResources(
+	nonConfigRs []ctlres.Resource, resolvedImages map[string]string) ([][]byte, error) {
 
 	var missingImageErrs []error
 	var resBss [][]byte
@@ -136,7 +115,7 @@ func (o *ApplyOptions) buildResources(
 
 		visitValues(resContents, imageKey, func(val interface{}) (interface{}, bool) {
 			if img, ok := val.(string); ok {
-				if outputImg, found := outputImages[img]; found {
+				if outputImg, found := resolvedImages[img]; found {
 					return outputImg, true
 				}
 				missingImageErrs = append(missingImageErrs, fmt.Errorf("Expected to find image for '%s'", img))

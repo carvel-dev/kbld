@@ -98,9 +98,9 @@ overrides:
 
 	expectedOut := `kind: Object
 spec:
-- image: index.docker.io/dkalinin/simple-app-kbld@sha256:47dbbe477076b174fa81418f305a68b6b669cfe94deded82a3000bc6f2d72aa9
-- image: index.docker.io/dkalinin/simple-app-kbld@sha256:47dbbe477076b174fa81418f305a68b6b669cfe94deded82a3000bc6f2d72aa9
-- image: index.docker.io/dkalinin/simple-app-kbld@sha256:47dbbe477076b174fa81418f305a68b6b669cfe94deded82a3000bc6f2d72aa9
+- image: index.docker.io/dkalinin/simple-app-kbld@sha256:b8bee631fe8d51f5b09c725b36f3148b7bf1f1afd744b8f23531754a143bd4fb
+- image: index.docker.io/dkalinin/simple-app-kbld@sha256:b8bee631fe8d51f5b09c725b36f3148b7bf1f1afd744b8f23531754a143bd4fb
+- image: index.docker.io/dkalinin/simple-app-kbld@sha256:b8bee631fe8d51f5b09c725b36f3148b7bf1f1afd744b8f23531754a143bd4fb
 `
 
 	if out != expectedOut {

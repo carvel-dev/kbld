@@ -3,12 +3,14 @@ package image
 import (
 	"crypto/tls"
 	"crypto/x509"
+	"fmt"
 	"net"
 	"net/http"
 	"time"
 
 	regauthn "github.com/google/go-containerregistry/pkg/authn"
 	regname "github.com/google/go-containerregistry/pkg/name"
+	regv1 "github.com/google/go-containerregistry/pkg/v1"
 	regremote "github.com/google/go-containerregistry/pkg/v1/remote"
 )
 
@@ -73,4 +75,42 @@ func (ResolvedImage) newHTTPTransport() (*http.Transport, error) {
 			RootCAs: pool,
 		},
 	}, nil
+}
+
+func (i ResolvedImage) Write(ref regname.Reference, img regv1.Image) error {
+	httpTran, err := i.newHTTPTransport()
+	if err != nil {
+		return err
+	}
+
+	authz, err := regauthn.DefaultKeychain.Resolve(ref.Context().Registry)
+	if err != nil {
+		return fmt.Errorf("Getting authz details: %s", err)
+	}
+
+	err = regremote.Write(ref, img, authz, httpTran)
+	if err != nil {
+		return fmt.Errorf("Writing image: %s", err)
+	}
+
+	return nil
+}
+
+func (i ResolvedImage) WriteIndex(ref regname.Reference, idx regv1.ImageIndex) error {
+	httpTran, err := i.newHTTPTransport()
+	if err != nil {
+		return err
+	}
+
+	authz, err := regauthn.DefaultKeychain.Resolve(ref.Context().Registry)
+	if err != nil {
+		return fmt.Errorf("Getting authz details: %s", err)
+	}
+
+	err = regremote.WriteIndex(ref, idx, authz, httpTran)
+	if err != nil {
+		return fmt.Errorf("Writing image index: %s", err)
+	}
+
+	return nil
 }

@@ -50,3 +50,8 @@ func (w *LoggerPrefixWriter) Write(data []byte) (int, error) {
 	// return original data length
 	return len(data), nil
 }
+
+func (w *LoggerPrefixWriter) WriteStr(str string, args ...interface{}) error {
+	_, err := w.Write([]byte(fmt.Sprintf(str, args...)))
+	return err
+}

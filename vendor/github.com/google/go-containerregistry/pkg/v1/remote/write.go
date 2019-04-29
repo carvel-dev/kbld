@@ -85,16 +85,16 @@ func Write(ref name.Reference, img v1.Image, auth authn.Authenticator, t http.Ro
 		// since the layer DiffIDs haven't been calculated yet. Attempt to wait
 		// for the other layers to be uploaded, then try the config again.
 		if err := g.Wait(); err != nil {
-			return err
+			return fmt.Errorf("uploading layers: %s", err)
 		}
 
 		// Now that all the layers are uploaded, try to upload the config file blob.
 		l, err := partial.ConfigLayer(img)
 		if err != nil {
-			return err
+			return fmt.Errorf("building config layer: %s", err)
 		}
 		if err := w.uploadOne(l); err != nil {
-			return err
+			return fmt.Errorf("uploading config layer: %s", err)
 		}
 	} else {
 		// We *can* read the ConfigLayer, so upload it concurrently with the layers.
@@ -104,7 +104,7 @@ func Write(ref name.Reference, img v1.Image, auth authn.Authenticator, t http.Ro
 
 		// Wait for the layers + config.
 		if err := g.Wait(); err != nil {
-			return err
+			return fmt.Errorf("uploading layers: %s", err)
 		}
 	}
 
@@ -348,6 +348,11 @@ func (w *writer) commitImage(man manifest) error {
 		return err
 	}
 
+	digest, err := man.Digest()
+	if err != nil {
+		return err
+	}
+
 	u := w.url(fmt.Sprintf("/v2/%s/manifests/%s", w.ref.Context().RepositoryStr(), w.ref.Identifier()))
 
 	// Make the request to PUT the serialized manifest
@@ -359,17 +364,12 @@ func (w *writer) commitImage(man manifest) error {
 
 	resp, err := w.client.Do(req)
 	if err != nil {
-		return err
+		return fmt.Errorf("uploading manifest1: %s", err)
 	}
 	defer resp.Body.Close()
 
 	if err := transport.CheckError(resp, http.StatusOK, http.StatusCreated, http.StatusAccepted); err != nil {
-		return err
-	}
-
-	digest, err := man.Digest()
-	if err != nil {
-		return err
+		return fmt.Errorf("uploading manifest2: %s", err)
 	}
 
 	// The image was successfully pushed!
@@ -453,6 +453,25 @@ func WriteIndex(ref name.Reference, ii v1.ImageIndex, auth authn.Authenticator, 
 				return err
 			}
 		}
+	}
+
+	// With all of the constituent elements uploaded, upload the manifest
+	// to commit the image.
+	return w.commitImage(ii)
+}
+
+// WriteIndex pushes the provided ImageIndex to the specified image reference.
+// WriteIndex will attempt to push all of the referenced manifests before
+// attempting to push the ImageIndex, to retain referential integrity.
+func WriteIndexPartial(ref name.Reference, ii v1.ImageIndex, auth authn.Authenticator, t http.RoundTripper) error {
+	scopes := []string{ref.Scope(transport.PushScope)}
+	tr, err := transport.New(ref.Context().Registry, auth, t, scopes)
+	if err != nil {
+		return err
+	}
+	w := writer{
+		ref:    ref,
+		client: &http.Client{Transport: tr},
 	}
 
 	// With all of the constituent elements uploaded, upload the manifest
