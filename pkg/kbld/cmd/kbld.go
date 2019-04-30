@@ -31,7 +31,7 @@ func NewDefaultKbldCmd(ui *ui.ConfUI) *cobra.Command {
 }
 
 func NewKbldCmd(o *KbldOptions, flagsFactory cmdcore.FlagsFactory) *cobra.Command {
-	cmd := NewApplyCmd(NewApplyOptions(o.ui, o.depsFactory), flagsFactory)
+	cmd := NewResolveCmd(NewResolveOptions(o.ui, o.depsFactory), flagsFactory)
 
 	cmd.Use = "kbld"
 	cmd.Short = "kbld prepares Docker images to deploy to Kubernetes"

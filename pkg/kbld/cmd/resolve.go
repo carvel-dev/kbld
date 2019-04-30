@@ -18,7 +18,7 @@ const (
 	imageKey = "image"
 )
 
-type ApplyOptions struct {
+type ResolveOptions struct {
 	ui          ui.UI
 	depsFactory cmdcore.DepsFactory
 
@@ -30,13 +30,13 @@ type ApplyOptions struct {
 	ImportRepository string
 }
 
-func NewApplyOptions(ui ui.UI, depsFactory cmdcore.DepsFactory) *ApplyOptions {
-	return &ApplyOptions{ui: ui, depsFactory: depsFactory}
+func NewResolveOptions(ui ui.UI, depsFactory cmdcore.DepsFactory) *ResolveOptions {
+	return &ResolveOptions{ui: ui, depsFactory: depsFactory}
 }
 
-func NewApplyCmd(o *ApplyOptions, flagsFactory cmdcore.FlagsFactory) *cobra.Command {
+func NewResolveCmd(o *ResolveOptions, flagsFactory cmdcore.FlagsFactory) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "apply",
+		Use:   "resolve",
 		Short: "Build images and update references",
 		RunE:  func(_ *cobra.Command, _ []string) error { return o.Run() },
 	}
@@ -45,9 +45,9 @@ func NewApplyCmd(o *ApplyOptions, flagsFactory cmdcore.FlagsFactory) *cobra.Comm
 	return cmd
 }
 
-func (o *ApplyOptions) Run() error {
+func (o *ResolveOptions) Run() error {
 	logger := ctlimg.NewLogger(os.Stderr)
-	prefixedLogger := logger.NewPrefixedWriter("apply | ")
+	prefixedLogger := logger.NewPrefixedWriter("resolve | ")
 
 	nonConfigRs, conf, err := o.FileFlags.ResourcesAndConfig()
 	if err != nil {
@@ -80,7 +80,7 @@ func (o *ApplyOptions) Run() error {
 	return nil
 }
 
-func (o *ApplyOptions) resolveImages(
+func (o *ResolveOptions) resolveImages(
 	nonConfigRs []ctlres.Resource, conf ctlconf.Conf, logger ctlimg.Logger) (map[string]string, error) {
 
 	foundImages := map[string]struct{}{}
@@ -104,7 +104,7 @@ func (o *ApplyOptions) resolveImages(
 	return resolvedImages, nil
 }
 
-func (o *ApplyOptions) updateRefsInResources(
+func (o *ResolveOptions) updateRefsInResources(
 	nonConfigRs []ctlres.Resource, resolvedImages map[string]string) ([][]byte, error) {
 
 	var missingImageErrs []error
