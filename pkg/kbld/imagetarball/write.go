@@ -80,7 +80,7 @@ func (w *TarWriter) writeImage(td ImageTarDescriptor) error {
 
 		// Dedup layers
 		if _, found := w.writtenLayers[name]; found {
-			return nil
+			continue
 		}
 
 		stream, err := w.tds.ImageLayerStream(imgLayer)
