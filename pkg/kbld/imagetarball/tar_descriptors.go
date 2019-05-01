@@ -3,9 +3,11 @@ package tarball
 import (
 	"fmt"
 	"io"
+	"strings"
 
 	regname "github.com/google/go-containerregistry/pkg/name"
 	regv1 "github.com/google/go-containerregistry/pkg/v1"
+	regtran "github.com/google/go-containerregistry/pkg/v1/remote/transport"
 	regtypes "github.com/google/go-containerregistry/pkg/v1/types"
 )
 
@@ -22,6 +24,8 @@ type TarDescriptors struct {
 }
 
 func NewTarDescriptors(refs []regname.Reference, metadata TarDescriptorsMetadata) (*TarDescriptors, error) {
+	metadata = errTarDescriptorsMetadata{metadata}
+
 	tds := &TarDescriptors{
 		imageLayers: map[ImageLayerTarDescriptor]regv1.Layer{},
 		metadata:    metadata,
@@ -194,7 +198,11 @@ func (tds *TarDescriptors) ImageLayerStream(td ImageLayerTarDescriptor) (io.Read
 	if !found {
 		panic(fmt.Sprintf("Expected to find stream for %#v", td))
 	}
-	return layer.Compressed()
+	reader, err := layer.Compressed()
+	if err != nil {
+		return nil, fmt.Errorf("Getting compressed layer: %s", err)
+	}
+	return reader, nil
 }
 
 func (tds *TarDescriptors) buildRef(otherRef regname.Reference, digest string) regname.Reference {
@@ -203,4 +211,33 @@ func (tds *TarDescriptors) buildRef(otherRef regname.Reference, digest string) r
 		panic(fmt.Sprintf("Building new ref"))
 	}
 	return newRef
+}
+
+type errTarDescriptorsMetadata struct {
+	delegate TarDescriptorsMetadata
+}
+
+func (m errTarDescriptorsMetadata) Generic(ref regname.Reference) (regv1.Descriptor, error) {
+	desc, err := m.delegate.Generic(ref)
+	return desc, m.betterErr(ref, err)
+}
+
+func (m errTarDescriptorsMetadata) Index(ref regname.Reference) (regv1.ImageIndex, error) {
+	idx, err := m.delegate.Index(ref)
+	return idx, m.betterErr(ref, err)
+}
+
+func (m errTarDescriptorsMetadata) Image(ref regname.Reference) (regv1.Image, error) {
+	img, err := m.delegate.Image(ref)
+	return img, m.betterErr(ref, err)
+}
+
+func (m errTarDescriptorsMetadata) betterErr(ref regname.Reference, err error) error {
+	if err != nil {
+		if strings.Contains(err.Error(), string(regtran.ManifestUnknownErrorCode)) {
+			err = fmt.Errorf("Encountered an error most likely because this image is in Docker Registry v1 format; only v2 or OCI image format is supported (underlying error: %s)", err)
+		}
+		err = fmt.Errorf("Working with %s: %s", ref.Name(), err)
+	}
+	return err
 }

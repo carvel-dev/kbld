@@ -109,7 +109,7 @@ func (o *PackageOptions) exportImages(imgRefsToExport map[string]struct{}, logge
 
 	tds, err := regtarball.NewTarDescriptors(refs, remoteTarDescritorsMetadata{})
 	if err != nil {
-		return err
+		return fmt.Errorf("Collecting packaging metadata: %s", err)
 	}
 
 	return regtarball.NewTarWriter(tds, outputFile).Write()
