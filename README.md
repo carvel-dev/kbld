@@ -1,32 +1,26 @@
 # kbld
 
-`kbld`
+`kbld` can
 
-1. optionally builds Docker images (by delegating to other tools such as Docker, kaniko, etc.)
-1. resolves images to their *immutable* image references (digests)
-1. and, outputs YAML configuration with *immutable* image references
-
-... so that output can be used with other Kubernetes deployment tools.
+- resolves images to their *immutable* image references (digests)
+- optionally build Docker images (by delegating to tools such as Docker)
+- export set of images as a single tarball, and import into a different registry
+  - maintaining exactly same digests, hence guaranteeing exactly same content
 
 ![](docs/kbld-screenshot.png)
 
-For example, one could use [ytt](https://github.com/k14s/ytt) + kbld + [kapp](https://github.com/k14s/kapp) to deploy an application:
+Example of using [ytt](https://github.com/k14s/ytt) + kbld + [kapp](https://github.com/k14s/kapp) to deploy an application:
 
 ```bash
 ytt template -R -f kubernetes-manifests/ | kbld -f- | kapp -y deploy -a app1 -f-
 ```
 
-kbld can also be used to package Docker images as a single archive and later imported into a private registry:
-
-```bash
-cat /tmp/manifest | kbld -f- | kbld -f- --output /tmp/images.tar
-# ... referenced images are fully saved into images.tar ...
-cat /tmp/manifest | kbld -f- | kbld -f- --input /tmp/images.tar --repository docker.io/dkalinin/app1
-```
-
 ## Docs
 
-- [Docs](docs/README.md)
+- [Resolving image references to digests](docs/resolving.md)
+- [Building images from source](docs/building.md)
+- [Packaging images for distribution](docs/packaging.md)
+- [Configuration](docs/config.md)
 
 ## Install
 
