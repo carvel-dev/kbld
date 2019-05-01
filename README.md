@@ -2,7 +2,7 @@
 
 `kbld` can
 
-- resolves images to their *immutable* image references (digests)
+- resolve images to their *immutable* image references (digests)
 - optionally build Docker images (by delegating to tools such as Docker)
 - export set of images as a single tarball, and import into a different registry
   - maintaining exactly same digests, hence guaranteeing exactly same content
