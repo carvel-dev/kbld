@@ -88,7 +88,7 @@ func (i ResolvedImage) Write(ref regname.Reference, img regv1.Image) error {
 		return fmt.Errorf("Getting authz details: %s", err)
 	}
 
-	err = regremote.Write(ref, img, authz, httpTran)
+	err = i.retry(func() error { return regremote.Write(ref, img, authz, httpTran) })
 	if err != nil {
 		return fmt.Errorf("Writing image: %s", err)
 	}
@@ -107,10 +107,22 @@ func (i ResolvedImage) WriteIndex(ref regname.Reference, idx regv1.ImageIndex) e
 		return fmt.Errorf("Getting authz details: %s", err)
 	}
 
-	err = regremote.WriteIndex(ref, idx, authz, httpTran)
+	err = i.retry(func() error { return regremote.WriteIndex(ref, idx, authz, httpTran) })
 	if err != nil {
 		return fmt.Errorf("Writing image index: %s", err)
 	}
 
 	return nil
+}
+
+func (i ResolvedImage) retry(doFunc func() error) error {
+	var lastErr error
+	for i := 0; i < 5; i++ {
+		lastErr = doFunc()
+		if lastErr == nil {
+			return nil
+		}
+		time.Sleep(1 * time.Second)
+	}
+	return fmt.Errorf("Retried 5 times: %s", lastErr)
 }
