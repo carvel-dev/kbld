@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"io"
+	"sort"
 
 	regv1 "github.com/google/go-containerregistry/pkg/v1"
 )
@@ -13,11 +14,11 @@ type TarWriter struct {
 	tds           *TarDescriptors
 	dst           io.Writer
 	tf            *tar.Writer
-	writtenLayers map[string]struct{}
+	layersToWrite []ImageLayerTarDescriptor
 }
 
 func NewTarWriter(tds *TarDescriptors, dst io.Writer) *TarWriter {
-	return &TarWriter{tds, dst, nil, map[string]struct{}{}}
+	return &TarWriter{tds, dst, nil, nil}
 }
 
 func (w *TarWriter) Write() error {
@@ -53,7 +54,7 @@ func (w *TarWriter) Write() error {
 		}
 	}
 
-	return nil
+	return w.writeLayers()
 }
 
 func (w *TarWriter) writeImageIndex(td ImageIndexTarDescriptor) error {
@@ -76,6 +77,20 @@ func (w *TarWriter) writeImageIndex(td ImageIndexTarDescriptor) error {
 
 func (w *TarWriter) writeImage(td ImageTarDescriptor) error {
 	for _, imgLayer := range td.Layers {
+		w.layersToWrite = append(w.layersToWrite, imgLayer)
+	}
+	return nil
+}
+
+func (w *TarWriter) writeLayers() error {
+	// Sort layers by digest to have deterministic archive
+	sort.Slice(w.layersToWrite, func(i, j int) bool {
+		return w.layersToWrite[i].Digest < w.layersToWrite[j].Digest
+	})
+
+	writtenLayers := map[string]struct{}{}
+
+	for _, imgLayer := range w.layersToWrite {
 		digest, err := regv1.NewHash(imgLayer.Digest)
 		if err != nil {
 			return err
@@ -84,7 +99,7 @@ func (w *TarWriter) writeImage(td ImageTarDescriptor) error {
 		name := digest.Algorithm + "-" + digest.Hex + ".tar.gz"
 
 		// Dedup layers
-		if _, found := w.writtenLayers[name]; found {
+		if _, found := writtenLayers[name]; found {
 			continue
 		}
 
@@ -98,7 +113,7 @@ func (w *TarWriter) writeImage(td ImageTarDescriptor) error {
 			return err
 		}
 
-		w.writtenLayers[name] = struct{}{}
+		writtenLayers[name] = struct{}{}
 	}
 
 	return nil
