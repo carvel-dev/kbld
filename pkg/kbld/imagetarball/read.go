@@ -66,12 +66,17 @@ func MultiRefReadFromFile(path string) ([]TarImageOrIndex, error) {
 	}
 
 	for _, td := range tds {
-		if td.Image != nil {
+		switch {
+		case td.Image != nil:
 			var img ImageWithRef = tarImage{*td.Image, file}
 			result = append(result, TarImageOrIndex{Image: &img})
-		} else {
+
+		case td.ImageIndex != nil:
 			idx := buildIndex(*td.ImageIndex, file)
 			result = append(result, TarImageOrIndex{Index: &idx})
+
+		default:
+			panic("Unknown item")
 		}
 	}
 

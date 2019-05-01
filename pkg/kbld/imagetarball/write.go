@@ -35,16 +35,21 @@ func (w *TarWriter) Write() error {
 	}
 
 	for _, td := range w.tds.tds {
-		if td.Image != nil {
+		switch {
+		case td.Image != nil:
 			err := w.writeImage(*td.Image)
 			if err != nil {
 				return err
 			}
-		} else {
+
+		case td.ImageIndex != nil:
 			err := w.writeImageIndex(*td.ImageIndex)
 			if err != nil {
 				return err
 			}
+
+		default:
+			panic("Unknown item")
 		}
 	}
 
