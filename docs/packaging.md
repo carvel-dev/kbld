@@ -10,53 +10,53 @@ For example, to package referenced images into a single tarball:
 
 1. First make sure all image references are in their digest form
 
-```bash
-$ cat /tmp/manifest
-images:
-- image: nginx
-- image: haproxy
+    ```bash
+    $ cat /tmp/manifest
+    images:
+    - image: nginx
+    - image: haproxy
 
-$ kbld -f /tmp/manifest > /tmp/resolved-manifest
-resolve | final: haproxy -> index.docker.io/library/haproxy@sha256:6dae9c8674e2e5f418c3dd040041a05f6b490597315139c0bcacadf65a46cfd5
-resolve | final: nginx -> index.docker.io/library/nginx@sha256:e71b1bf4281f25533cf15e6e5f9be4dac74d2328152edf7ecde23abc54e16c1c
+    $ kbld -f /tmp/manifest > /tmp/resolved-manifest
+    resolve | final: haproxy -> index.docker.io/library/haproxy@sha256:6dae9c8674e2e5f418c3dd040041a05f6b490597315139c0bcacadf65a46cfd5
+    resolve | final: nginx -> index.docker.io/library/nginx@sha256:e71b1bf4281f25533cf15e6e5f9be4dac74d2328152edf7ecde23abc54e16c1c
 
-$ cat /tmp/resolved-manifest
-images:
-- image: index.docker.io/library/nginx@sha256:e71b1bf4281f25533cf15e6e5f9be4dac74d2328152edf7ecde23abc54e16c1c
-- image: index.docker.io/library/haproxy@sha256:6dae9c8674e2e5f418c3dd040041a05f6b490597315139c0bcacadf65a46cfd5
-```
+    $ cat /tmp/resolved-manifest
+    images:
+    - image: index.docker.io/library/nginx@sha256:e71b1bf4281f25533cf15e6e5f9be4dac74d2328152edf7ecde23abc54e16c1c
+    - image: index.docker.io/library/haproxy@sha256:6dae9c8674e2e5f418c3dd040041a05f6b490597315139c0bcacadf65a46cfd5
+    ```
 
 1. Feed `/tmp/resolved-manifest` to `kbld pkg` command to download images and pack them into a single tarball `/tmp/packaged-images.tar`:
 
-```bash
-$ kbld pkg -f /tmp/resolved-manifest --output /tmp/packaged-images.tar
-package | exporting 2 images...
-package | will export index.docker.io/library/nginx@sha256:e71b1bf4281f25533cf15e6e5f9be4dac74d2328152edf7ecde23abc54e16c1c
-package | will export index.docker.io/library/haproxy@sha256:6dae9c8674e2e5f418c3dd040041a05f6b490597315139c0bcacadf65a46cfd5
-package | exported 2 images
+    ```bash
+    $ kbld pkg -f /tmp/resolved-manifest --output /tmp/packaged-images.tar
+    package | exporting 2 images...
+    package | will export index.docker.io/library/nginx@sha256:e71b1bf4281f25533cf15e6e5f9be4dac74d2328152edf7ecde23abc54e16c1c
+    package | will export index.docker.io/library/haproxy@sha256:6dae9c8674e2e5f418c3dd040041a05f6b490597315139c0bcacadf65a46cfd5
+    package | exported 2 images
 
-$ ls -lah /tmp/nginx-images2
--rw-r--r-- 1 root root 314M May  3 18:59 /tmp/nginx-images2
-```
+    $ ls -lah /tmp/packaged-images.tar
+    -rw-r--r-- 1 root root 314M May  3 18:59 /tmp/packaged-images.tar
+    ```
 
-Note: Depending on your internet connection this may be slow.
+    Note: Depending on your internet connection this may be slow.
 
 To import packaged images from a tarball:
 
 1. Specify new repository location `docker.io/dkalinin/app1` and provide tarball:
 
-```bash
-$ kbld unpkg -f /tmp/resolved-manifest --input /tmp/packaged-images.tar --repository docker.io/dkalinin/app1
-unpackage | importing 2 images...
-unpackage | importing index.docker.io/library/nginx@sha256:e71b1bf4281f25533cf15e6e5f9be4dac74d2328152edf7ecde23abc54e16c1c -> docker.io/dkalinin/app1@sha256:e71b1bf4281f25533cf15e6e5f9be4dac74d2328152edf7ecde23abc54e16c1c...
-unpackage | importing index.docker.io/library/haproxy@sha256:6dae9c8674e2e5f418c3dd040041a05f6b490597315139c0bcacadf65a46cfd5 -> docker.io/dkalinin/app1@sha256:6dae9c8674e2e5f418c3dd040041a05f6b490597315139c0bcacadf65a46cfd5...
-unpackage | imported 2 images
-images:
-- image: docker.io/dkalinin/app1@sha256:e71b1bf4281f25533cf15e6e5f9be4dac74d2328152edf7ecde23abc54e16c1c
-- image: docker.io/dkalinin/app1@sha256:6dae9c8674e2e5f418c3dd040041a05f6b490597315139c0bcacadf65a46cfd5
-```
+    ```bash
+    $ kbld unpkg -f /tmp/resolved-manifest --input /tmp/packaged-images.tar --repository docker.io/dkalinin/app1
+    unpackage | importing 2 images...
+    unpackage | importing index.docker.io/library/nginx@sha256:e71b1bf4281f25533cf15e6e5f9be4dac74d2328152edf7ecde23abc54e16c1c -> docker.io/dkalinin/app1@sha256:e71b1bf4281f25533cf15e6e5f9be4dac74d2328152edf7ecde23abc54e16c1c...
+    unpackage | importing index.docker.io/library/haproxy@sha256:6dae9c8674e2e5f418c3dd040041a05f6b490597315139c0bcacadf65a46cfd5 -> docker.io/dkalinin/app1@sha256:6dae9c8674e2e5f418c3dd040041a05f6b490597315139c0bcacadf65a46cfd5...
+    unpackage | imported 2 images
+    images:
+    - image: docker.io/dkalinin/app1@sha256:e71b1bf4281f25533cf15e6e5f9be4dac74d2328152edf7ecde23abc54e16c1c
+    - image: docker.io/dkalinin/app1@sha256:6dae9c8674e2e5f418c3dd040041a05f6b490597315139c0bcacadf65a46cfd5
+    ```
 
-Images will be imported under a single new repository `docker.io/dkalinin/app1`. **You are guaranteed that images are exactly same as they are referenced by the same digests in produced YAML configuration (though under a different repository name)**.
+    Images will be imported under a single new repository `docker.io/dkalinin/app1`. **You are guaranteed that images are exactly same as they are referenced by the same digests in produced YAML configuration (though under a different repository name)**.
 
 ### Authentication
 
