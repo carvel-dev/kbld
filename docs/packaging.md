@@ -71,6 +71,46 @@ Even though `kbld pkg/unpkg` commands use registry APIs directly, by default the
 - Run `cat /tmp/key | docker login -u _json_key --password-stdin https://gcr.io` to authenticate
 - Run `kbld unpkg -f /tmp/resolved-manifest --input /tmp/packaged-images.tar --repository gcr.io/{project-id}/app1` to import images (e.g. project id is `dkalinin`)
 
+### Authenticating to AWS ECR
+
+TODO: unpkg against AWS ECR fails due to seemingly non-conformant Registry v2 API implementation (`Writing image index: Retried 5 times: uploading manifest2: UNSUPPORTED: Invalid parameter at 'imageTag' failed to satisfy constraint: 'must satisfy regular expression '[a-zA-Z0-9-_.]+'')`. Trying to see if this could be fixed.
+
+- Create ECR repository
+- Create IAM user with ECR policy that allows to read/write
+  - See [Amazon ECR Policies](https://docs.aws.amazon.com/AmazonECR/latest/userguide/ecr_managed_policies.html)
+- Run `aws configure` and specify access key ID, secret access key and region
+  - To install on Ubuntu, run `apt-get install pip3` and `pip3 install awscli`
+    - See [Installing the AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html)
+- Run `eval $(aws ecr get-login --no-include-email)` to authenticate
+  - See [get-login command](https://docs.aws.amazon.com/cli/latest/reference/ecr/get-login.html)
+- Run `kbld unpkg -f /tmp/resolved-manifest --input /tmp/packaged-images.tar --repository {uri}` to import images (e.g. uri is `823869848626.dkr.ecr.us-east-1.amazonaws.com/k14s/kbld-test`)
+
+```json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "ecr:GetAuthorizationToken",
+                "ecr:BatchCheckLayerAvailability",
+                "ecr:GetDownloadUrlForLayer",
+                "ecr:GetRepositoryPolicy",
+                "ecr:DescribeRepositories",
+                "ecr:ListImages",
+                "ecr:DescribeImages",
+                "ecr:BatchGetImage",
+                "ecr:InitiateLayerUpload",
+                "ecr:UploadLayerPart",
+                "ecr:CompleteLayerUpload",
+                "ecr:PutImage"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
+```
+
 ### Notes
 
 - Produced tarball does not have duplicate image layers, as they are named by their digest (see `tar tvf /tmp/packaged-images.tar`).
