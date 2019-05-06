@@ -125,7 +125,7 @@ func (o *UnpackageOptions) importImages(logger *ctlimg.LoggerPrefixWriter) (map[
 	logger.WriteStr("importing %d images...\n", len(imgOrIndexes))
 	defer func() { logger.WriteStr("imported %d images\n", len(imgOrIndexes)) }()
 
-	importRef, err := regname.NewRepository(o.Repository)
+	importRepo, err := regname.NewRepository(o.Repository)
 	if err != nil {
 		return nil, fmt.Errorf("Building import repository ref: %s", err)
 	}
@@ -143,32 +143,66 @@ func (o *UnpackageOptions) importImages(logger *ctlimg.LoggerPrefixWriter) (map[
 			return nil, err
 		}
 
-		newRef, err := regname.NewDigest(fmt.Sprintf("%s@%s", importRef.Name(), itemDigest))
+		importDigestRef, err := regname.NewDigest(fmt.Sprintf("%s@%s", importRepo.Name(), itemDigest))
 		if err != nil {
-			return nil, fmt.Errorf("Building new image ref: %s", err)
+			return nil, fmt.Errorf("Building new digest image ref: %s", err)
 		}
 
-		logger.Write([]byte(fmt.Sprintf("importing %s -> %s...\n", existingRef.Name(), newRef.Name())))
+		// Seems like AWS ECR doesnt like using digests for manifest uploads
+		uploadTagRef, err := regname.NewTag(fmt.Sprintf("%s:kbld-%s-%s", importRepo.Name(), itemDigest.Algorithm, itemDigest.Hex))
+		if err != nil {
+			return nil, fmt.Errorf("Building upload tag image ref: %s", err)
+		}
+
+		logger.Write([]byte(fmt.Sprintf("importing %s -> %s...\n", existingRef.Name(), importDigestRef.Name())))
 
 		switch {
 		case item.Image != nil:
-			err = ctlimg.ResolvedImage{}.Write(newRef, *item.Image)
+			err = ctlimg.ResolvedImage{}.Write(uploadTagRef, *item.Image)
 			if err != nil {
-				return nil, fmt.Errorf("Importing image as %s: %s", newRef.Name(), err)
+				return nil, fmt.Errorf("Importing image as %s: %s", importDigestRef.Name(), err)
 			}
 
 		case item.Index != nil:
-			err = ctlimg.ResolvedImage{}.WriteIndex(newRef, *item.Index)
+			err = ctlimg.ResolvedImage{}.WriteIndex(uploadTagRef, *item.Index)
 			if err != nil {
-				return nil, fmt.Errorf("Importing image index as %s: %s", newRef.Name(), err)
+				return nil, fmt.Errorf("Importing image index as %s: %s", importDigestRef.Name(), err)
 			}
 
 		default:
 			panic("Unknown item")
 		}
 
-		importedImages[existingRef.Name()] = newRef.Name()
+		// Verify that imported image still has the same digest as we expect.
+		// Being a little bit paranoid here because tag ref is used for import
+		// instead of plain digest ref, because AWS ECR doesnt like digests
+		// during manifest upload.
+		err = o.verifyTagDigest(uploadTagRef, importDigestRef)
+		if err != nil {
+			return nil, err
+		}
+
+		importedImages[existingRef.Name()] = importDigestRef.Name()
 	}
 
 	return importedImages, nil
+}
+
+func (o *UnpackageOptions) verifyTagDigest(uploadTagRef regname.Reference, importDigestRef regname.Digest) error {
+	resultURL, err := ctlimg.NewResolvedImage(uploadTagRef.Name()).URL()
+	if err != nil {
+		return fmt.Errorf("Verifying imported image %s: %s", uploadTagRef.Name(), err)
+	}
+
+	resultRef, err := regname.NewDigest(resultURL)
+	if err != nil {
+		return fmt.Errorf("Verifying imported image %s: %s", resultURL, err)
+	}
+
+	if resultRef.DigestStr() != importDigestRef.DigestStr() {
+		return fmt.Errorf("Expected imported image '%s' to have digest '%s' but was '%s'",
+			resultURL, importDigestRef.DigestStr(), resultRef.DigestStr())
+	}
+
+	return nil
 }

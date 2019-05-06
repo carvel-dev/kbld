@@ -19,6 +19,10 @@ type ResolvedImage struct {
 	url string
 }
 
+func NewResolvedImage(url string) ResolvedImage {
+	return ResolvedImage{url}
+}
+
 func (i ResolvedImage) URL() (string, error) {
 	tag, err := regname.NewTag(i.url, regname.WeakValidation)
 	if err != nil {

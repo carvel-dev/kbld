@@ -73,7 +73,7 @@ Even though `kbld pkg/unpkg` commands use registry APIs directly, by default the
 
 ### Authenticating to AWS ECR
 
-TODO: unpkg against AWS ECR fails due to seemingly non-conformant Registry v2 API implementation (`Writing image index: Retried 5 times: uploading manifest2: UNSUPPORTED: Invalid parameter at 'imageTag' failed to satisfy constraint: 'must satisfy regular expression '[a-zA-Z0-9-_.]+'')`. Trying to see if this could be fixed.
+**Note**: AWS ECR does not support manifest list media types from Docker Registry v2 API. Manifest lists are used for images that are built against multiple architectures and platforms and are referenced through a single digest or tag. Most user-built images do not use manifest lists (as it's a single image); however, common Docker Hub library images are represented by manifest lists and will fail upon import into AWS ECR. You will see following error: `Writing image index: Retried 5 times: uploading manifest2: UNSUPPORTED: Invalid parameter at 'imageTag' failed to satisfy constraint: 'must satisfy regular expression '[a-zA-Z0-9-_.]+'`. Related [AWS feature request](https://forums.aws.amazon.com/thread.jspa?threadID=292294)).
 
 - Create ECR repository
 - Create IAM user with ECR policy that allows to read/write
