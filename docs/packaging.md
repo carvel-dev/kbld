@@ -111,6 +111,10 @@ Even though `kbld pkg/unpkg` commands use registry APIs directly, by default the
 }
 ```
 
+### Authenticating to Harbor
+
+You may have to provide `--registry-ca-cert-path` flag with a path to a CA certificate file for Harbor Registry API.
+
 ### Notes
 
 - Produced tarball does not have duplicate image layers, as they are named by their digest (see `tar tvf /tmp/packaged-images.tar`).

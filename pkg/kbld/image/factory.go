@@ -9,12 +9,13 @@ type Image interface {
 }
 
 type Factory struct {
-	conf   ctlconf.Conf
-	logger Logger
+	conf     ctlconf.Conf
+	registry Registry
+	logger   Logger
 }
 
-func NewFactory(conf ctlconf.Conf, logger Logger) Factory {
-	return Factory{conf, logger}
+func NewFactory(conf ctlconf.Conf, registry Registry, logger Logger) Factory {
+	return Factory{conf, registry, logger}
 }
 
 func (f Factory) New(url string) Image {
@@ -37,7 +38,7 @@ func (f Factory) New(url string) Image {
 		return digestedImage
 	}
 
-	return ResolvedImage{url}
+	return NewResolvedImage(url, f.registry)
 }
 
 func (f Factory) shouldOverride(url string) (ctlconf.ImageOverride, bool) {

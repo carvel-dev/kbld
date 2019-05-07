@@ -18,9 +18,10 @@ type UnpackageOptions struct {
 	ui          ui.UI
 	depsFactory cmdcore.DepsFactory
 
-	FileFlags  FileFlags
-	InputPath  string
-	Repository string
+	FileFlags     FileFlags
+	RegistryFlags RegistryFlags
+	InputPath     string
+	Repository    string
 }
 
 func NewUnpackageOptions(ui ui.UI, depsFactory cmdcore.DepsFactory) *UnpackageOptions {
@@ -35,6 +36,7 @@ func NewUnpackageCmd(o *UnpackageOptions, flagsFactory cmdcore.FlagsFactory) *co
 		RunE:    func(_ *cobra.Command, _ []string) error { return o.Run() },
 	}
 	o.FileFlags.Set(cmd)
+	o.RegistryFlags.Set(cmd)
 	cmd.Flags().StringVarP(&o.InputPath, "input", "i", "", "Input tarball path")
 	cmd.Flags().StringVarP(&o.Repository, "repository", "r", "", "Import images into given image repository (e.g. docker.io/dkalinin/my-project)")
 	return cmd
@@ -156,15 +158,17 @@ func (o *UnpackageOptions) importImages(logger *ctlimg.LoggerPrefixWriter) (map[
 
 		logger.Write([]byte(fmt.Sprintf("importing %s -> %s...\n", existingRef.Name(), importDigestRef.Name())))
 
+		registry := ctlimg.NewRegistry(o.RegistryFlags.CACertPaths)
+
 		switch {
 		case item.Image != nil:
-			err = ctlimg.ResolvedImage{}.Write(uploadTagRef, *item.Image)
+			err = registry.WriteImage(uploadTagRef, *item.Image)
 			if err != nil {
 				return nil, fmt.Errorf("Importing image as %s: %s", importDigestRef.Name(), err)
 			}
 
 		case item.Index != nil:
-			err = ctlimg.ResolvedImage{}.WriteIndex(uploadTagRef, *item.Index)
+			err = registry.WriteIndex(uploadTagRef, *item.Index)
 			if err != nil {
 				return nil, fmt.Errorf("Importing image index as %s: %s", importDigestRef.Name(), err)
 			}
@@ -189,7 +193,7 @@ func (o *UnpackageOptions) importImages(logger *ctlimg.LoggerPrefixWriter) (map[
 }
 
 func (o *UnpackageOptions) verifyTagDigest(uploadTagRef regname.Reference, importDigestRef regname.Digest) error {
-	resultURL, err := ctlimg.NewResolvedImage(uploadTagRef.Name()).URL()
+	resultURL, err := ctlimg.NewResolvedImage(uploadTagRef.Name(), ctlimg.NewRegistry(o.RegistryFlags.CACertPaths)).URL()
 	if err != nil {
 		return fmt.Errorf("Verifying imported image %s: %s", uploadTagRef.Name(), err)
 	}

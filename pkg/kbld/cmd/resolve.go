@@ -23,6 +23,7 @@ type ResolveOptions struct {
 	depsFactory cmdcore.DepsFactory
 
 	FileFlags        FileFlags
+	RegistryFlags    RegistryFlags
 	BuildConcurrency int
 
 	ExportImages     string
@@ -41,6 +42,7 @@ func NewResolveCmd(o *ResolveOptions, flagsFactory cmdcore.FlagsFactory) *cobra.
 		RunE:  func(_ *cobra.Command, _ []string) error { return o.Run() },
 	}
 	o.FileFlags.Set(cmd)
+	o.RegistryFlags.Set(cmd)
 	cmd.Flags().IntVar(&o.BuildConcurrency, "build-concurrency", 4, "Set maximum number of concurrent builds")
 	return cmd
 }
@@ -94,7 +96,9 @@ func (o *ResolveOptions) resolveImages(
 		})
 	}
 
-	queue := NewImageBuildQueue(ctlimg.NewFactory(conf, logger))
+	registry := ctlimg.NewRegistry(o.RegistryFlags.CACertPaths)
+	factory := ctlimg.NewFactory(conf, registry, logger)
+	queue := NewImageBuildQueue(factory)
 
 	resolvedImages, err := queue.Run(foundImages, o.BuildConcurrency)
 	if err != nil {

@@ -5,10 +5,7 @@ import (
 	"os"
 
 	"github.com/cppforlife/go-cli-ui/ui"
-	regauthn "github.com/google/go-containerregistry/pkg/authn"
 	regname "github.com/google/go-containerregistry/pkg/name"
-	regv1 "github.com/google/go-containerregistry/pkg/v1"
-	regremote "github.com/google/go-containerregistry/pkg/v1/remote"
 	cmdcore "github.com/k14s/kbld/pkg/kbld/cmd/core"
 	ctlimg "github.com/k14s/kbld/pkg/kbld/image"
 	regtarball "github.com/k14s/kbld/pkg/kbld/imagetarball"
@@ -20,9 +17,12 @@ type PackageOptions struct {
 	ui          ui.UI
 	depsFactory cmdcore.DepsFactory
 
-	FileFlags  FileFlags
-	OutputPath string
+	FileFlags     FileFlags
+	RegistryFlags RegistryFlags
+	OutputPath    string
 }
+
+var _ regtarball.TarDescriptorsMetadata = ctlimg.Registry{}
 
 func NewPackageOptions(ui ui.UI, depsFactory cmdcore.DepsFactory) *PackageOptions {
 	return &PackageOptions{ui: ui, depsFactory: depsFactory}
@@ -36,6 +36,7 @@ func NewPackageCmd(o *PackageOptions, flagsFactory cmdcore.FlagsFactory) *cobra.
 		RunE:    func(_ *cobra.Command, _ []string) error { return o.Run() },
 	}
 	o.FileFlags.Set(cmd)
+	o.RegistryFlags.Set(cmd)
 	cmd.Flags().StringVarP(&o.OutputPath, "output", "o", "", "Output tarball path")
 	return cmd
 }
@@ -107,30 +108,10 @@ func (o *PackageOptions) exportImages(imgRefsToExport map[string]struct{}, logge
 
 	defer outputFile.Close()
 
-	tds, err := regtarball.NewTarDescriptors(refs, remoteTarDescritorsMetadata{})
+	tds, err := regtarball.NewTarDescriptors(refs, ctlimg.NewRegistry(o.RegistryFlags.CACertPaths))
 	if err != nil {
 		return fmt.Errorf("Collecting packaging metadata: %s", err)
 	}
 
 	return regtarball.NewTarWriter(tds, outputFile).Write()
-}
-
-type remoteTarDescritorsMetadata struct{}
-
-var _ regtarball.TarDescriptorsMetadata = remoteTarDescritorsMetadata{}
-
-func (m remoteTarDescritorsMetadata) Generic(ref regname.Reference) (regv1.Descriptor, error) {
-	desc, err := regremote.Get(ref, regremote.WithAuthFromKeychain(regauthn.DefaultKeychain))
-	if err != nil {
-		return regv1.Descriptor{}, err
-	}
-	return desc.Descriptor, nil
-}
-
-func (m remoteTarDescritorsMetadata) Index(ref regname.Reference) (regv1.ImageIndex, error) {
-	return regremote.Index(ref, regremote.WithAuthFromKeychain(regauthn.DefaultKeychain))
-}
-
-func (m remoteTarDescritorsMetadata) Image(ref regname.Reference) (regv1.Image, error) {
-	return regremote.Image(ref, regremote.WithAuthFromKeychain(regauthn.DefaultKeychain))
 }
