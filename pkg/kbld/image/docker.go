@@ -82,6 +82,21 @@ func (d Docker) Build(image, directory string) (DockerTmpRef, error) {
 		}
 	}
 
+	// Remove temporary tag to be nice to `docker images` output
+	{
+		var stdoutBuf, stderrBuf bytes.Buffer
+
+		cmd := exec.Command("docker", "rmi", tmpRef.AsString())
+		cmd.Stdout = io.MultiWriter(&stdoutBuf, prefixedLogger)
+		cmd.Stderr = io.MultiWriter(&stderrBuf, prefixedLogger)
+
+		err := cmd.Run()
+		if err != nil {
+			prefixedLogger.Write([]byte(fmt.Sprintf("untag error: %s\n", err)))
+			return DockerTmpRef{}, err
+		}
+	}
+
 	return stableTmpRef, nil
 }
 
