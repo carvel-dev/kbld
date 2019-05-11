@@ -2,6 +2,7 @@ package image
 
 import (
 	"bytes"
+	"crypto/rand"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -33,8 +34,13 @@ type DockerImageDigest struct {
 func (r DockerImageDigest) AsString() string { return r.val }
 
 func (d Docker) Build(image, directory string) (DockerTmpRef, error) {
-	// Timestamp at the beginning for easier sorting
-	tmpRef := DockerTmpRef{fmt.Sprintf("kbld:%d-%s", time.Now().UTC().UnixNano(), tmpRefHint.ReplaceAllString(image, "-"))}
+	randPrefix, err := d.randomStr(5)
+	if err != nil {
+		return DockerTmpRef{}, fmt.Errorf("Generating tmp image suffix: %s", err)
+	}
+
+	tmpRef := DockerTmpRef{fmt.Sprintf(
+		"kbld:%s-%s", randPrefix, tmpRefHint.ReplaceAllString(image, "-"))}
 	prefixedLogger := d.logger.NewPrefixedWriter(image + " | ")
 
 	prefixedLogger.Write([]byte(fmt.Sprintf("starting build (using Docker): %s -> %s\n", directory, tmpRef.AsString())))
@@ -61,9 +67,9 @@ func (d Docker) Build(image, directory string) (DockerTmpRef, error) {
 		return DockerTmpRef{}, err
 	}
 
-	// Retag image with its sha256 to produce exact image ref if nothing has changed
-	// Seems that Docker doesn't like `kbld@sha256:...` format for local images
-	// Image hint at the beginning for easier sorting
+	// Retag image with its sha256 to produce exact image ref if nothing has changed.
+	// Seems that Docker doesn't like `kbld@sha256:...` format for local images.
+	// Image hint at the beginning for easier sorting.
 	stableTmpRef := DockerTmpRef{fmt.Sprintf("kbld:%s-%s",
 		tmpRefHint.ReplaceAllString(image, "-"),
 		tmpRefHint.ReplaceAllString(inspectData.Id, "-"))}
@@ -82,7 +88,7 @@ func (d Docker) Build(image, directory string) (DockerTmpRef, error) {
 		}
 	}
 
-	// Remove temporary tag to be nice to `docker images` output
+	// Remove temporary tag to be nice to `docker images` output.
 	{
 		var stdoutBuf, stderrBuf bytes.Buffer
 
@@ -103,8 +109,34 @@ func (d Docker) Build(image, directory string) (DockerTmpRef, error) {
 func (d Docker) Push(tmpRef DockerTmpRef, imageDst string) (DockerImageDigest, error) {
 	prefixedLogger := d.logger.NewPrefixedWriter(imageDst + " | ")
 
+	// Generate random tag for pushed image.
+	// TODO we are technically polluting registry with new tags.
+	// Unfortunately we do not know digest upfront so cannot use kbld-sha256-... format.
+	imageDstTagged, err := regname.NewTag(imageDst, regname.WeakValidation)
+	if err == nil {
+		randSuffix, err := d.randomStr(5)
+		if err != nil {
+			return DockerImageDigest{}, fmt.Errorf("Generating image dst suffix: %s", err)
+		}
+
+		imageDstTag := fmt.Sprintf("kbld-%s", randSuffix)
+
+		imageDstTagged, err = regname.NewTag(imageDst+":"+imageDstTag, regname.WeakValidation)
+		if err != nil {
+			return DockerImageDigest{}, fmt.Errorf("Generating image dst tag '%s': %s", imageDst, err)
+		}
+	}
+
+	imageDst = imageDstTagged.Name()
+
 	prefixedLogger.Write([]byte(fmt.Sprintf("starting push (using Docker): %s -> %s\n", tmpRef.AsString(), imageDst)))
 	defer prefixedLogger.Write([]byte("finished push (using Docker)\n"))
+
+	prevInspectData, err := d.inspect(tmpRef.AsString())
+	if err != nil {
+		prefixedLogger.Write([]byte(fmt.Sprintf("inspect error: %s\n", err)))
+		return DockerImageDigest{}, err
+	}
 
 	{
 		var stdoutBuf, stderrBuf bytes.Buffer
@@ -134,25 +166,49 @@ func (d Docker) Push(tmpRef DockerTmpRef, imageDst string) (DockerImageDigest, e
 		}
 	}
 
-	inspectData, err := d.inspect(imageDst)
+	currInspectData, err := d.inspect(imageDst)
 	if err != nil {
 		prefixedLogger.Write([]byte(fmt.Sprintf("inspect error: %s\n", err)))
 		return DockerImageDigest{}, err
 	}
 
-	if len(inspectData.RepoDigests) != 1 {
+	// Try to detect if image we should be pushing isnt the one we ended up pushing
+	// given that its theoretically possible concurrent Docker commands
+	// may have retagged in the middle of the process.
+	if prevInspectData.Id != currInspectData.Id {
+		prefixedLogger.Write([]byte(fmt.Sprintf("push race error: %s\n", err)))
+		return DockerImageDigest{}, err
+	}
+
+	return d.determineRepoDigest(currInspectData, prefixedLogger)
+}
+
+func (d Docker) determineRepoDigest(inspectData dockerInspectData, prefixedLogger *LoggerPrefixWriter) (DockerImageDigest, error) {
+	if len(inspectData.RepoDigests) == 0 {
+		prefixedLogger.Write([]byte("missing repo digest\n"))
+		return DockerImageDigest{}, fmt.Errorf("Expected to find at least one repo digest")
+	}
+
+	digestStrs := map[string]struct{}{}
+
+	for _, rd := range inspectData.RepoDigests {
+		nameWithDigest, err := regname.NewDigest(rd, regname.WeakValidation)
+		if err != nil {
+			return DockerImageDigest{}, fmt.Errorf("Extracting reference digest from '%s': %s", rd, err)
+		}
+		digestStrs[nameWithDigest.DigestStr()] = struct{}{}
+	}
+
+	if len(digestStrs) != 1 {
 		prefixedLogger.Write([]byte("repo digests mismatch\n"))
-		return DockerImageDigest{}, fmt.Errorf("Expected to find exactly one repo digest, but found %#v", inspectData.RepoDigests)
+		return DockerImageDigest{}, fmt.Errorf("Expected to find same repo digest, but found %#v", inspectData.RepoDigests)
 	}
 
-	ref := inspectData.RepoDigests[0]
-
-	nameWithDigest, err := regname.NewDigest(ref, regname.WeakValidation)
-	if err != nil {
-		return DockerImageDigest{}, fmt.Errorf("Extracting reference digest from '%s': %s", ref, err)
+	for digest, _ := range digestStrs {
+		return DockerImageDigest{digest}, nil
 	}
 
-	return DockerImageDigest{nameWithDigest.DigestStr()}, nil
+	panic("unreachable")
 }
 
 type dockerInspectData struct {
@@ -184,4 +240,26 @@ func (d Docker) inspect(ref string) (dockerInspectData, error) {
 	}
 
 	return data[0], nil
+}
+
+func (d Docker) randomStr(n int) (string, error) {
+	bs, err := d.randomBytes(n)
+	if err != nil {
+		return "", err
+	}
+	result := ""
+	for _, b := range bs {
+		result += fmt.Sprintf("%d", b)
+	}
+	// Timestamp at the beginning for easier sorting
+	return fmt.Sprintf("rand-%d-%s", time.Now().UTC().UnixNano(), result), nil
+}
+
+func (d Docker) randomBytes(n int) ([]byte, error) {
+	bs := make([]byte, n)
+	_, err := rand.Read(bs)
+	if err != nil {
+		return nil, err
+	}
+	return bs, nil
 }

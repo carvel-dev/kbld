@@ -1,0 +1,13 @@
+image: simple-app
+---
+apiVersion: kbld.k14s.io/v1alpha1
+kind: Sources
+sources:
+- image: simple-app
+  path: test/e2e/assets/simple-app
+---
+apiVersion: kbld.k14s.io/v1alpha1
+kind: ImageDestinations
+destinations:
+- image: simple-app
+  newImage: docker.io/cppforlife/kbld-simple-app2
