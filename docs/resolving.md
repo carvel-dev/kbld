@@ -28,6 +28,6 @@ Few other variations
 
 ```bash
 pbpaste | kbld -f-
-kbld -R -f .
+kbld -f .
 kbld -f file.yml -f config2.yml
 ```
