@@ -1,8 +1,6 @@
 package cmd
 
 import (
-	"fmt"
-
 	"github.com/ghodss/yaml"
 	ctlimg "github.com/k14s/kbld/pkg/kbld/image"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
@@ -68,11 +66,11 @@ func (r ResourceWithBuiltImages) Metas() ([]BuiltImageMeta, error) {
 	return metas, nil
 }
 
-func (ms BuiltImageMetas) ForImage(url string) (BuiltImageMeta, error) {
+func (ms BuiltImageMetas) ForImage(url string) (BuiltImageMeta, bool) {
 	for _, meta := range ms {
 		if meta.Image == url {
-			return meta, nil
+			return meta, true
 		}
 	}
-	return BuiltImageMeta{}, fmt.Errorf("Expected to find meta for image '%s'", url)
+	return BuiltImageMeta{}, false
 }

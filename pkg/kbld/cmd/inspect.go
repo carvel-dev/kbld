@@ -95,9 +95,9 @@ func (s foundSource) Sources() (string, error) {
 		return "", err
 	}
 
-	meta, err := BuiltImageMetas(metas).ForImage(s.Image)
-	if err != nil {
-		return "", err
+	meta, found := BuiltImageMetas(metas).ForImage(s.Image)
+	if !found {
+		return "{}", nil
 	}
 
 	srcsYAML, err := yaml.Marshal(meta.BuiltImageSources)
