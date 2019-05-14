@@ -11,7 +11,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-type ListOptions struct {
+type InspectOptions struct {
 	ui          ui.UI
 	depsFactory cmdcore.DepsFactory
 
@@ -19,15 +19,15 @@ type ListOptions struct {
 	RegistryFlags RegistryFlags
 }
 
-func NewListOptions(ui ui.UI, depsFactory cmdcore.DepsFactory) *ListOptions {
-	return &ListOptions{ui: ui, depsFactory: depsFactory}
+func NewInspectOptions(ui ui.UI, depsFactory cmdcore.DepsFactory) *InspectOptions {
+	return &InspectOptions{ui: ui, depsFactory: depsFactory}
 }
 
-func NewListCmd(o *ListOptions, flagsFactory cmdcore.FlagsFactory) *cobra.Command {
+func NewInspectCmd(o *InspectOptions, flagsFactory cmdcore.FlagsFactory) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "list",
-		Aliases: []string{"ls"},
-		Short:   "List images",
+		Use:     "inspect",
+		Aliases: []string{"i", "is", "insp"},
+		Short:   "Inspect images",
 		RunE:    func(_ *cobra.Command, _ []string) error { return o.Run() },
 	}
 	o.FileFlags.Set(cmd)
@@ -35,7 +35,7 @@ func NewListCmd(o *ListOptions, flagsFactory cmdcore.FlagsFactory) *cobra.Comman
 	return cmd
 }
 
-func (o *ListOptions) Run() error {
+func (o *InspectOptions) Run() error {
 	rs, _, err := o.FileFlags.ResourcesAndConfig()
 	if err != nil {
 		return err
@@ -108,7 +108,7 @@ func (s foundSource) Sources() (string, error) {
 	return strings.TrimSpace(string(srcsYAML)), nil
 }
 
-func (o *ListOptions) findImages(rs []ctlres.Resource) ([]foundSource, error) {
+func (o *InspectOptions) findImages(rs []ctlres.Resource) ([]foundSource, error) {
 	foundImages := []foundSource{}
 
 	for _, res := range rs {

@@ -52,7 +52,7 @@ func NewKbldCmd(o *KbldOptions, flagsFactory cmdcore.FlagsFactory) *cobra.Comman
 	o.configFactory.ConfigurePathResolver(o.KubeconfigFlags.Path.Value)
 	o.configFactory.ConfigureContextResolver(o.KubeconfigFlags.Context.Value)
 
-	cmd.AddCommand(NewListCmd(NewListOptions(o.ui, o.depsFactory), flagsFactory))
+	cmd.AddCommand(NewInspectCmd(NewInspectOptions(o.ui, o.depsFactory), flagsFactory))
 	cmd.AddCommand(NewPackageCmd(NewPackageOptions(o.ui, o.depsFactory), flagsFactory))
 	cmd.AddCommand(NewUnpackageCmd(NewUnpackageOptions(o.ui, o.depsFactory), flagsFactory))
 	cmd.AddCommand(NewWebsiteCmd(NewWebsiteOptions()))
