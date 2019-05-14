@@ -41,6 +41,20 @@ func (f Factory) New(url string) Image {
 	return NewResolvedImage(url, f.registry)
 }
 
+func (f Factory) NewBuilt(url string) (BuiltImage, bool) {
+	// TODO consolidate somehow with New?
+	if overrideURL, found := f.shouldOverride(url); found {
+		url = overrideURL.NewImage
+	}
+
+	if buildSource, found := f.shouldBuild(url); found {
+		docker := Docker{f.logger}
+		return NewBuiltImage(url, buildSource, docker), true
+	}
+
+	return BuiltImage{}, false
+}
+
 func (f Factory) shouldOverride(url string) (ctlconf.ImageOverride, bool) {
 	for _, override := range f.conf.ImageOverrides() {
 		if override.Image == url {

@@ -35,7 +35,7 @@ overrides:
   newImage: simple-app-two
 `
 
-	out, _ := kbld.RunWithOpts([]string{"-f", "-"}, RunOpts{
+	out, _ := kbld.RunWithOpts([]string{"-f", "-", "--sources-annotations=false"}, RunOpts{
 		StdinReader: strings.NewReader(input),
 	})
 
@@ -92,7 +92,7 @@ overrides:
   newImage: simple-app-two
 `
 
-	out, _ := kbld.RunWithOpts([]string{"-f", "-"}, RunOpts{
+	out, _ := kbld.RunWithOpts([]string{"-f", "-", "--sources-annotations=false"}, RunOpts{
 		StdinReader: strings.NewReader(input),
 	})
 

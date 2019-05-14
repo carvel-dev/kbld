@@ -6,9 +6,7 @@ import (
 	"strings"
 
 	"github.com/cppforlife/go-cli-ui/ui"
-	"github.com/ghodss/yaml"
 	cmdcore "github.com/k14s/kbld/pkg/kbld/cmd/core"
-	ctlconf "github.com/k14s/kbld/pkg/kbld/config"
 	ctlimg "github.com/k14s/kbld/pkg/kbld/image"
 	ctlres "github.com/k14s/kbld/pkg/kbld/resources"
 	"github.com/spf13/cobra"
@@ -22,13 +20,10 @@ type ResolveOptions struct {
 	ui          ui.UI
 	depsFactory cmdcore.DepsFactory
 
-	FileFlags        FileFlags
-	RegistryFlags    RegistryFlags
-	BuildConcurrency int
-
-	ExportImages     string
-	ImportImages     string
-	ImportRepository string
+	FileFlags         FileFlags
+	RegistryFlags     RegistryFlags
+	BuildConcurrency  int
+	SourcesAnnotation bool
 }
 
 func NewResolveOptions(ui ui.UI, depsFactory cmdcore.DepsFactory) *ResolveOptions {
@@ -44,6 +39,7 @@ func NewResolveCmd(o *ResolveOptions, flagsFactory cmdcore.FlagsFactory) *cobra.
 	o.FileFlags.Set(cmd)
 	o.RegistryFlags.Set(cmd)
 	cmd.Flags().IntVar(&o.BuildConcurrency, "build-concurrency", 4, "Set maximum number of concurrent builds")
+	cmd.Flags().BoolVar(&o.SourcesAnnotation, "sources-annotations", true, "Annotate resources with sources metadata for built images")
 	return cmd
 }
 
@@ -56,7 +52,10 @@ func (o *ResolveOptions) Run() error {
 		return err
 	}
 
-	resolvedImages, err := o.resolveImages(nonConfigRs, conf, logger)
+	registry := ctlimg.NewRegistry(o.RegistryFlags.CACertPaths)
+	imgFactory := ctlimg.NewFactory(conf, registry, logger)
+
+	resolvedImages, err := o.resolveImages(nonConfigRs, imgFactory)
 	if err != nil {
 		return err
 	}
@@ -66,7 +65,7 @@ func (o *ResolveOptions) Run() error {
 		prefixedLogger.WriteStr("final: %s -> %s\n", img, outputImg)
 	}
 
-	resBss, err := o.updateRefsInResources(nonConfigRs, resolvedImages)
+	resBss, err := o.updateRefsInResources(nonConfigRs, resolvedImages, imgFactory)
 	if err != nil {
 		return err
 	}
@@ -83,7 +82,7 @@ func (o *ResolveOptions) Run() error {
 }
 
 func (o *ResolveOptions) resolveImages(
-	nonConfigRs []ctlres.Resource, conf ctlconf.Conf, logger ctlimg.Logger) (map[string]string, error) {
+	nonConfigRs []ctlres.Resource, imgFactory ctlimg.Factory) (map[string]string, error) {
 
 	foundImages := map[string]struct{}{}
 
@@ -96,9 +95,7 @@ func (o *ResolveOptions) resolveImages(
 		})
 	}
 
-	registry := ctlimg.NewRegistry(o.RegistryFlags.CACertPaths)
-	factory := ctlimg.NewFactory(conf, registry, logger)
-	queue := NewImageBuildQueue(factory)
+	queue := NewImageBuildQueue(imgFactory)
 
 	resolvedImages, err := queue.Run(foundImages, o.BuildConcurrency)
 	if err != nil {
@@ -108,26 +105,44 @@ func (o *ResolveOptions) resolveImages(
 	return resolvedImages, nil
 }
 
-func (o *ResolveOptions) updateRefsInResources(
-	nonConfigRs []ctlres.Resource, resolvedImages map[string]string) ([][]byte, error) {
+func (o *ResolveOptions) updateRefsInResources(nonConfigRs []ctlres.Resource,
+	resolvedImages map[string]string, imgFactory ctlimg.Factory) ([][]byte, error) {
 
-	var missingImageErrs []error
+	var errs []error
 	var resBss [][]byte
 
 	for _, res := range nonConfigRs {
 		resContents := res.DeepCopyRaw()
+		metas := []BuiltImageMeta{}
 
 		visitValues(resContents, imageKey, func(val interface{}) (interface{}, bool) {
-			if img, ok := val.(string); ok {
-				if outputImg, found := resolvedImages[img]; found {
-					return outputImg, true
-				}
-				missingImageErrs = append(missingImageErrs, fmt.Errorf("Expected to find image for '%s'", img))
+			img, ok := val.(string)
+			if !ok {
+				return nil, false
 			}
-			return nil, false
+
+			outputImg, found := resolvedImages[img]
+			if !found {
+				errs = append(errs, fmt.Errorf("Expected to find image for '%s'", img))
+				return nil, false
+			}
+
+			if o.SourcesAnnotation {
+				builtImg, wasBuilt := imgFactory.NewBuilt(img)
+				if wasBuilt {
+					sourceInfo, err := builtImg.Sources()
+					if err != nil {
+						errs = append(errs, fmt.Errorf("Expected to find image sources for '%s': %s", img, err))
+						return nil, false
+					}
+					metas = append(metas, BuiltImageMeta{outputImg, sourceInfo})
+				}
+			}
+
+			return outputImg, true
 		})
 
-		resBs, err := yaml.Marshal(resContents)
+		resBs, err := NewResourceWithBuiltImages(resContents, metas).Bytes()
 		if err != nil {
 			return nil, err
 		}
@@ -135,7 +150,7 @@ func (o *ResolveOptions) updateRefsInResources(
 		resBss = append(resBss, resBs)
 	}
 
-	err := errFromErrs(missingImageErrs)
+	err := errFromErrs(errs)
 	if err != nil {
 		return nil, err
 	}

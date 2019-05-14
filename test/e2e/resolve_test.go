@@ -19,7 +19,7 @@ spec:
 - image: nginx@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 `
 
-	out, _ := kbld.RunWithOpts([]string{"-f", "-"}, RunOpts{
+	out, _ := kbld.RunWithOpts([]string{"-f", "-", "--sources-annotations=false"}, RunOpts{
 		StdinReader: strings.NewReader(input),
 	})
 
@@ -47,7 +47,7 @@ spec:
 - image: nginx@sha256:digest
 `
 
-	_, err := kbld.RunWithOpts([]string{"-f", "-"}, RunOpts{
+	_, err := kbld.RunWithOpts([]string{"-f", "-", "--sources-annotations=false"}, RunOpts{
 		StdinReader: strings.NewReader(input),
 		AllowError:  true,
 	})
@@ -69,7 +69,7 @@ spec:
 - image: unknown
 `
 
-	_, err := kbld.RunWithOpts([]string{"-f", "-"}, RunOpts{
+	_, err := kbld.RunWithOpts([]string{"-f", "-", "--sources-annotations=false"}, RunOpts{
 		StdinReader: strings.NewReader(input),
 		AllowError:  true,
 	})
@@ -97,7 +97,7 @@ overrides:
   newImage: docker.io/library/nginx:1.14.2
 `
 
-	out, _ := kbld.RunWithOpts([]string{"-f", "-"}, RunOpts{
+	out, _ := kbld.RunWithOpts([]string{"-f", "-", "--sources-annotations=false"}, RunOpts{
 		StdinReader: strings.NewReader(input),
 	})
 
