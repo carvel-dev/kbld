@@ -24,7 +24,7 @@ func (r GitRepo) RemoteURL() (string, error) {
 		if strings.Contains(stderr, "No remote configured to list refs from") {
 			return "<unknown>", nil
 		}
-		return "", fmt.Errorf("Determining remote: %s", err)
+		return "", fmt.Errorf("Determining remote: %s (stderr '%s')", err, stderr)
 	}
 
 	return strings.TrimSpace(stdout), nil
@@ -36,7 +36,7 @@ func (r GitRepo) HeadSHA() (string, error) {
 		if strings.Contains(stderr, "Needed a single revision") {
 			return "<no commits>", nil
 		}
-		return "", fmt.Errorf("Checking HEAD commit: %s", err)
+		return "", fmt.Errorf("Checking HEAD commit: %s (stderr '%s')", err, stderr)
 	}
 
 	return strings.TrimSpace(stdout), nil
@@ -45,10 +45,11 @@ func (r GitRepo) HeadSHA() (string, error) {
 func (r GitRepo) HeadTags() ([]string, error) {
 	stdout, stderr, err := r.runCmd([]string{"describe", "--tags", "--exact-match", "HEAD"})
 	if err != nil {
-		if strings.Contains(stderr, "no tag exactly matches") {
+		if strings.Contains(stderr, "no tag exactly matches") ||
+			strings.Contains(stderr, "No names found") {
 			return nil, nil
 		}
-		return nil, fmt.Errorf("Checking HEAD tags: %s", err)
+		return nil, fmt.Errorf("Checking HEAD tags: %s (stderr '%s')", err, stderr)
 	}
 
 	return strings.Split(strings.TrimSpace(stdout), "\n"), nil
