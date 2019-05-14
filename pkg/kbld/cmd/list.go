@@ -61,7 +61,9 @@ func (o *ListOptions) Run() error {
 			{Column: 2, Asc: true},
 		},
 
-		FillFirstColumn: false,
+		// Image URLs and other content is too long
+		FillFirstColumn: true,
+		Transpose:       true,
 	}
 
 	for _, imgSrc := range foundImages {
