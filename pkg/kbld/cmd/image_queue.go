@@ -7,22 +7,22 @@ import (
 	ctlimg "github.com/k14s/kbld/pkg/kbld/image"
 )
 
-type ImageBuildQueue struct {
+type ImageQueue struct {
 	imgFactory ctlimg.Factory
 
-	outputImages     map[string]string
+	outputImages     map[string]Image
 	outputImagesLock sync.Mutex
 
 	outputErrs     []error
 	outputErrsLock sync.Mutex
 }
 
-func NewImageBuildQueue(imgFactory ctlimg.Factory) *ImageBuildQueue {
-	return &ImageBuildQueue{imgFactory: imgFactory}
+func NewImageQueue(imgFactory ctlimg.Factory) *ImageQueue {
+	return &ImageQueue{imgFactory: imgFactory}
 }
 
-func (b *ImageBuildQueue) Run(inputImages map[string]struct{}, numWorkers int) (map[string]string, error) {
-	b.outputImages = map[string]string{}
+func (b *ImageQueue) Run(inputImages map[string]struct{}, numWorkers int) (map[string]Image, error) {
+	b.outputImages = map[string]Image{}
 	b.outputErrs = nil
 
 	queueCh := make(chan string, numWorkers)
@@ -43,16 +43,16 @@ func (b *ImageBuildQueue) Run(inputImages map[string]struct{}, numWorkers int) (
 	return b.outputImages, errFromErrs(b.outputErrs)
 }
 
-func (b *ImageBuildQueue) worker(workWg *sync.WaitGroup, queueCh <-chan string) {
+func (b *ImageQueue) worker(workWg *sync.WaitGroup, queueCh <-chan string) {
 	for img := range queueCh {
 		b.work(workWg, img)
 	}
 }
 
-func (b *ImageBuildQueue) work(workWg *sync.WaitGroup, img string) {
+func (b *ImageQueue) work(workWg *sync.WaitGroup, img string) {
 	defer workWg.Done()
 
-	imgURL, err := b.imgFactory.New(img).URL()
+	imgURL, metas, err := b.imgFactory.New(img).URL()
 	if err != nil {
 		b.outputErrsLock.Lock()
 		b.outputErrs = append(b.outputErrs, fmt.Errorf("Resolving image '%s': %s", img, err))
@@ -61,6 +61,6 @@ func (b *ImageBuildQueue) work(workWg *sync.WaitGroup, img string) {
 	}
 
 	b.outputImagesLock.Lock()
-	b.outputImages[img] = imgURL
+	b.outputImages[img] = Image{URL: imgURL, Metas: metas}
 	b.outputImagesLock.Unlock()
 }

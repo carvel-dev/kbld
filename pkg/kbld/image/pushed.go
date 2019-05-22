@@ -15,16 +15,20 @@ func NewPushedImage(image Image, imgDst ctlconf.ImageDestination, docker Docker)
 	return PushedImage{image, imgDst, docker}
 }
 
-func (i PushedImage) URL() (string, error) {
-	url, err := i.image.URL()
+func (i PushedImage) URL() (string, []ImageMeta, error) {
+	url, metas, err := i.image.URL()
 	if err != nil {
-		return "", err
+		return "", nil, err
 	}
 
 	digest, err := i.docker.Push(DockerTmpRef{url}, i.imgDst.NewImage)
 	if err != nil {
-		return "", err
+		return "", nil, err
 	}
 
-	return NewDigestedImageFromParts(i.imgDst.NewImage, digest.AsString()).URL()
+	url, metas2, err := NewDigestedImageFromParts(i.imgDst.NewImage, digest.AsString()).URL()
+
+	metas = append(metas, metas2...)
+
+	return url, metas, err
 }

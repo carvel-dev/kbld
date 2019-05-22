@@ -20,10 +20,10 @@ type ResolveOptions struct {
 	ui          ui.UI
 	depsFactory cmdcore.DepsFactory
 
-	FileFlags         FileFlags
-	RegistryFlags     RegistryFlags
-	BuildConcurrency  int
-	SourcesAnnotation bool
+	FileFlags        FileFlags
+	RegistryFlags    RegistryFlags
+	BuildConcurrency int
+	ImagesAnnotation bool
 }
 
 func NewResolveOptions(ui ui.UI, depsFactory cmdcore.DepsFactory) *ResolveOptions {
@@ -39,7 +39,7 @@ func NewResolveCmd(o *ResolveOptions, flagsFactory cmdcore.FlagsFactory) *cobra.
 	o.FileFlags.Set(cmd)
 	o.RegistryFlags.Set(cmd)
 	cmd.Flags().IntVar(&o.BuildConcurrency, "build-concurrency", 4, "Set maximum number of concurrent builds")
-	cmd.Flags().BoolVar(&o.SourcesAnnotation, "sources-annotations", true, "Annotate resources with sources metadata for built images")
+	cmd.Flags().BoolVar(&o.ImagesAnnotation, "images-annotation", true, "Annotate resources with images annotation")
 	return cmd
 }
 
@@ -61,8 +61,8 @@ func (o *ResolveOptions) Run() error {
 	}
 
 	// Record final image transformation
-	for img, outputImg := range resolvedImages {
-		prefixedLogger.WriteStr("final: %s -> %s\n", img, outputImg)
+	for imgURL, img := range resolvedImages {
+		prefixedLogger.WriteStr("final: %s -> %s\n", imgURL, img.URL)
 	}
 
 	resBss, err := o.updateRefsInResources(nonConfigRs, resolvedImages, imgFactory)
@@ -82,20 +82,20 @@ func (o *ResolveOptions) Run() error {
 }
 
 func (o *ResolveOptions) resolveImages(
-	nonConfigRs []ctlres.Resource, imgFactory ctlimg.Factory) (map[string]string, error) {
+	nonConfigRs []ctlres.Resource, imgFactory ctlimg.Factory) (map[string]Image, error) {
 
 	foundImages := map[string]struct{}{}
 
 	for _, res := range nonConfigRs {
 		visitValues(res.DeepCopyRaw(), imageKey, func(val interface{}) (interface{}, bool) {
-			if img, ok := val.(string); ok {
-				foundImages[img] = struct{}{}
+			if imgURL, ok := val.(string); ok {
+				foundImages[imgURL] = struct{}{}
 			}
 			return nil, false
 		})
 	}
 
-	queue := NewImageBuildQueue(imgFactory)
+	queue := NewImageQueue(imgFactory)
 
 	resolvedImages, err := queue.Run(foundImages, o.BuildConcurrency)
 	if err != nil {
@@ -106,43 +106,35 @@ func (o *ResolveOptions) resolveImages(
 }
 
 func (o *ResolveOptions) updateRefsInResources(nonConfigRs []ctlres.Resource,
-	resolvedImages map[string]string, imgFactory ctlimg.Factory) ([][]byte, error) {
+	resolvedImages map[string]Image, imgFactory ctlimg.Factory) ([][]byte, error) {
 
 	var errs []error
 	var resBss [][]byte
 
 	for _, res := range nonConfigRs {
 		resContents := res.DeepCopyRaw()
-		metas := []BuiltImageMeta{}
+		images := []Image{}
 
 		visitValues(resContents, imageKey, func(val interface{}) (interface{}, bool) {
-			img, ok := val.(string)
+			imgURL, ok := val.(string)
 			if !ok {
 				return nil, false
 			}
 
-			outputImg, found := resolvedImages[img]
+			img, found := resolvedImages[imgURL]
 			if !found {
-				errs = append(errs, fmt.Errorf("Expected to find image for '%s'", img))
+				errs = append(errs, fmt.Errorf("Expected to find image for '%s'", imgURL))
 				return nil, false
 			}
 
-			if o.SourcesAnnotation {
-				builtImg, wasBuilt := imgFactory.NewBuilt(img)
-				if wasBuilt {
-					sourceInfo, err := builtImg.Sources()
-					if err != nil {
-						errs = append(errs, fmt.Errorf("Expected to find image sources for '%s': %s", img, err))
-						return nil, false
-					}
-					metas = append(metas, BuiltImageMeta{outputImg, sourceInfo})
-				}
+			if o.ImagesAnnotation {
+				images = append(images, img)
 			}
 
-			return outputImg, true
+			return img.URL, true
 		})
 
-		resBs, err := NewResourceWithBuiltImages(resContents, metas).Bytes()
+		resBs, err := NewResourceWithImages(resContents, images).Bytes()
 		if err != nil {
 			return nil, err
 		}

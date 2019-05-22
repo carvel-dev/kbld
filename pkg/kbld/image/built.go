@@ -16,69 +16,78 @@ func NewBuiltImage(url string, buildSource ctlconf.Source, docker Docker) BuiltI
 	return BuiltImage{url, buildSource, docker}
 }
 
-func (i BuiltImage) URL() (string, error) {
-	digest, err := i.docker.Build(i.url, i.buildSource.Path)
+func (i BuiltImage) URL() (string, []ImageMeta, error) {
+	sources, err := i.sources()
 	if err != nil {
-		return "", err
+		return "", nil, err
 	}
 
-	return digest.AsString(), nil
-}
+	digest, err := i.docker.Build(i.url, i.buildSource.Path)
+	if err != nil {
+		return "", nil, err
+	}
 
-type BuiltImageSources struct {
-	Git   *BuiltImageSourceGit   `json:",omitempty" yaml:",omitempty"`
-	Local *BuiltImageSourceLocal `json:",omitempty" yaml:",omitempty"`
+	return digest.AsString(), sources, nil
 }
 
 type BuiltImageSourceGit struct {
+	Type      string // always set to 'git'
 	RemoteURL string `json:",omitempty" yaml:",omitempty"`
 	SHA       string
 	Dirty     bool
 	Tags      []string `json:",omitempty" yaml:",omitempty"`
 }
 
+func (BuiltImageSourceGit) meta() {}
+
 type BuiltImageSourceLocal struct {
+	Type string // always set to 'local'
 	Path string
 }
 
-func (i BuiltImage) Sources() (BuiltImageSources, error) {
+func (BuiltImageSourceLocal) meta() {}
+
+func (i BuiltImage) sources() ([]ImageMeta, error) {
+	var sources []ImageMeta
+
 	absPath, err := filepath.Abs(i.buildSource.Path)
 	if err != nil {
-		return BuiltImageSources{}, err
+		return nil, err
 	}
 
-	info := BuiltImageSources{
-		Local: &BuiltImageSourceLocal{
-			Path: absPath,
-		},
-	}
+	sources = append(sources, BuiltImageSourceLocal{
+		Type: "local",
+		Path: absPath,
+	})
 
 	gitRepo := NewGitRepo(absPath)
 
 	if gitRepo.IsValid() {
 		var err error
-		info.Git = &BuiltImageSourceGit{}
+		git := BuiltImageSourceGit{Type: "git"}
 
-		info.Git.RemoteURL, err = gitRepo.RemoteURL()
+		git.RemoteURL, err = gitRepo.RemoteURL()
 		if err != nil {
-			return BuiltImageSources{}, err
+			return nil, err
 		}
 
-		info.Git.SHA, err = gitRepo.HeadSHA()
+		git.SHA, err = gitRepo.HeadSHA()
 		if err != nil {
-			return BuiltImageSources{}, err
+			return nil, err
 		}
 
-		info.Git.Dirty, err = gitRepo.IsDirty()
+		git.Dirty, err = gitRepo.IsDirty()
 		if err != nil {
-			return BuiltImageSources{}, err
+			return nil, err
 		}
 
-		info.Git.Tags, err = gitRepo.HeadTags()
+		git.Tags, err = gitRepo.HeadTags()
 		if err != nil {
-			return BuiltImageSources{}, err
+			return nil, err
 		}
+
+		sources = append(sources, git)
 	}
 
-	return info, nil
+	return sources, nil
 }

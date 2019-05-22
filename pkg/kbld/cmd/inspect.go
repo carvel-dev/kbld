@@ -1,11 +1,8 @@
 package cmd
 
 import (
-	"strings"
-
 	"github.com/cppforlife/go-cli-ui/ui"
 	uitable "github.com/cppforlife/go-cli-ui/ui/table"
-	"github.com/ghodss/yaml"
 	cmdcore "github.com/k14s/kbld/pkg/kbld/cmd/core"
 	ctlres "github.com/k14s/kbld/pkg/kbld/resources"
 	"github.com/spf13/cobra"
@@ -52,7 +49,7 @@ func (o *InspectOptions) Run() error {
 
 		Header: []uitable.Header{
 			uitable.NewHeader("Image"),
-			uitable.NewHeader("Sources"),
+			uitable.NewHeader("Metadata"),
 			uitable.NewHeader("Resource"),
 		},
 
@@ -66,16 +63,16 @@ func (o *InspectOptions) Run() error {
 		Transpose:       true,
 	}
 
-	for _, imgSrc := range foundImages {
-		srcs, err := imgSrc.Sources()
+	for _, resWithImg := range foundImages {
+		metasDesc, err := resWithImg.MetasDescription()
 		if err != nil {
 			return err
 		}
 
 		table.Rows = append(table.Rows, []uitable.Value{
-			uitable.NewValueString(imgSrc.Image),
-			uitable.NewValueString(srcs),
-			uitable.NewValueString(imgSrc.Resource.Description()),
+			uitable.NewValueString(resWithImg.URL),
+			uitable.NewValueString(metasDesc),
+			uitable.NewValueString(resWithImg.Resource.Description()),
 		})
 	}
 
@@ -84,41 +81,36 @@ func (o *InspectOptions) Run() error {
 	return nil
 }
 
-type foundSource struct {
-	Image    string
-	Resource ctlres.Resource
-}
-
-func (s foundSource) Sources() (string, error) {
-	metas, err := NewResourceWithBuiltImages(s.Resource.DeepCopyRaw(), nil).Metas()
-	if err != nil {
-		return "", err
-	}
-
-	meta, found := BuiltImageMetas(metas).ForImage(s.Image)
-	if !found {
-		return "{}", nil
-	}
-
-	srcsYAML, err := yaml.Marshal(meta.BuiltImageSources)
-	if err != nil {
-		return "", err
-	}
-
-	return strings.TrimSpace(string(srcsYAML)), nil
-}
-
-func (o *InspectOptions) findImages(rs []ctlres.Resource) ([]foundSource, error) {
-	foundImages := []foundSource{}
+func (o *InspectOptions) findImages(rs []ctlres.Resource) ([]foundResourceWithImage, error) {
+	foundImages := []foundResourceWithImage{}
 
 	for _, res := range rs {
 		visitValues(res.DeepCopyRaw(), imageKey, func(val interface{}) (interface{}, bool) {
-			if img, ok := val.(string); ok {
-				foundImages = append(foundImages, foundSource{Image: img, Resource: res})
+			if imgURL, ok := val.(string); ok {
+				foundImages = append(foundImages, foundResourceWithImage{URL: imgURL, Resource: res})
 			}
 			return nil, false
 		})
 	}
 
 	return foundImages, nil
+}
+
+type foundResourceWithImage struct {
+	URL      string
+	Resource ctlres.Resource
+}
+
+func (s foundResourceWithImage) MetasDescription() (string, error) {
+	images, err := NewResourceWithImages(s.Resource.DeepCopyRaw(), nil).Images()
+	if err != nil {
+		return "", err
+	}
+
+	image, found := Images(images).ForImage(s.URL)
+	if !found {
+		return "", nil
+	}
+
+	return image.Description(), nil
 }
