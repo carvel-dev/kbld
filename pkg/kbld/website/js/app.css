@@ -139,6 +139,7 @@ code, .terminal, .logo {
   border-width: 0;
   vertical-align: text-top;
 }
+#before-after th { font-weight: bold; }
 #before-after .before,
 #before-after .after {
   font-size: 80%;

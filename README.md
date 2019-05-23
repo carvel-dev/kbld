@@ -3,20 +3,21 @@
 - Website: https://get-kbld.io
 - Slack: [#k14s in Kubernetes slack](https://slack.kubernetes.io)
 
-`kbld` can
+`kbld` seamlessly incorporates image building and image pushing into your development and deployment workflows.
 
-- resolve images to their *immutable* image references (digests)
-- optionally build Docker images (by delegating to tools such as Docker)
-- export set of images as a single tarball, and import into a different registry
+Features:
+
+- Orchestrates image builds (delegates to tools like Docker) and registry pushes
+- Works with local Docker daemon and remote registries, for development and production cases
+- Records metadata about image sources in annotation on Kubernetes resources (see examples below)
+- Resolves image references to their digest form (*immutable*) ([details](https://get-kbld.io/#why))
+- Provides a way to transport set of images in a single tarball between registries
   - maintaining exactly same digests, hence guaranteeing exactly same content
+- Not specific to Kubernetes, but works really well with Kubernetes configuration files  
 
 ![](docs/kbld-screenshot.png)
 
-Example of using [ytt](https://github.com/k14s/ytt) + kbld + [kapp](https://github.com/k14s/kapp) to deploy an application:
-
-```bash
-ytt template -f kubernetes-manifests/ | kbld -f- | kapp -y deploy -a app1 -f-
-```
+See [building and deploying simple Go application to Kubernetes example](https://github.com/k14s/k8s-simple-app-example#step-3-building-container-images-locally) that uses kbld.
 
 ## Docs
 

@@ -14,8 +14,8 @@
       <div class="header">
         <h1><span class="logo">$ kbld</span></h1>
 
-        <p class="hero"><code>kbld</code> is a tool centered around <em>immutable</em><br/>
-        Docker image references (i.e. digests) for Kubernetes configuration.</p>
+        <p class="hero"><code>kbld</code> seamlessly incorporates image building<br/>
+        and image pushing into your development and deployment workflows.</p>
 
         <p class="hero">
           <a class="link-button" href="https://github.com/k14s/kbld">Github</a>
@@ -26,20 +26,26 @@
 
       <div id="intro">
         <div id="why">
-          <h2>Why?</h2>
+          <h2>Features</h2>
+          <ul>
+            <li>Orchestrates image builds (delegates to tools like Docker) and registry pushes</li>
+            <li>Works with local Docker daemon and remote registries, for development and production cases</li>
+            <li>Records metadata about image sources in annotation on Kubernetes resources (see examples below)</li>
+            <li>Resolves image references to their digest form (immutable) (<a href="#why">see "why" below</a>)</li>
+            <li>Provides a way to transport set of images in a single tarball between registries</li>
+            <li>Not specific to Kubernetes, but works really well with Kubernetes configuration files</li>
+          </ul>
 
-          <p>Docker images can be referenced by their name (<code>nginx</code>), name-tag pair (<code>nginx:1.14</code>), or a digest (<code>nginx@sha256:c398dc3f2...</code>). Using non-digest methods may lead to hard to find deployment inconsistencies, hence it's a good practice to use image digests as they uniquely represent a particular image and cannot change.</p>
+          <h2>Why Digest References?</h2>
 
-          <p>kbld helps Kubernetes users convert non-digest image references to their digest form so that it's easier to track which images are used and how they change over time.</p>
-
-          <p>Additionally, kbld can orchestrate image building (delegates to tools like Docker) and pushing (to registries) and capture digest references of built images.</p>
+          <p>Docker images can be referenced by their name (<code>nginx</code>), name-tag pair (<code>nginx:1.14</code>), or a digest (<code>nginx@sha256:c398dc3f2...</code>). One can avoid potential deployment inconsistencies by using digest references as they are immutable, and therefore <em>always</em> points to an exact image. kbld helps Kubernetes users convert image references to their digest form to make sure exact image is used during deploys.</p>
         </div>
 
         <div id="basic-usage">
           <h2>Basic Usage</h2>
           <pre class="terminal">
 <span class="gray"># Configurations picked up from a directory</span>
-$ kbld -R -f examples/cassandra/ <strong>|</strong> kubectl apply -f -
+$ kbld -f examples/cassandra/ | kubectl apply -f -
 
 <span class="gray"># Can be used with helm charts</span>
 $ helm template my-chart --values my-vals.yml | kbld -f - | kubectl apply -f -
@@ -48,13 +54,17 @@ $ helm template my-chart --values my-vals.yml | kbld -f - | kubectl apply -f -
 $ kustomize build ./some-app | kbld -f - | kubectl apply -f -
 
 <span class="gray"># ... or templated with ytt and deployed with kapp</span>
-$ ytt template -R -f ./some-app | kbld -f - | kapp -y deploy -a some-app -f -</pre>
+$ ytt template -f ./some-app | kbld -f - | kapp -y deploy -a some-app -f -</pre>
         </div>
 
         <div id="before-after">
           <h2>Examples</h2>
           <table>
             <tbody>
+              <tr>
+                <th>Input file</th>
+                <th>stdout</th>
+              </tr>
               <tr>
                 <td colspan="2"><p>Resolves name-tag pair reference (<code>nginx:1.7.9</code>) into digest reference (<code>index.docker.io/library/nginx@sha256:c398dc3f2...</code>)</p></td>
               </tr>
@@ -91,6 +101,13 @@ metadata:
   name: nginx-deployment
   labels:
     app: nginx
+  annotations:
+    <span class="green">kbld.k14s.io/images: |
+      - Metas:
+        - Tag: 1.7.9
+          Type: resolved
+          URL: nginx:1.7.9
+        URL: index.docker.io/library/nginx@sha256:c398dc3f2...</span>
 spec:
   replicas: 3
   selector:
@@ -162,6 +179,16 @@ metadata:
   name: app1-deployment
   labels:
     app: app1
+  annotations:
+    <span class="green">kbld.k14s.io/images: |
+      - Metas:
+        - Path: /Users/pivotal/workspace/simple-app
+          Type: local
+        - Dirty: false
+          RemoteURL: git@github.com:k14s/super-secret-simple-app
+          SHA: e877718521f7ccea0ab0844db0f86fe123a8d8ef
+          Type: git
+        URL: index.docker.io/dkalinin/simple-app@sha256:e932e46fd...</span>
 spec:
   replicas: 3
   selector:
