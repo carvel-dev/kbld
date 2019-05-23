@@ -1,5 +1,8 @@
 # kbld
 
+- Website: https://get-kbld.io
+- Slack: [#k14s in Kubernetes slack](https://slack.kubernetes.io)
+
 `kbld` can
 
 - resolve images to their *immutable* image references (digests)
