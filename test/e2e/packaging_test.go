@@ -31,15 +31,15 @@ spec:
 		t.Fatalf("Expected package output >>>%s<<< to match >>>%s<<<", out, expectedOut)
 	}
 
-	out, _ = kbld.RunWithOpts([]string{"unpackage", "-f", "-", "--input", path, "--repository", "docker.io/dkalinin/kbld-test-pkg-unpkg"}, RunOpts{
+	out, _ = kbld.RunWithOpts([]string{"unpackage", "-f", "-", "--input", path, "--repository", env.WithRegistries("docker.io/*username*/kbld-test-pkg-unpkg")}, RunOpts{
 		StdinReader: strings.NewReader(input),
 	})
 
-	expectedOut = `kind: Object
+	expectedOut = env.WithRegistries(`kind: Object
 spec:
-- image: index.docker.io/dkalinin/kbld-test-pkg-unpkg@sha256:000339fb57e0ddf2d48d72f3341e47a8ca3b1beae9bdcb25a96323095b72a79b
-- image: index.docker.io/dkalinin/kbld-test-pkg-unpkg@sha256:055519529bf1ba12bf916fa42d6d3f68bdc581413621c269425bb0fee2467a93
-`
+- image: index.docker.io/*username*/kbld-test-pkg-unpkg@sha256:000339fb57e0ddf2d48d72f3341e47a8ca3b1beae9bdcb25a96323095b72a79b
+- image: index.docker.io/*username*/kbld-test-pkg-unpkg@sha256:055519529bf1ba12bf916fa42d6d3f68bdc581413621c269425bb0fee2467a93
+`)
 
 	if out != expectedOut {
 		t.Fatalf("Expected unpackage output >>>%s<<< to match >>>%s<<<", out, expectedOut)

@@ -7,13 +7,13 @@ import (
 )
 
 type Env struct {
-	Namespace       string
-	PushDestination string
+	Namespace         string
+	DockerHubUsername string
 }
 
 func BuildEnv(t *testing.T) Env {
 	env := Env{
-		PushDestination: os.Getenv("KBLD_E2E_PUSH_DESTINATION"),
+		DockerHubUsername: os.Getenv("KBLD_E2E_DOCKERHUB_USERNAME"),
 	}
 	env.Validate(t)
 	return env
@@ -22,11 +22,18 @@ func BuildEnv(t *testing.T) Env {
 func (e Env) Validate(t *testing.T) {
 	errStrs := []string{}
 
-	if len(e.PushDestination) == 0 {
-		errStrs = append(errStrs, "Expected PushDestination to be non-empty")
+	if len(e.DockerHubUsername) == 0 {
+		errStrs = append(errStrs, "Expected DockerHubUsername to be non-empty")
 	}
 
 	if len(errStrs) > 0 {
 		t.Fatalf("%s", strings.Join(errStrs, "\n"))
 	}
+}
+
+func (e Env) WithRegistries(input string) string {
+	for _, prefix := range []string{"index.docker.io/", "docker.io/"} {
+		input = strings.Replace(input, prefix+"*username*/", prefix+e.DockerHubUsername+"/", -1)
+	}
+	return input
 }
