@@ -54,7 +54,7 @@ $ helm template my-chart --values my-vals.yml | kbld -f - | kubectl apply -f -
 $ kustomize build ./some-app | kbld -f - | kubectl apply -f -
 
 <span class="gray"># ... or templated with ytt and deployed with kapp</span>
-$ ytt template -f ./some-app | kbld -f - | kapp -y deploy -a some-app -f -</pre>
+$ ytt -f ./some-app | kbld -f - | kapp -y deploy -a some-app -f -</pre>
         </div>
 
         <div id="before-after">
