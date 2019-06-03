@@ -35,6 +35,8 @@ Grab prebuilt binaries from the [Releases page](https://github.com/k14s/kbld/rel
 ```bash
 ./hack/build.sh
 ./hack/test-all.sh
+
+BUILD_VALUES=./hack/build-values-get-kbld-io.yml ./hack/build.sh # includes goog analytics
 ```
 
 `build.sh` depends on [ytt](https://github.com/k14s/ytt).
