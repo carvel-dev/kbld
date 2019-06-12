@@ -12,7 +12,7 @@
 
     <div class="content">
       <div class="header">
-        <h1><span class="logo">$ kbld</span></h1>
+        <h1><span class="logo">$<strong>kbld</strong></span></h1>
 
         <p class="hero"><code>kbld</code> seamlessly incorporates image building<br/>
         and image pushing into your development and deployment workflows.</p>
@@ -45,16 +45,16 @@
           <h2>Basic Usage</h2>
           <pre class="terminal">
 <span class="gray"># Configurations picked up from a directory</span>
-$ kbld -f examples/cassandra/ | kubectl apply -f -
+$ <span class="green">kbld -f examples/cassandra/</span> | kubectl apply -f -
 
 <span class="gray"># Can be used with helm charts</span>
-$ helm template my-chart --values my-vals.yml | kbld -f - | kubectl apply -f -
+$ helm template my-chart --values my-vals.yml | <span class="green">kbld -f -</span> | kubectl apply -f -
 
 <span class="gray"># ... and with kustomize</span>
-$ kustomize build ./some-app | kbld -f - | kubectl apply -f -
+$ kustomize build ./some-app | <span class="green">kbld -f -</span> | kubectl apply -f -
 
 <span class="gray"># ... or templated with ytt and deployed with kapp</span>
-$ ytt -f ./some-app | kbld -f - | kapp -y deploy -a some-app -f -</pre>
+$ ytt -f ./some-app | <span class="green">kbld -f -</span> | kapp -y deploy -a some-app -f -</pre>
         </div>
 
         <div id="before-after">
