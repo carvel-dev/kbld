@@ -3,7 +3,7 @@
 - Website: https://get-kbld.io
 - Slack: [#k14s in Kubernetes slack](https://slack.kubernetes.io)
 
-`kbld` seamlessly incorporates image building and image pushing into your development and deployment workflows.
+`kbld` (pronounced: `kei·bild`) seamlessly incorporates image building and image pushing into your development and deployment workflows.
 
 Features:
 
