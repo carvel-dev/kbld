@@ -25,6 +25,8 @@ See [building and deploying simple Go application to Kubernetes example](https:/
 - [Building images from source](docs/building.md)
 - [Packaging images for distribution](docs/packaging.md)
 - [Configuration](docs/config.md)
+- Blog posts
+  - [Introducing k14s (Kubernetes Tools): Simple and Composable Tools for Application Deployment](https://content.pivotal.io/blog/introducing-k14s-kubernetes-tools-simple-and-composable-tools-for-application-deployment)
 
 ## Install
 
