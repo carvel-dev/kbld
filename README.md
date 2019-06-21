@@ -2,6 +2,8 @@
 
 - Website: https://get-kbld.io
 - Slack: [#k14s in Kubernetes slack](https://slack.kubernetes.io)
+- Docs below
+- Install: Grab prebuilt binaries from the [Releases page](https://github.com/k14s/kbld/releases)
 
 `kbld` (pronounced: `kei·bild`) seamlessly incorporates image building and image pushing into your development and deployment workflows.
 
@@ -27,10 +29,6 @@ See [building and deploying simple Go application to Kubernetes example](https:/
 - [Configuration](docs/config.md)
 - Blog posts
   - [Introducing k14s (Kubernetes Tools): Simple and Composable Tools for Application Deployment](https://content.pivotal.io/blog/introducing-k14s-kubernetes-tools-simple-and-composable-tools-for-application-deployment)
-
-## Install
-
-Grab prebuilt binaries from the [Releases page](https://github.com/k14s/kbld/releases).
 
 ## Development
 
