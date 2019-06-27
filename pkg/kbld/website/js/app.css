@@ -39,6 +39,7 @@ h1 {
 }
 .content {
   margin: 10px auto;
+  padding: 0 15px;
   width: 1000px;
 }
 input {
@@ -90,6 +91,7 @@ a:hover {
   padding: 7px 9px;
   border-radius: 4px;
   border-bottom: 1px solid #ddd;
+  overflow-x: auto;
 }
 .green { color: #618402; }
 .red { color: red; }
@@ -102,7 +104,7 @@ code, .terminal, .logo {
 #k14s-tools {
   margin: 0 auto;
   width: 1000px;
-  border-bottom: 1px solid #ddd;
+  padding: 0 15px;
 }
 #k14s-tools p {
   color: #777;
