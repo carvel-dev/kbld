@@ -37,6 +37,46 @@ spec:
 	}
 }
 
+func TestResolveSuccessfulWithAnnotations(t *testing.T) {
+	env := BuildEnv(t)
+	kbld := Kbld{t, env.Namespace, Logger{}}
+
+	input := `
+kind: Object
+spec:
+- image: nginx:1.14.2
+- image: library/nginx:1.14.2
+`
+
+	out, _ := kbld.RunWithOpts([]string{"-f", "-"}, RunOpts{
+		StdinReader: strings.NewReader(input),
+	})
+
+	// TODO dedup same url images
+	expectedOut := `kind: Object
+metadata:
+  annotations:
+    kbld.k14s.io/images: |
+      - Metas:
+        - Tag: 1.14.2
+          Type: resolved
+          URL: nginx:1.14.2
+        URL: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
+      - Metas:
+        - Tag: 1.14.2
+          Type: resolved
+          URL: library/nginx:1.14.2
+        URL: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
+spec:
+- image: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
+- image: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
+`
+
+	if out != expectedOut {
+		t.Fatalf("Expected >>>%s<<< to match >>>%s<<<", out, expectedOut)
+	}
+}
+
 func TestResolveInvalidDigest(t *testing.T) {
 	env := BuildEnv(t)
 	kbld := Kbld{t, env.Namespace, Logger{}}
