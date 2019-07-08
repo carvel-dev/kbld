@@ -1,10 +1,12 @@
 package image_test
 
 import (
+	"bytes"
 	"io/ioutil"
 	"os"
-	"path/filepath"
 	"os/exec"
+	"path/filepath"
+	"strings"
 	"testing"
 
 	ctlimg "github.com/k14s/kbld/pkg/kbld/image"
@@ -169,12 +171,112 @@ func TestGitRepoValidNonGit(t *testing.T) {
 	}
 }
 
-func runCmd(t *testing.T, cmdName string, args []string, dir string) {
+func TestGitRepoRemoteURL(t *testing.T) {
+	dir, err := ioutil.TempDir("", "kbld-git-repo")
+	if err != nil {
+		t.Fatalf("Making tmp dir: %s", err)
+	}
+
+	defer os.RemoveAll(dir)
+
+	runCmd(t, "git", []string{"init", "."}, dir)
+
+	gitRepo := ctlimg.NewGitRepo(dir)
+
+	url, err := gitRepo.RemoteURL()
+	if err != nil {
+		t.Fatalf("Expected url to succeed")
+	}
+	if url != ctlimg.GitRepoRemoteURLUnknown {
+		t.Fatalf("Expected url to be unknown")
+	}
+
+	runCmd(t, "git", []string{"remote", "add", "origin", "http://some-remote"}, dir)
+
+	url, err = gitRepo.RemoteURL()
+	if err != nil {
+		t.Fatalf("Expected url to succeed")
+	}
+	if url != "http://some-remote" {
+		t.Fatalf("Expected url to be correct: %s", url)
+	}
+}
+
+func TestGitRepoHeadSHA(t *testing.T) {
+	dir, err := ioutil.TempDir("", "kbld-git-repo")
+	if err != nil {
+		t.Fatalf("Making tmp dir: %s", err)
+	}
+
+	defer os.RemoveAll(dir)
+
+	runCmd(t, "git", []string{"init", "."}, dir)
+
+	gitRepo := ctlimg.NewGitRepo(dir)
+
+	sha, err := gitRepo.HeadSHA()
+	if err != nil {
+		t.Fatalf("Expected sha to succeed")
+	}
+	if sha != ctlimg.GitRepoHeadSHANoCommits {
+		t.Fatalf("Expected sha to be unknown")
+	}
+
+	runCmd(t, "git", []string{"commit", "-am", "msg1", "--allow-empty"}, dir)
+	expectedSHAShort := runCmd(t, "git", []string{"log", "-1", "--oneline"}, dir)[0:7]
+
+	sha, err = gitRepo.HeadSHA()
+	if err != nil {
+		t.Fatalf("Expected sha to succeed")
+	}
+	if !strings.HasPrefix(sha, expectedSHAShort) {
+		t.Fatalf("Expected sha to be correct: %s vs %s", sha, expectedSHAShort)
+	}
+}
+
+func TestGitRepoIsDirty(t *testing.T) {
+	dir, err := ioutil.TempDir("", "kbld-git-repo")
+	if err != nil {
+		t.Fatalf("Making tmp dir: %s", err)
+	}
+
+	defer os.RemoveAll(dir)
+
+	runCmd(t, "git", []string{"init", "."}, dir)
+	runCmd(t, "git", []string{"commit", "-am", "msg1", "--allow-empty"}, dir)
+
+	gitRepo := ctlimg.NewGitRepo(dir)
+
+	dirty, err := gitRepo.IsDirty()
+	if err != nil {
+		t.Fatalf("Expected dirty to succeed")
+	}
+	if dirty != false {
+		t.Fatalf("Expected dirty to be false")
+	}
+
+	runCmd(t, "touch", []string{"file"}, dir)
+
+	dirty, err = gitRepo.IsDirty()
+	if err != nil {
+		t.Fatalf("Expected dirty to succeed")
+	}
+	if dirty != true {
+		t.Fatalf("Expected dirty to be true")
+	}
+}
+
+func runCmd(t *testing.T, cmdName string, args []string, dir string) string {
+	var stdoutBuf bytes.Buffer
+
 	cmd := exec.Command(cmdName, args...)
 	cmd.Dir = dir
+	cmd.Stdout = &stdoutBuf
 
 	err := cmd.Run()
 	if err != nil {
 		t.Fatalf("Running cmd %s (%#v): %s", cmdName, args, err)
 	}
+
+	return stdoutBuf.String()
 }

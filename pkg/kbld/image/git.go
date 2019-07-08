@@ -21,7 +21,7 @@ func NewGitRepo(dirPath string) GitRepo {
 }
 
 func (r GitRepo) RemoteURL() (string, error) {
-	// TODO support other remotes?
+	// TODO support other remotes besides origin?
 	stdout, stderr, err := r.runCmd([]string{"ls-remote", "--get-url"})
 	if err != nil {
 		// Same message is returned if it's not a git repo
