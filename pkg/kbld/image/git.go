@@ -3,10 +3,13 @@ package image
 import (
 	"bytes"
 	"fmt"
-	"os"
 	"os/exec"
-	"path/filepath"
 	"strings"
+)
+
+const (
+	GitRepoRemoteURLUnknown = "<unknown>"
+	GitRepoHeadSHANoCommits = "<no commits>"
 )
 
 type GitRepo struct {
@@ -21,8 +24,9 @@ func (r GitRepo) RemoteURL() (string, error) {
 	// TODO support other remotes?
 	stdout, stderr, err := r.runCmd([]string{"ls-remote", "--get-url"})
 	if err != nil {
-		if strings.Contains(stderr, "No remote configured to list refs from") {
-			return "<unknown>", nil
+		// Same message is returned if it's not a git repo
+		if r.IsValid() && strings.Contains(stderr, "No remote configured to list refs from") {
+			return GitRepoRemoteURLUnknown, nil
 		}
 		return "", fmt.Errorf("Determining remote: %s (stderr '%s')", err, stderr)
 	}
@@ -33,8 +37,9 @@ func (r GitRepo) RemoteURL() (string, error) {
 func (r GitRepo) HeadSHA() (string, error) {
 	stdout, stderr, err := r.runCmd([]string{"rev-parse", "HEAD"})
 	if err != nil {
-		if strings.Contains(stderr, "Needed a single revision") {
-			return "<no commits>", nil
+		listStdout, _, listErr := r.runCmd([]string{"rev-list", "-n", "1", "--all"})
+		if listErr == nil && len(strings.TrimSpace(listStdout)) == 0 {
+			return GitRepoHeadSHANoCommits, nil
 		}
 		return "", fmt.Errorf("Checking HEAD commit: %s (stderr '%s')", err, stderr)
 	}
@@ -66,15 +71,9 @@ func (r GitRepo) IsDirty() (bool, error) {
 }
 
 func (r GitRepo) IsValid() bool {
-	return !r.isNotGitRepo()
-}
-
-func (r GitRepo) isNotGitRepo() bool {
-	if _, err := os.Stat(filepath.Join(r.dirPath, ".git")); err != nil {
-		return false
-	}
+	// Prints .git directory path if it's git repo
 	_, _, err := r.runCmd([]string{"rev-parse", "--git-dir"})
-	return err != nil
+	return err == nil
 }
 
 func (r GitRepo) runCmd(args []string) (string, string, error) {
