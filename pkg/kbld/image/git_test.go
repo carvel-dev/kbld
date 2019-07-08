@@ -3,6 +3,7 @@ package image_test
 import (
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"os/exec"
 	"testing"
 
@@ -78,6 +79,45 @@ func TestGitRepoValidNotOnBranch(t *testing.T) {
 	runCmd(t, "git", []string{"checkout", "HEAD~1"}, dir)
 
 	gitRepo := ctlimg.NewGitRepo(dir)
+	if gitRepo.IsValid() != true {
+		t.Fatalf("Expected not-on-branch repo to be a git repo")
+	}
+	url, err := gitRepo.RemoteURL()
+	if err != nil || url != ctlimg.GitRepoRemoteURLUnknown {
+		t.Fatalf("Expected unknown remote url")
+	}
+	sha, err := gitRepo.HeadSHA()
+	if err != nil || sha == ctlimg.GitRepoHeadSHANoCommits || len(sha) < 20 {
+		t.Fatalf("Expected head sha to succeed: %s; %s", err, sha)
+	}
+	_, err = gitRepo.HeadTags()
+	if err != nil {
+		t.Fatalf("Expected head tags to succeed")
+	}
+	_, err = gitRepo.IsDirty()
+	if err != nil {
+		t.Fatalf("Expected dirty to succeed")
+	}
+}
+
+func TestGitRepoValidSubDir(t *testing.T) {
+	dir, err := ioutil.TempDir("", "kbld-git-repo")
+	if err != nil {
+		t.Fatalf("Making tmp dir: %s", err)
+	}
+
+	defer os.RemoveAll(dir)
+
+	runCmd(t, "git", []string{"init", "."}, dir)
+	runCmd(t, "git", []string{"commit", "-am", "msg1", "--allow-empty"}, dir)
+
+	subDir := filepath.Join(dir, "sub-dir")
+	err = os.Mkdir(subDir, os.ModePerm)
+	if err != nil {
+		t.Fatalf("Making subdir: %s", err)
+	}
+
+	gitRepo := ctlimg.NewGitRepo(subDir)
 	if gitRepo.IsValid() != true {
 		t.Fatalf("Expected not-on-branch repo to be a git repo")
 	}
