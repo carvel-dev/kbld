@@ -108,7 +108,7 @@ func (o *PackageOptions) exportImages(imgRefsToExport map[string]struct{}, logge
 
 	defer outputFile.Close()
 
-	tds, err := regtarball.NewTarDescriptors(refs, ctlimg.NewRegistry(o.RegistryFlags.CACertPaths))
+	tds, err := regtarball.NewTarDescriptors(refs, ctlimg.NewRegistry(o.RegistryFlags.AsRegistryOpts()))
 	if err != nil {
 		return fmt.Errorf("Collecting packaging metadata: %s", err)
 	}

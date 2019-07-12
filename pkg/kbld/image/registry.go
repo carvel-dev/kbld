@@ -15,16 +15,21 @@ import (
 	regremote "github.com/google/go-containerregistry/pkg/v1/remote"
 )
 
-type Registry struct {
-	caCertsPaths []string
+type RegistryOpts struct {
+	CACertPaths []string
+	VerifyCerts bool
 }
 
-func NewRegistry(caCertsPaths []string) Registry {
-	return Registry{caCertsPaths}
+type Registry struct {
+	opts RegistryOpts
+}
+
+func NewRegistry(opts RegistryOpts) Registry {
+	return Registry{opts}
 }
 
 func (i Registry) Generic(ref regname.Reference) (regv1.Descriptor, error) {
-	opts, err := i.opts()
+	opts, err := i.imageOpts()
 	if err != nil {
 		return regv1.Descriptor{}, err
 	}
@@ -38,7 +43,7 @@ func (i Registry) Generic(ref regname.Reference) (regv1.Descriptor, error) {
 }
 
 func (i Registry) Image(ref regname.Reference) (regv1.Image, error) {
-	opts, err := i.opts()
+	opts, err := i.imageOpts()
 	if err != nil {
 		return nil, err
 	}
@@ -66,7 +71,7 @@ func (i Registry) WriteImage(ref regname.Reference, img regv1.Image) error {
 }
 
 func (i Registry) Index(ref regname.Reference) (regv1.ImageIndex, error) {
-	opts, err := i.opts()
+	opts, err := i.imageOpts()
 	if err != nil {
 		return nil, err
 	}
@@ -93,7 +98,7 @@ func (i Registry) WriteIndex(ref regname.Reference, idx regv1.ImageIndex) error 
 	return nil
 }
 
-func (i Registry) opts() ([]regremote.ImageOption, error) {
+func (i Registry) imageOpts() ([]regremote.ImageOption, error) {
 	httpTran, err := i.newHTTPTransport()
 	if err != nil {
 		return nil, err
@@ -111,8 +116,8 @@ func (i Registry) newHTTPTransport() (*http.Transport, error) {
 		pool = x509.NewCertPool()
 	}
 
-	if len(i.caCertsPaths) > 0 {
-		for _, path := range i.caCertsPaths {
+	if len(i.opts.CACertPaths) > 0 {
+		for _, path := range i.opts.CACertPaths {
 			if certs, err := ioutil.ReadFile(path); err != nil {
 				return nil, fmt.Errorf("Reading CA certificates from '%s': %s", path, err)
 			} else if ok := pool.AppendCertsFromPEM(certs); !ok {
@@ -138,7 +143,8 @@ func (i Registry) newHTTPTransport() (*http.Transport, error) {
 		ExpectContinueTimeout: 1 * time.Second,
 		// Use the cert pool with k8s cert bundle appended.
 		TLSClientConfig: &tls.Config{
-			RootCAs: pool,
+			RootCAs:            pool,
+			InsecureSkipVerify: (i.opts.VerifyCerts == false),
 		},
 	}, nil
 }

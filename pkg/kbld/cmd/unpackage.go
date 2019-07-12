@@ -158,7 +158,7 @@ func (o *UnpackageOptions) importImages(logger *ctlimg.LoggerPrefixWriter) (map[
 
 		logger.Write([]byte(fmt.Sprintf("importing %s -> %s...\n", existingRef.Name(), importDigestRef.Name())))
 
-		registry := ctlimg.NewRegistry(o.RegistryFlags.CACertPaths)
+		registry := ctlimg.NewRegistry(o.RegistryFlags.AsRegistryOpts())
 
 		switch {
 		case item.Image != nil:
@@ -193,7 +193,7 @@ func (o *UnpackageOptions) importImages(logger *ctlimg.LoggerPrefixWriter) (map[
 }
 
 func (o *UnpackageOptions) verifyTagDigest(uploadTagRef regname.Reference, importDigestRef regname.Digest) error {
-	resultURL, _, err := ctlimg.NewResolvedImage(uploadTagRef.Name(), ctlimg.NewRegistry(o.RegistryFlags.CACertPaths)).URL()
+	resultURL, _, err := ctlimg.NewResolvedImage(uploadTagRef.Name(), ctlimg.NewRegistry(o.RegistryFlags.AsRegistryOpts())).URL()
 	if err != nil {
 		return fmt.Errorf("Verifying imported image %s: %s", uploadTagRef.Name(), err)
 	}

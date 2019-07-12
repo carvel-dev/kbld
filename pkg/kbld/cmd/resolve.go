@@ -52,7 +52,7 @@ func (o *ResolveOptions) Run() error {
 		return err
 	}
 
-	registry := ctlimg.NewRegistry(o.RegistryFlags.CACertPaths)
+	registry := ctlimg.NewRegistry(o.RegistryFlags.AsRegistryOpts())
 	imgFactory := ctlimg.NewFactory(conf, registry, logger)
 
 	resolvedImages, err := o.resolveImages(nonConfigRs, imgFactory)
