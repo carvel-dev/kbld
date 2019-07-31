@@ -46,8 +46,9 @@ type SourceDockerBuildOpts struct {
 }
 
 type ImageOverride struct {
-	Image    string
-	NewImage string `json:"newImage"`
+	Image       string
+	NewImage    string `json:"newImage"`
+	Preresolved bool
 }
 
 type ImageDestination struct {

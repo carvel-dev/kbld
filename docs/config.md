@@ -62,3 +62,15 @@ overrides:
 - image: unknown
   newImage: docker.io/library/nginx:1.14.2
 ```
+
+It can also hold `preresolved` new image, so no building or resolution happens:
+
+```yaml
+---
+apiVersion: kbld.k14s.io/v1alpha1
+kind: ImageOverrides
+overrides:
+- image: unknown
+  newImage: docker.io/library/nginx:1.14.2
+  preresolved: true
+```

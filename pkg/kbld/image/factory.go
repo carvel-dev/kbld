@@ -23,16 +23,19 @@ func NewFactory(conf ctlconf.Conf, registry Registry, logger Logger) Factory {
 }
 
 func (f Factory) New(url string) Image {
-	if overrideURL, found := f.shouldOverride(url); found {
-		url = overrideURL.NewImage
+	if overrideConf, found := f.shouldOverride(url); found {
+		url = overrideConf.NewImage
+		if overrideConf.Preresolved {
+			return NewPreresolvedImage(url, f.registry)
+		}
 	}
 
-	if buildSource, found := f.shouldBuild(url); found {
+	if srcConf, found := f.shouldBuild(url); found {
 		docker := Docker{f.logger}
-		buildImg := NewBuiltImage(url, buildSource, docker)
+		buildImg := NewBuiltImage(url, srcConf, docker)
 
-		if imgDst, found := f.shouldPush(url); found {
-			return NewPushedImage(buildImg, imgDst, docker)
+		if imgDstConf, found := f.shouldPush(url); found {
+			return NewPushedImage(buildImg, imgDstConf, docker)
 		}
 		return buildImg
 	}
