@@ -21,6 +21,15 @@ type Docker struct {
 	logger Logger
 }
 
+type DockerBuildOpts struct {
+	// https://docs.docker.com/engine/reference/commandline/build/
+	Target     *string
+	Pull       *bool
+	NoCache    *bool
+	File       *string
+	RawOptions *[]string
+}
+
 type DockerTmpRef struct {
 	val string
 }
@@ -33,7 +42,7 @@ type DockerImageDigest struct {
 
 func (r DockerImageDigest) AsString() string { return r.val }
 
-func (d Docker) Build(image, directory string) (DockerTmpRef, error) {
+func (d Docker) Build(image, directory string, opts DockerBuildOpts) (DockerTmpRef, error) {
 	randPrefix, err := d.randomStr(5)
 	if err != nil {
 		return DockerTmpRef{}, fmt.Errorf("Generating tmp image suffix: %s", err)
@@ -49,7 +58,29 @@ func (d Docker) Build(image, directory string) (DockerTmpRef, error) {
 	{
 		var stdoutBuf, stderrBuf bytes.Buffer
 
-		cmd := exec.Command("docker", "build", "-t", tmpRef.AsString(), ".")
+		cmdArgs := []string{"build"}
+
+		if opts.Target != nil {
+			cmdArgs = append(cmdArgs, "--target", *opts.Target)
+		}
+		if opts.Pull != nil && *opts.Pull {
+			cmdArgs = append(cmdArgs, "--pull")
+		}
+		if opts.NoCache != nil && *opts.NoCache {
+			cmdArgs = append(cmdArgs, "--no-cache")
+		}
+		if opts.File != nil {
+			// Since docker command is executed with cwd of directory,
+			// Dockerfile path doesnt need to be joined with it
+			cmdArgs = append(cmdArgs, "--file", *opts.File)
+		}
+		if opts.RawOptions != nil {
+			cmdArgs = append(cmdArgs, *opts.RawOptions...)
+		}
+
+		cmdArgs = append(cmdArgs, "--tag", tmpRef.AsString(), ".")
+
+		cmd := exec.Command("docker", cmdArgs...)
 		cmd.Dir = directory
 		cmd.Stdout = io.MultiWriter(&stdoutBuf, prefixedLogger)
 		cmd.Stderr = io.MultiWriter(&stderrBuf, prefixedLogger)

@@ -16,6 +16,7 @@ spec:
 - image: docker.io/*username*/kbld-e2e-tests-build
 - image: simple-app-two
 - image: simple-app-two-overriden
+- image: simple-app-three
 ---
 apiVersion: kbld.k14s.io/v1alpha1
 kind: Sources
@@ -24,6 +25,14 @@ sources:
   path: assets/simple-app
 - image: simple-app-two
   path: assets/simple-app
+  docker:
+    build:
+      file: dev/Dockerfile.dev
+- image: simple-app-three
+  path: assets/simple-app
+  docker:
+    build:
+      target: build-env
 # 'unused' should not be built
 - image: unused
   path: invalid-dir
@@ -47,6 +56,7 @@ spec:
 - image: kbld:img-title-SHA256-REPLACED
 - image: kbld:simple-app-two-SHA256-REPLACED
 - image: kbld:simple-app-two-SHA256-REPLACED
+- image: kbld:simple-app-three-SHA256-REPLACED
 `
 
 	if out != expectedOut {

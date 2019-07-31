@@ -22,7 +22,15 @@ func (i BuiltImage) URL() (string, []ImageMeta, error) {
 		return "", nil, err
 	}
 
-	digest, err := i.docker.Build(i.url, i.buildSource.Path)
+	opts := DockerBuildOpts{
+		Target:     i.buildSource.Docker.Build.Target,
+		Pull:       i.buildSource.Docker.Build.Pull,
+		NoCache:    i.buildSource.Docker.Build.NoCache,
+		File:       i.buildSource.Docker.Build.File,
+		RawOptions: i.buildSource.Docker.Build.RawOptions,
+	}
+
+	digest, err := i.docker.Build(i.url, i.buildSource.Path, opts)
 	if err != nil {
 		return "", nil, err
 	}

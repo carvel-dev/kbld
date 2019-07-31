@@ -28,8 +28,21 @@ type Config struct {
 }
 
 type Source struct {
-	Image string
-	Path  string
+	Image  string
+	Path   string
+	Docker SourceDockerOpts
+}
+
+type SourceDockerOpts struct {
+	Build SourceDockerBuildOpts
+}
+
+type SourceDockerBuildOpts struct {
+	Target     *string
+	Pull       *bool
+	NoCache    *bool `json:"noCache"`
+	File       *string
+	RawOptions *[]string `json:"rawOptions"`
 }
 
 type ImageOverride struct {
