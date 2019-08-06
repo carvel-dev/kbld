@@ -1,12 +1,15 @@
 package cmd
 
 import (
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"strings"
 
 	"github.com/cppforlife/go-cli-ui/ui"
 	cmdcore "github.com/k14s/kbld/pkg/kbld/cmd/core"
+	ctlconf "github.com/k14s/kbld/pkg/kbld/config"
 	ctlimg "github.com/k14s/kbld/pkg/kbld/image"
 	ctlres "github.com/k14s/kbld/pkg/kbld/resources"
 	"github.com/spf13/cobra"
@@ -24,6 +27,7 @@ type ResolveOptions struct {
 	RegistryFlags    RegistryFlags
 	BuildConcurrency int
 	ImagesAnnotation bool
+	ImageMapFile     string
 }
 
 func NewResolveOptions(ui ui.UI, depsFactory cmdcore.DepsFactory) *ResolveOptions {
@@ -40,6 +44,7 @@ func NewResolveCmd(o *ResolveOptions, flagsFactory cmdcore.FlagsFactory) *cobra.
 	o.RegistryFlags.Set(cmd)
 	cmd.Flags().IntVar(&o.BuildConcurrency, "build-concurrency", 4, "Set maximum number of concurrent builds")
 	cmd.Flags().BoolVar(&o.ImagesAnnotation, "images-annotation", true, "Annotate resources with images annotation")
+	cmd.Flags().StringVar(&o.ImageMapFile, "image-map-file", "", "Set image map file (/cnab/app/relocation-mapping.json in CNAB)")
 	return cmd
 }
 
@@ -48,6 +53,11 @@ func (o *ResolveOptions) Run() error {
 	prefixedLogger := logger.NewPrefixedWriter("resolve | ")
 
 	nonConfigRs, conf, err := o.FileFlags.ResourcesAndConfig()
+	if err != nil {
+		return err
+	}
+
+	conf, err = o.withImageMapConf(conf)
 	if err != nil {
 		return err
 	}
@@ -191,4 +201,34 @@ func visitValues(obj interface{}, key string, visitorFunc func(interface{}) (int
 			visitValues(o, key, visitorFunc)
 		}
 	}
+}
+
+func (o *ResolveOptions) withImageMapConf(conf ctlconf.Conf) (ctlconf.Conf, error) {
+	if len(o.ImageMapFile) == 0 {
+		return conf, nil
+	}
+
+	bs, err := ioutil.ReadFile(o.ImageMapFile)
+	if err != nil {
+		return ctlconf.Conf{}, err
+	}
+
+	var mapping map[string]string
+
+	err = json.Unmarshal(bs, &mapping)
+	if err != nil {
+		return ctlconf.Conf{}, err
+	}
+
+	additionalConfig := ctlconf.Config{}
+
+	for k, v := range mapping {
+		additionalConfig.Overrides = append(additionalConfig.Overrides, ctlconf.ImageOverride{
+			Image:       k,
+			NewImage:    v,
+			Preresolved: true,
+		})
+	}
+
+	return conf.WithAdditionalConfig(additionalConfig), nil
 }

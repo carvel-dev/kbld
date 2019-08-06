@@ -74,3 +74,5 @@ overrides:
   newImage: docker.io/library/nginx:1.14.2
   preresolved: true
 ```
+
+For preresolved images, kbld will not connect to registry to obtain any metadata.

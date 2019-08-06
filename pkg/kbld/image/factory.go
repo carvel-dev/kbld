@@ -26,7 +26,7 @@ func (f Factory) New(url string) Image {
 	if overrideConf, found := f.shouldOverride(url); found {
 		url = overrideConf.NewImage
 		if overrideConf.Preresolved {
-			return NewPreresolvedImage(url, f.registry)
+			return NewPreresolvedImage(url)
 		}
 	}
 

@@ -1,6 +1,8 @@
 package e2e
 
 import (
+	"io/ioutil"
+	"os"
 	"strings"
 	"testing"
 )
@@ -149,6 +151,54 @@ overrides:
 spec:
 - image: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
 - image: docker.io/library/nginx:1.14.2
+`
+
+	if out != expectedOut {
+		t.Fatalf("Expected >>>%s<<< to match >>>%s<<<", out, expectedOut)
+	}
+}
+
+func TestResolveWithImageMap(t *testing.T) {
+	env := BuildEnv(t)
+	kbld := Kbld{t, env.Namespace, Logger{}}
+
+	input := `
+kind: Object
+spec:
+- image: img1
+- image: img2:1.14.2
+- image: img3
+`
+
+	imageMapData := `{
+  "img1": "docker.io/foo/img1@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d",
+  "img2:1.14.2": "docker.io/foo/img2:1.14.2",
+  "img3": "img3"
+}
+`
+
+	file, err := ioutil.TempFile("", "kbld-test-resolve-with-image-map")
+	if err != nil {
+		t.Fatalf("temp file err: %s", err)
+	}
+
+	file.Close()
+	defer os.RemoveAll(file.Name())
+
+	err = ioutil.WriteFile(file.Name(), []byte(imageMapData), os.ModePerm)
+	if err != nil {
+		t.Fatalf("write image map err: %s", err)
+	}
+
+	out, _ := kbld.RunWithOpts([]string{"-f", "-", "--images-annotation=false", "--image-map-file", file.Name()}, RunOpts{
+		StdinReader: strings.NewReader(input),
+	})
+
+	expectedOut := `kind: Object
+spec:
+- image: docker.io/foo/img1@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
+- image: docker.io/foo/img2:1.14.2
+- image: img3
 `
 
 	if out != expectedOut {

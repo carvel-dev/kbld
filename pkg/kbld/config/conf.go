@@ -27,6 +27,13 @@ func NewConfFromResources(resources []ctlres.Resource) ([]ctlres.Resource, Conf,
 	return rsWithoutConfigs, Conf{configs}, nil
 }
 
+func (c Conf) WithAdditionalConfig(config Config) Conf {
+	newConf := Conf{}
+	newConf.configs = append([]Config{}, newConf.configs...)
+	newConf.configs = append(newConf.configs, config)
+	return newConf
+}
+
 func matchesConfigKind(res ctlres.Resource) bool {
 	for _, kind := range configKinds {
 		if res.Kind() == kind {
