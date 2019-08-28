@@ -2,7 +2,7 @@
 
 - Website: https://get-kbld.io
 - Slack: [#k14s in Kubernetes slack](https://slack.kubernetes.io)
-- Docs below
+- [Docs](docs/README.md) with topics about building, packaging images, blog posts, etc.
 - Install: Grab prebuilt binaries from the [Releases page](https://github.com/k14s/kbld/releases)
 
 `kbld` (pronounced: `kei·bild`) seamlessly incorporates image building and image pushing into your development and deployment workflows.
@@ -21,19 +21,14 @@ Features:
 
 See [building and deploying simple Go application to Kubernetes example](https://github.com/k14s/k8s-simple-app-example#step-3-building-container-images-locally) that uses kbld.
 
-## Docs
-
-- [Resolving image references to digests](docs/resolving.md)
-- [Building images from source](docs/building.md)
-- [Packaging images for distribution](docs/packaging.md)
-- [Configuration](docs/config.md)
-- Blog posts
-  - [Introducing k14s (Kubernetes Tools): Simple and Composable Tools for Application Deployment](https://content.pivotal.io/blog/introducing-k14s-kubernetes-tools-simple-and-composable-tools-for-application-deployment)
-
 ## Development
 
 ```bash
 ./hack/build.sh
+
+eval $(minikube docker-env)
+docker login ...
+export KBLD_E2E_DOCKERHUB_USERNAME=...
 ./hack/test-all.sh
 
 # include goog analytics in 'kbld website' command for https://get-kbld.io
