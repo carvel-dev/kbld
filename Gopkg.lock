@@ -124,7 +124,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:1c5204c40a4bcd71b473797790125008cd59a140e64f8ebac955de317289a053"
+  digest = "1:1d708bd13fe2a6eced9acf76b1b470273b806f9fc25a35ccc1f14f144d294444"
   name = "github.com/google/go-containerregistry"
   packages = [
     "pkg/authn",
@@ -133,7 +133,6 @@
     "pkg/v1/partial",
     "pkg/v1/remote",
     "pkg/v1/remote/transport",
-    "pkg/v1/tarball",
     "pkg/v1/types",
     "pkg/v1/v1util",
   ]
@@ -572,8 +571,11 @@
     "github.com/ghodss/yaml",
     "github.com/google/go-containerregistry/pkg/authn",
     "github.com/google/go-containerregistry/pkg/name",
+    "github.com/google/go-containerregistry/pkg/v1",
     "github.com/google/go-containerregistry/pkg/v1/remote",
-    "github.com/google/go-containerregistry/pkg/v1/tarball",
+    "github.com/google/go-containerregistry/pkg/v1/remote/transport",
+    "github.com/google/go-containerregistry/pkg/v1/types",
+    "github.com/google/go-containerregistry/pkg/v1/v1util",
     "github.com/spf13/cobra",
     "github.com/spf13/pflag",
     "k8s.io/apimachinery/pkg/apis/meta/v1",
