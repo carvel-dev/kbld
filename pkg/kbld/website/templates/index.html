@@ -47,14 +47,11 @@
           <pre class="terminal">
 <span class="gray"># Configurations picked up from a directory</span>
 $ <span class="green">kbld -f examples/cassandra/</span> | kubectl apply -f -
-
-<span class="gray"># Can be used with helm charts</span>
+<span class="gray spacer-before"># Can be used with helm charts</span>
 $ helm template my-chart --values my-vals.yml | <span class="green">kbld -f -</span> | kubectl apply -f -
-
-<span class="gray"># ... and with kustomize</span>
+<span class="gray spacer-before"># ... and with kustomize</span>
 $ kustomize build ./some-app | <span class="green">kbld -f -</span> | kubectl apply -f -
-
-<span class="gray"># ... or templated with ytt and deployed with kapp</span>
+<span class="gray spacer-before"># ... or templated with ytt and deployed with kapp</span>
 $ ytt -f ./some-app | <span class="green">kbld -f -</span> | kapp -y deploy -a some-app -f -</pre>
         </div>
 
