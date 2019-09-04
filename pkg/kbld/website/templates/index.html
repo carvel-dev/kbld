@@ -26,7 +26,7 @@
       </div>
 
       <div id="intro">
-        <div id="why">
+        <div>
           <h2>Features</h2>
           <ul>
             <li>Orchestrates image builds (delegates to tools like Docker) and registry pushes</li>
@@ -37,7 +37,7 @@
             <li>Not specific to Kubernetes, but works really well with Kubernetes configuration files</li>
           </ul>
 
-          <h2>Why Digest References?</h2>
+          <h2 id="why">Why Digest References?</h2>
 
           <p>Docker images can be referenced by their name (<code>nginx</code>), name-tag pair (<code>nginx:1.14</code>), or a digest (<code>nginx@sha256:c398dc3f2...</code>). One can avoid potential deployment inconsistencies by using digest references as they are immutable, and therefore <em>always</em> points to an exact image. kbld helps Kubernetes users convert image references to their digest form to make sure exact image is used during deploys.</p>
         </div>
