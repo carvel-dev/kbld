@@ -81,10 +81,8 @@ func (o *ResolveOptions) Run() error {
 	}
 
 	// Print all resources as one YAML stream
-	for i, resBs := range resBss {
-		if i != 0 {
-			resBs = append([]byte("---\n"), resBs...)
-		}
+	for _, resBs := range resBss {
+		resBs = append([]byte("---\n"), resBs...)
 		o.ui.PrintBlock(resBs)
 	}
 
