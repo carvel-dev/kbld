@@ -60,58 +60,19 @@ To import packaged images from a tarball:
 
 ### Authentication
 
-Even though `kbld pkg/unpkg` commands use registry APIs directly, by default they rely on credentials stored in `~/.docker/config.json` which are typically generated via `docker login` command.
+See general authentication steps in [Authentication doc](auth.md).
 
-### Authenticating to gcr.io
+### Using with gcr.io
 
-- Create service account with "Storage Admin" for push access
-  - See [Permissions and Roles](https://cloud.google.com/container-registry/docs/access-control#permissions_and_roles)
-- Download JSON service account key and place it somewhere on filesystem (e.g. `/tmp/key`)
-  - See [Advanced authentication](https://cloud.google.com/container-registry/docs/advanced-authentication#json_key_file)
-- Run `cat /tmp/key | docker login -u _json_key --password-stdin https://gcr.io` to authenticate
 - Run `kbld unpkg -f /tmp/resolved-manifest --input /tmp/packaged-images.tar --repository gcr.io/{project-id}/app1` to import images (e.g. project id is `dkalinin`)
 
-### Authenticating to AWS ECR
+### Using with AWS ECR
 
 **Note**: AWS ECR does not support manifest list media types from Docker Registry v2 API. Manifest lists are used for images that are built against multiple architectures and platforms and are referenced through a single digest or tag. Most user-built images do not use manifest lists (as it's a single image); however, common Docker Hub library images are represented by manifest lists and will fail upon import into AWS ECR. You will see following error: `Writing image index: Retried 5 times: uploading manifest2: UNSUPPORTED: Invalid parameter at 'imageTag' failed to satisfy constraint: 'must satisfy regular expression '[a-zA-Z0-9-_.]+'`. Related [AWS feature request](https://forums.aws.amazon.com/thread.jspa?threadID=292294)).
 
-- Create ECR repository
-- Create IAM user with ECR policy that allows to read/write
-  - See [Amazon ECR Policies](https://docs.aws.amazon.com/AmazonECR/latest/userguide/ecr_managed_policies.html)
-- Run `aws configure` and specify access key ID, secret access key and region
-  - To install on Ubuntu, run `apt-get install pip3` and `pip3 install awscli`
-    - See [Installing the AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html)
-- Run `eval $(aws ecr get-login --no-include-email)` to authenticate
-  - See [get-login command](https://docs.aws.amazon.com/cli/latest/reference/ecr/get-login.html)
 - Run `kbld unpkg -f /tmp/resolved-manifest --input /tmp/packaged-images.tar --repository {uri}` to import images (e.g. uri is `823869848626.dkr.ecr.us-east-1.amazonaws.com/k14s/kbld-test`)
 
-```json
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Effect": "Allow",
-            "Action": [
-                "ecr:GetAuthorizationToken",
-                "ecr:BatchCheckLayerAvailability",
-                "ecr:GetDownloadUrlForLayer",
-                "ecr:GetRepositoryPolicy",
-                "ecr:DescribeRepositories",
-                "ecr:ListImages",
-                "ecr:DescribeImages",
-                "ecr:BatchGetImage",
-                "ecr:InitiateLayerUpload",
-                "ecr:UploadLayerPart",
-                "ecr:CompleteLayerUpload",
-                "ecr:PutImage"
-            ],
-            "Resource": "*"
-        }
-    ]
-}
-```
-
-### Authenticating to Harbor
+### Using with Harbor
 
 You may have to provide `--registry-ca-cert-path` flag with a path to a CA certificate file for Harbor Registry API.
 
