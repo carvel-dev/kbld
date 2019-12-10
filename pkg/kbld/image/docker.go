@@ -8,6 +8,7 @@ import (
 	"io"
 	"os/exec"
 	"regexp"
+	"strings"
 	"time"
 
 	regname "github.com/google/go-containerregistry/pkg/name"
@@ -98,12 +99,18 @@ func (d Docker) Build(image, directory string, opts DockerBuildOpts) (DockerTmpR
 		return DockerTmpRef{}, err
 	}
 
+	return d.RetagStable(tmpRef, image, inspectData.Id, prefixedLogger)
+}
+
+func (d Docker) RetagStable(tmpRef DockerTmpRef, image, imageID string,
+	prefixedLogger *LoggerPrefixWriter) (DockerTmpRef, error) {
+
 	// Retag image with its sha256 to produce exact image ref if nothing has changed.
 	// Seems that Docker doesn't like `kbld@sha256:...` format for local images.
 	// Image hint at the beginning for easier sorting.
 	stableTmpRef := DockerTmpRef{fmt.Sprintf("kbld:%s-%s",
 		tmpRefHint.ReplaceAllString(image, "-"),
-		tmpRefHint.ReplaceAllString(inspectData.Id, "-"))}
+		tmpRefHint.ReplaceAllString(imageID, "-"))}
 
 	{
 		var stdoutBuf, stderrBuf bytes.Buffer
@@ -120,7 +127,8 @@ func (d Docker) Build(image, directory string, opts DockerBuildOpts) (DockerTmpR
 	}
 
 	// Remove temporary tag to be nice to `docker images` output.
-	{
+	// (No point in "untagging" digest reference)
+	if !strings.HasPrefix(tmpRef.AsString(), "sha256:") {
 		var stdoutBuf, stderrBuf bytes.Buffer
 
 		cmd := exec.Command("docker", "rmi", tmpRef.AsString())
