@@ -51,7 +51,8 @@ overrides:
 	out = regexp.MustCompile("sha256\\-[a-z0-9]{64}").ReplaceAllString(out, "SHA256-REPLACED")
 	out = regexp.MustCompile("docker-io-(.+)-kbld-e2e-tests-build-SHA256-REPLACED").ReplaceAllString(out, "img-title-SHA256-REPLACED")
 
-	expectedOut := `kind: Object
+	expectedOut := `---
+kind: Object
 spec:
 - image: kbld:img-title-SHA256-REPLACED
 - image: kbld:simple-app-two-SHA256-REPLACED
@@ -109,7 +110,8 @@ overrides:
 
 	out = strings.Replace(out, regexp.MustCompile("sha256:[a-z0-9]{64}").FindString(out), "SHA256-REPLACED", -1)
 
-	expectedOut := env.WithRegistries(`kind: Object
+	expectedOut := env.WithRegistries(`---
+kind: Object
 spec:
 - image: index.docker.io/*username*/kbld-e2e-tests-build@SHA256-REPLACED
 - image: index.docker.io/*username*/kbld-e2e-tests-build@SHA256-REPLACED

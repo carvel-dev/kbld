@@ -25,7 +25,8 @@ spec:
 		StdinReader: strings.NewReader(input),
 	})
 
-	expectedOut := `kind: Object
+	expectedOut := `---
+kind: Object
 spec:
 - image: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
 - image: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
@@ -55,7 +56,8 @@ spec:
 	})
 
 	// TODO dedup same url images
-	expectedOut := `kind: Object
+	expectedOut := `---
+kind: Object
 metadata:
   annotations:
     kbld.k14s.io/images: |
@@ -147,7 +149,8 @@ overrides:
 		StdinReader: strings.NewReader(input),
 	})
 
-	expectedOut := `kind: Object
+	expectedOut := `---
+kind: Object
 spec:
 - image: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
 - image: docker.io/library/nginx:1.14.2
@@ -194,7 +197,8 @@ spec:
 		StdinReader: strings.NewReader(input),
 	})
 
-	expectedOut := `kind: Object
+	expectedOut := `---
+kind: Object
 spec:
 - image: docker.io/foo/img1@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
 - image: docker.io/foo/img2:1.14.2
