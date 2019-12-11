@@ -32,7 +32,9 @@ func (f Factory) New(url string) Image {
 
 	if srcConf, found := f.shouldBuild(url); found {
 		docker := Docker{f.logger}
-		buildImg := NewBuiltImage(url, srcConf, docker)
+		pack := Pack{docker, f.logger}
+
+		buildImg := NewBuiltImage(url, srcConf, docker, pack)
 
 		if imgDstConf, found := f.shouldPush(url); found {
 			return NewPushedImage(buildImg, imgDstConf, docker)

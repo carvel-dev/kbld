@@ -10,10 +10,13 @@ type BuiltImage struct {
 	url         string
 	buildSource ctlconf.Source
 	docker      Docker
+	pack        Pack
 }
 
-func NewBuiltImage(url string, buildSource ctlconf.Source, docker Docker) BuiltImage {
-	return BuiltImage{url, buildSource, docker}
+func NewBuiltImage(url string, buildSource ctlconf.Source,
+	docker Docker, pack Pack) BuiltImage {
+
+	return BuiltImage{url, buildSource, docker, pack}
 }
 
 func (i BuiltImage) URL() (string, []ImageMeta, error) {
@@ -22,20 +25,46 @@ func (i BuiltImage) URL() (string, []ImageMeta, error) {
 		return "", nil, err
 	}
 
-	opts := DockerBuildOpts{
-		Target:     i.buildSource.Docker.Build.Target,
-		Pull:       i.buildSource.Docker.Build.Pull,
-		NoCache:    i.buildSource.Docker.Build.NoCache,
-		File:       i.buildSource.Docker.Build.File,
-		RawOptions: i.buildSource.Docker.Build.RawOptions,
+	var digestStr string
+
+	switch {
+	case i.buildSource.Pack != nil:
+		opts := PackBuildOpts{
+			Builder:    i.buildSource.Pack.Build.Builder,
+			Buildpacks: i.buildSource.Pack.Build.Buildpacks,
+			ClearCache: i.buildSource.Pack.Build.ClearCache,
+			RawOptions: i.buildSource.Pack.Build.RawOptions,
+		}
+
+		digest, err := i.pack.Build(i.url, i.buildSource.Path, opts)
+		if err != nil {
+			return "", nil, err
+		}
+
+		digestStr = digest.AsString()
+
+	default:
+		if i.buildSource.Docker == nil {
+			i.buildSource.Docker = &ctlconf.SourceDockerOpts{}
+		}
+
+		opts := DockerBuildOpts{
+			Target:     i.buildSource.Docker.Build.Target,
+			Pull:       i.buildSource.Docker.Build.Pull,
+			NoCache:    i.buildSource.Docker.Build.NoCache,
+			File:       i.buildSource.Docker.Build.File,
+			RawOptions: i.buildSource.Docker.Build.RawOptions,
+		}
+
+		digest, err := i.docker.Build(i.url, i.buildSource.Path, opts)
+		if err != nil {
+			return "", nil, err
+		}
+
+		digestStr = digest.AsString()
 	}
 
-	digest, err := i.docker.Build(i.url, i.buildSource.Path, opts)
-	if err != nil {
-		return "", nil, err
-	}
-
-	return digest.AsString(), sources, nil
+	return digestStr, sources, nil
 }
 
 type BuiltImageSourceGit struct {

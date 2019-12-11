@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func TestBuildSuccessful(t *testing.T) {
+func TestDockerBuildSuccessful(t *testing.T) {
 	env := BuildEnv(t)
 	kbld := Kbld{t, env.Namespace, Logger{}}
 
@@ -65,7 +65,7 @@ spec:
 	}
 }
 
-func TestBuildAndPushSuccessful(t *testing.T) {
+func TestDockerBuildAndPushSuccessful(t *testing.T) {
 	env := BuildEnv(t)
 	kbld := Kbld{t, env.Namespace, Logger{}}
 
