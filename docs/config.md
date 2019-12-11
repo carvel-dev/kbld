@@ -17,7 +17,7 @@ sources:
   path: src/
 ```
 
-For Docker (all options shown):
+#### Docker
 
 ```yaml
 ---
@@ -27,6 +27,7 @@ sources:
 - image: image1
   path: src/
   docker:
+    # all options shown; none are required
     build:
       target: "some-target"
       pull: true
@@ -35,7 +36,13 @@ sources:
       rawOptions: ["--squash"]
 ```
 
-For pack:
+- `docker.build.target` (string): Set the target build stage to build (no default)
+- `docker.build.pull` (bool): Always attempt to pull a newer version of the image (default is false)
+- `docker.build.noCache` (bool): Do not use cache when building the image (default is false)
+- `docker.build.file` (string): Name of the Dockerfile (default is Dockerfile)
+- `docker.build.rawOptions` ([]string): Refer to https://docs.docker.com/engine/reference/commandline/build/ for all available options
+
+#### Pack
 
 ```yaml
 ---
@@ -48,16 +55,6 @@ sources:
     build:
       builder: cloudfoundry/cnb:bionic
 ```
-
-#### Docker
-
-- `docker.build.target` (string): Set the target build stage to build (no default)
-- `docker.build.pull` (bool): Always attempt to pull a newer version of the image (default is false)
-- `docker.build.noCache` (bool): Do not use cache when building the image (default is false)
-- `docker.build.file` (string): Name of the Dockerfile (default is Dockerfile)
-- `docker.build.rawOptions` ([]string): Refer to https://docs.docker.com/engine/reference/commandline/build/ for all available options
-
-#### Pack
 
 - `pack.build.builder` (string): Set builder image (required)
 - `pack.build.buildpacks` ([]string): Set list of buildpacks to be used (no default)
