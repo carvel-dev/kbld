@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"os"
 	"os/exec"
 	"regexp"
 	"strings"
@@ -44,6 +45,11 @@ type DockerImageDigest struct {
 func (r DockerImageDigest) AsString() string { return r.val }
 
 func (d Docker) Build(image, directory string, opts DockerBuildOpts) (DockerTmpRef, error) {
+	err := d.ensureDirectory(directory)
+	if err != nil {
+		return DockerTmpRef{}, err
+	}
+
 	randPrefix, err := d.randomStr(5)
 	if err != nil {
 		return DockerTmpRef{}, fmt.Errorf("Generating tmp image suffix: %s", err)
@@ -220,6 +226,21 @@ func (d Docker) Push(tmpRef DockerTmpRef, imageDst string) (DockerImageDigest, e
 	}
 
 	return d.determineRepoDigest(currInspectData, prefixedLogger)
+}
+
+func (d Docker) ensureDirectory(directory string) error {
+	stat, err := os.Stat(directory)
+	if err != nil {
+		return fmt.Errorf("Checking if path '%s' is a directory: %s", directory, err)
+	}
+
+	// Provide explicit directory check error message because otherwise docker CLI
+	// outputs confusing msg 'error: fork/exec /usr/local/bin/docker: not a directory'
+	if !stat.IsDir() {
+		return fmt.Errorf("Expected path '%s' to be a directory, but was not", directory)
+	}
+
+	return nil
 }
 
 func (d Docker) determineRepoDigest(inspectData dockerInspectData, prefixedLogger *LoggerPrefixWriter) (DockerImageDigest, error) {
