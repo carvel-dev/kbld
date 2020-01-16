@@ -102,3 +102,15 @@ overrides:
 ```
 
 For preresolved images, kbld will not connect to registry to obtain any metadata.
+
+### ImageKeys
+
+ImageKeys resource configures kbld to look for additional keys that reference images (in addition to using default `image` key).
+
+```yaml
+---
+apiVersion: kbld.k14s.io/v1alpha1
+kind: ImageKeys
+keys:
+- sidecarImage
+```

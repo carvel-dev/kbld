@@ -4,6 +4,7 @@ import (
 	"github.com/cppforlife/go-cli-ui/ui"
 	uitable "github.com/cppforlife/go-cli-ui/ui/table"
 	cmdcore "github.com/k14s/kbld/pkg/kbld/cmd/core"
+	ctlconf "github.com/k14s/kbld/pkg/kbld/config"
 	ctlres "github.com/k14s/kbld/pkg/kbld/resources"
 	"github.com/spf13/cobra"
 )
@@ -33,12 +34,12 @@ func NewInspectCmd(o *InspectOptions, flagsFactory cmdcore.FlagsFactory) *cobra.
 }
 
 func (o *InspectOptions) Run() error {
-	rs, _, err := o.FileFlags.ResourcesAndConfig()
+	rs, conf, err := o.FileFlags.ResourcesAndConfig()
 	if err != nil {
 		return err
 	}
 
-	foundImages, err := o.findImages(rs)
+	foundImages, err := o.findImages(rs, conf)
 	if err != nil {
 		return err
 	}
@@ -81,11 +82,15 @@ func (o *InspectOptions) Run() error {
 	return nil
 }
 
-func (o *InspectOptions) findImages(rs []ctlres.Resource) ([]foundResourceWithImage, error) {
+func (o *InspectOptions) findImages(rs []ctlres.Resource,
+	conf ctlconf.Conf) ([]foundResourceWithImage, error) {
+
 	foundImages := []foundResourceWithImage{}
 
 	for _, res := range rs {
-		visitValues(res.DeepCopyRaw(), imageKey, func(val interface{}) (interface{}, bool) {
+		imageKVs := ImageKVs{res.DeepCopyRaw(), conf.ImageKeys()}
+
+		imageKVs.Visit(func(val interface{}) (interface{}, bool) {
 			if imgURL, ok := val.(string); ok {
 				foundImages = append(foundImages, foundResourceWithImage{URL: imgURL, Resource: res})
 			}

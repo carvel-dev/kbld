@@ -8,6 +8,7 @@ import (
 	"github.com/ghodss/yaml"
 	regname "github.com/google/go-containerregistry/pkg/name"
 	cmdcore "github.com/k14s/kbld/pkg/kbld/cmd/core"
+	ctlconf "github.com/k14s/kbld/pkg/kbld/config"
 	ctlimg "github.com/k14s/kbld/pkg/kbld/image"
 	regtarball "github.com/k14s/kbld/pkg/kbld/imagetarball"
 	ctlres "github.com/k14s/kbld/pkg/kbld/resources"
@@ -53,7 +54,7 @@ func (o *UnpackageOptions) Run() error {
 	logger := ctlimg.NewLogger(os.Stderr)
 	prefixedLogger := logger.NewPrefixedWriter("unpackage | ")
 
-	nonConfigRs, _, err := o.FileFlags.ResourcesAndConfig()
+	nonConfigRs, conf, err := o.FileFlags.ResourcesAndConfig()
 	if err != nil {
 		return err
 	}
@@ -65,7 +66,7 @@ func (o *UnpackageOptions) Run() error {
 	}
 
 	// Update previous image references with new references
-	resBss, err := o.updateRefsInResources(nonConfigRs, importedImages)
+	resBss, err := o.updateRefsInResources(nonConfigRs, conf, importedImages)
 	if err != nil {
 		return err
 	}
@@ -80,15 +81,17 @@ func (o *UnpackageOptions) Run() error {
 }
 
 func (o *UnpackageOptions) updateRefsInResources(
-	nonConfigRs []ctlres.Resource, resolvedImages map[string]string) ([][]byte, error) {
+	nonConfigRs []ctlres.Resource, conf ctlconf.Conf,
+	resolvedImages map[string]string) ([][]byte, error) {
 
 	var missingImageErrs []error
 	var resBss [][]byte
 
 	for _, res := range nonConfigRs {
 		resContents := res.DeepCopyRaw()
+		imageKVs := ImageKVs{resContents, conf.ImageKeys()}
 
-		visitValues(resContents, imageKey, func(val interface{}) (interface{}, bool) {
+		imageKVs.Visit(func(val interface{}) (interface{}, bool) {
 			if img, ok := val.(string); ok {
 				if outputImg, found := resolvedImages[img]; found {
 					return outputImg, true

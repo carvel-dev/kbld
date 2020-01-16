@@ -209,3 +209,40 @@ spec:
 		t.Fatalf("Expected >>>%s<<< to match >>>%s<<<", out, expectedOut)
 	}
 }
+
+func TestResolveWithImageKeys(t *testing.T) {
+	env := BuildEnv(t)
+	kbld := Kbld{t, env.Namespace, Logger{}}
+
+	input := `
+kind: Object
+spec:
+- image: nginx:1.14.2
+- customImage: nginx:1.14.2
+- subPath:
+    anotherCustomImage: nginx:1.14.2
+---
+apiVersion: kbld.k14s.io/v1alpha1
+kind: ImageKeys
+keys:
+- customImage
+- anotherCustomImage
+`
+
+	out, _ := kbld.RunWithOpts([]string{"-f", "-", "--images-annotation=false"}, RunOpts{
+		StdinReader: strings.NewReader(input),
+	})
+
+	expectedOut := `---
+kind: Object
+spec:
+- image: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
+- customImage: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
+- subPath:
+    anotherCustomImage: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
+`
+
+	if out != expectedOut {
+		t.Fatalf("Expected >>>%s<<< to match >>>%s<<<", out, expectedOut)
+	}
+}

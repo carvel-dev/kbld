@@ -12,10 +12,11 @@ const (
 	sourcesKind           = "Sources"           // specify list of sources for building images
 	imageOverridesKind    = "ImageOverrides"    // specify alternative image urls
 	imageDestinationsKind = "ImageDestinations" // specify image push destinations
+	imageKeysKind         = "ImageKeys"
 )
 
 var (
-	configKinds = []string{sourcesKind, imageOverridesKind, imageDestinationsKind}
+	configKinds = []string{sourcesKind, imageOverridesKind, imageDestinationsKind, imageKeysKind}
 )
 
 type Config struct {
@@ -25,6 +26,7 @@ type Config struct {
 	Sources      []Source
 	Overrides    []ImageOverride
 	Destinations []ImageDestination
+	Keys         []string
 }
 
 type Source struct {
@@ -93,6 +95,12 @@ func (d Config) Validate() error {
 		err := dst.Validate()
 		if err != nil {
 			return fmt.Errorf("Validating Destinations[%d]: %s", i, err)
+		}
+	}
+
+	for i, key := range d.Keys {
+		if len(key) == 0 {
+			return fmt.Errorf("Validating Destinations[%d]: Expected to be non-empty", i)
 		}
 	}
 

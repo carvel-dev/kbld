@@ -7,6 +7,7 @@ import (
 	"github.com/cppforlife/go-cli-ui/ui"
 	regname "github.com/google/go-containerregistry/pkg/name"
 	cmdcore "github.com/k14s/kbld/pkg/kbld/cmd/core"
+	ctlconf "github.com/k14s/kbld/pkg/kbld/config"
 	ctlimg "github.com/k14s/kbld/pkg/kbld/image"
 	regtarball "github.com/k14s/kbld/pkg/kbld/imagetarball"
 	ctlres "github.com/k14s/kbld/pkg/kbld/resources"
@@ -49,12 +50,12 @@ func (o *PackageOptions) Run() error {
 	logger := ctlimg.NewLogger(os.Stderr)
 	prefixedLogger := logger.NewPrefixedWriter("package | ")
 
-	allRs, err := o.FileFlags.AllResources()
+	rs, conf, err := o.FileFlags.ResourcesAndConfig()
 	if err != nil {
 		return err
 	}
 
-	foundImages, err := o.findImages(allRs, logger)
+	foundImages, err := o.findImages(rs, conf, logger)
 	if err != nil {
 		return err
 	}
@@ -62,11 +63,15 @@ func (o *PackageOptions) Run() error {
 	return o.exportImages(foundImages, prefixedLogger)
 }
 
-func (o *PackageOptions) findImages(allRs []ctlres.Resource, logger ctlimg.Logger) (map[string]struct{}, error) {
+func (o *PackageOptions) findImages(allRs []ctlres.Resource,
+	conf ctlconf.Conf, logger ctlimg.Logger) (map[string]struct{}, error) {
+
 	foundImages := map[string]struct{}{}
 
 	for _, res := range allRs {
-		visitValues(res.DeepCopyRaw(), imageKey, func(val interface{}) (interface{}, bool) {
+		imageKVs := ImageKVs{res.DeepCopyRaw(), conf.ImageKeys()}
+
+		imageKVs.Visit(func(val interface{}) (interface{}, bool) {
 			if img, ok := val.(string); ok {
 				foundImages[img] = struct{}{}
 			}

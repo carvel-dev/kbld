@@ -15,10 +15,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-const (
-	imageKey = "image"
-)
-
 type ResolveOptions struct {
 	ui          ui.UI
 	depsFactory cmdcore.DepsFactory
@@ -65,7 +61,7 @@ func (o *ResolveOptions) Run() error {
 	registry := ctlimg.NewRegistry(o.RegistryFlags.AsRegistryOpts())
 	imgFactory := ctlimg.NewFactory(conf, registry, logger)
 
-	resolvedImages, err := o.resolveImages(nonConfigRs, imgFactory)
+	resolvedImages, err := o.resolveImages(nonConfigRs, conf, imgFactory)
 	if err != nil {
 		return err
 	}
@@ -75,7 +71,7 @@ func (o *ResolveOptions) Run() error {
 		prefixedLogger.WriteStr("final: %s -> %s\n", imgURL, img.URL)
 	}
 
-	resBss, err := o.updateRefsInResources(nonConfigRs, resolvedImages, imgFactory)
+	resBss, err := o.updateRefsInResources(nonConfigRs, conf, resolvedImages, imgFactory)
 	if err != nil {
 		return err
 	}
@@ -89,13 +85,15 @@ func (o *ResolveOptions) Run() error {
 	return nil
 }
 
-func (o *ResolveOptions) resolveImages(
-	nonConfigRs []ctlres.Resource, imgFactory ctlimg.Factory) (map[string]Image, error) {
+func (o *ResolveOptions) resolveImages(nonConfigRs []ctlres.Resource,
+	conf ctlconf.Conf, imgFactory ctlimg.Factory) (map[string]Image, error) {
 
 	foundImages := map[string]struct{}{}
 
 	for _, res := range nonConfigRs {
-		visitValues(res.DeepCopyRaw(), imageKey, func(val interface{}) (interface{}, bool) {
+		imageKVs := ImageKVs{res.DeepCopyRaw(), conf.ImageKeys()}
+
+		imageKVs.Visit(func(val interface{}) (interface{}, bool) {
 			if imgURL, ok := val.(string); ok {
 				foundImages[imgURL] = struct{}{}
 			}
@@ -114,7 +112,8 @@ func (o *ResolveOptions) resolveImages(
 }
 
 func (o *ResolveOptions) updateRefsInResources(nonConfigRs []ctlres.Resource,
-	resolvedImages map[string]Image, imgFactory ctlimg.Factory) ([][]byte, error) {
+	conf ctlconf.Conf, resolvedImages map[string]Image,
+	imgFactory ctlimg.Factory) ([][]byte, error) {
 
 	var errs []error
 	var resBss [][]byte
@@ -122,8 +121,9 @@ func (o *ResolveOptions) updateRefsInResources(nonConfigRs []ctlres.Resource,
 	for _, res := range nonConfigRs {
 		resContents := res.DeepCopyRaw()
 		images := []Image{}
+		imageKVs := ImageKVs{resContents, conf.ImageKeys()}
 
-		visitValues(resContents, imageKey, func(val interface{}) (interface{}, bool) {
+		imageKVs.Visit(func(val interface{}) (interface{}, bool) {
 			imgURL, ok := val.(string)
 			if !ok {
 				return nil, false
@@ -168,37 +168,6 @@ func errFromErrs(errs []error) error {
 		errStrs = append(errStrs, err.Error())
 	}
 	return fmt.Errorf("\n- %s", strings.Join(errStrs, "\n- "))
-}
-
-func visitValues(obj interface{}, key string, visitorFunc func(interface{}) (interface{}, bool)) {
-	switch typedObj := obj.(type) {
-	case map[string]interface{}:
-		for k, v := range typedObj {
-			if k == key {
-				if newVal, update := visitorFunc(v); update {
-					typedObj[k] = newVal
-				}
-			} else {
-				visitValues(typedObj[k], key, visitorFunc)
-			}
-		}
-
-	case map[string]string:
-		for k, v := range typedObj {
-			if k == key {
-				if newVal, update := visitorFunc(v); update {
-					typedObj[k] = newVal.(string)
-				}
-			} else {
-				visitValues(typedObj[k], key, visitorFunc)
-			}
-		}
-
-	case []interface{}:
-		for _, o := range typedObj {
-			visitValues(o, key, visitorFunc)
-		}
-	}
 }
 
 func (o *ResolveOptions) withImageMapConf(conf ctlconf.Conf) (ctlconf.Conf, error) {

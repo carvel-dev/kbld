@@ -66,3 +66,11 @@ func (c Conf) ImageDestinations() []ImageDestination {
 	}
 	return result
 }
+
+func (c Conf) ImageKeys() []string {
+	result := []string{"image"} // default is just "image"
+	for _, config := range c.configs {
+		result = append(result, config.Keys...)
+	}
+	return result
+}
