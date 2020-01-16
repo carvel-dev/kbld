@@ -2,6 +2,10 @@
 
 set -e -x -u
 
+# makes builds reproducible
+export CGO_ENABLED=0
+repro_flags="-ldflags=-buildid= -trimpath"
+
 go fmt ./cmd/... ./pkg/... ./test/...
 
 build_values_path="../../../${BUILD_VALUES:-./hack/build-values-default.yml}"
@@ -21,12 +25,12 @@ build_values_path="../../../${BUILD_VALUES:-./hack/build-values-default.yml}"
 mv tmp/generated.go.txt pkg/kbld/website/generated.go
 
 # export GOOS=linux GOARCH=amd64
-go build -o kbld ./cmd/kbld/...
+go build $repro_flags -o kbld ./cmd/kbld/...
 ./kbld version
 
 # build aws lambda binary
 export GOOS=linux GOARCH=amd64
-go build -o ./tmp/main ./cmd/kbld-lambda-website/...
+go build $repro_flags -o ./tmp/main ./cmd/kbld-lambda-website/...
 (
 	cd tmp
 	chmod +x main
