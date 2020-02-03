@@ -29,7 +29,7 @@ func main() {
 
 	err := command.Execute()
 	if err != nil {
-		confUI.ErrorLinef("Error: %v", err)
+		confUI.ErrorLinef("kbld: Error: %v", err)
 		os.Exit(1)
 	}
 
