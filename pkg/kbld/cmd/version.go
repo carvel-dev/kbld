@@ -30,7 +30,7 @@ func NewVersionCmd(o *VersionOptions, flagsFactory cmdcore.FlagsFactory) *cobra.
 }
 
 func (o *VersionOptions) Run() error {
-	o.ui.PrintBlock([]byte(fmt.Sprintf("Client Version: %s\n", Version)))
+	o.ui.PrintBlock([]byte(fmt.Sprintf("kbld version %s\n", Version)))
 
 	return nil
 }

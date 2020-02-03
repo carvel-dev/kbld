@@ -35,6 +35,7 @@ func NewKbldCmd(o *KbldOptions, flagsFactory cmdcore.FlagsFactory) *cobra.Comman
 
 	cmd.Use = "kbld"
 	cmd.Short = "kbld prepares Docker images to deploy to Kubernetes"
+	cmd.Version = Version
 
 	// Affects children as well
 	cmd.SilenceErrors = true

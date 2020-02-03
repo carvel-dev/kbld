@@ -11,7 +11,7 @@ func TestVersion(t *testing.T) {
 
 	out, _ := kbld.RunWithOpts([]string{"version"}, RunOpts{})
 
-	if !strings.Contains(out, "Client Version") {
+	if !strings.Contains(out, "kbld version") {
 		t.Fatalf("Expected to find client version")
 	}
 }
