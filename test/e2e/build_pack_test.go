@@ -23,12 +23,12 @@ sources:
   path: assets/simple-app
   pack: &pack
     build:
-      builder: cloudfoundry/cnb:bionic
+      builder: index.docker.io/cloudfoundry/cnb@sha256:83270cf59e8944be0c544e45fd45a5a1f4526d7936d488d2de8937730341618d
 - image: docker.io/*username*/kbld-e2e-tests-build2
   path: assets/simple-app
   pack: &pack
     build:
-      builder: cloudfoundry/cnb:bionic
+      builder: index.docker.io/cloudfoundry/cnb@sha256:83270cf59e8944be0c544e45fd45a5a1f4526d7936d488d2de8937730341618d
 ---
 apiVersion: kbld.k14s.io/v1alpha1
 kind: ImageDestinations
