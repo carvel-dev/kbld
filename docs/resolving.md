@@ -5,17 +5,47 @@ kbld looks for `image` keys within YAML documents and tries to resolve image ref
 For example, following
 
 ```yaml
-kind: Object
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kbld-test1
 spec:
-- image: nginx:1.14.2
+  selector:
+    matchLabels:
+      app: kbld-test1
+  template:
+    metadata:
+      labels:
+        app: kbld-test1
+    spec:
+      containers:
+      - name: my-app
+        image: nginx:1.14.2
+        #!      ^-- image reference in its tag form
 ```
 
 will be transformed to
 
 ```yaml
-kind: Object
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kbld-test1
 spec:
-- image: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
+  selector:
+    matchLabels:
+      app: kbld-test1
+  template:
+    metadata:
+      labels:
+        app: kbld-test1
+    spec:
+      containers:
+      - name: my-app
+        image: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
+        #!      ^-- resolved image reference to its digest form
 ```
 
 via

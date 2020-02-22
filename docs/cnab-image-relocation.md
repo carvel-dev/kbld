@@ -16,17 +16,47 @@ kbld supports applying `relocation-mapping.json` on top of YAML configuration vi
 and kbld input:
 
 ```yaml
-kind: Object
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kbld-test1
 spec:
-- image: gabrtv/microservice@sha256:cca460afa270d4c527981ef9ca4989346c56cf9b20217dcea37df1ece8120687
-- image: technosophos/helloworld:0.1.0
+  selector:
+    matchLabels:
+      app: kbld-test1
+  template:
+    metadata:
+      labels:
+        app: kbld-test1
+    spec:
+      containers:
+      - name: my-app
+        image: gabrtv/microservice@sha256:cca460afa270d4c527981ef9ca4989346c56cf9b20217dcea37df1ece8120687
+      - name: my-app2
+        image: technosophos/helloworld:0.1.0
 ```
 
 would result in:
 
 ```yaml
-kind: Object
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kbld-test1
 spec:
-- image: my.registry/microservice@sha256:cca460afa270d4c527981ef9ca4989346c56cf9b20217dcea37df1ece8120687
-- image: my.registry/helloworld:0.1.0
+  selector:
+    matchLabels:
+      app: kbld-test1
+  template:
+    metadata:
+      labels:
+        app: kbld-test1
+    spec:
+      containers:
+      - name: my-app
+        image: my.registry/microservice@sha256:cca460afa270d4c527981ef9ca4989346c56cf9b20217dcea37df1ece8120687
+      - name: my-app2
+        image: my.registry/helloworld:0.1.0
 ```
