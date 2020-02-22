@@ -1,5 +1,19 @@
-images:
-- image: simple-app
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kbld-simple-app-build-local-pack
+spec:
+  selector:
+    matchLabels:
+      app: kbld-simple-app-build-local-pack
+  template:
+    metadata:
+      labels:
+        app: kbld-simple-app-build-local-pack
+    spec:
+      containers:
+      - name: my-app
+        image: simple-app
 ---
 apiVersion: kbld.k14s.io/v1alpha1
 kind: Sources

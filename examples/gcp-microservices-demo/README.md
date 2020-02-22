@@ -4,7 +4,7 @@ Repo: [https://github.com/GoogleCloudPlatform/microservices-demo](https://github
 
 ```bash
 $ git clone https://github.com/GoogleCloudPlatform/microservices-demo
-$ kbld -R -f microservices-demo/kubernetes-manifests -f ../examples/gcp-microservices-demo/prebuilt.yml | kapp deploy -a md -f - -y
+$ kapp deploy -a md -f <(kbld -f microservices-demo/kubernetes-manifests -f ../examples/gcp-microservices-demo/prebuilt.yml)
 ```
 
 With your own application one would expect that `prebuilt.yml` configuration would be part of that repository (instead of similar to this example, where `prebuilt.yml` is in a separate repo).

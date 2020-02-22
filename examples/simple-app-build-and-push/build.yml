@@ -1,4 +1,19 @@
-image: simple-app
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kbld-simple-app
+spec:
+  selector:
+    matchLabels:
+      app: kbld-simple-app
+  template:
+    metadata:
+      labels:
+        app: kbld-simple-app
+    spec:
+      containers:
+      - name: my-app
+        image: simple-app
 ---
 apiVersion: kbld.k14s.io/v1alpha1
 kind: Sources

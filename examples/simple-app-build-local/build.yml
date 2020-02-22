@@ -1,6 +1,36 @@
-images:
-- image: simple-app
-- image: simple-app2
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kbld-simple-app-build-local
+spec:
+  selector:
+    matchLabels:
+      app: kbld-simple-app-build-local
+  template:
+    metadata:
+      labels:
+        app: kbld-simple-app-build-local
+    spec:
+      containers:
+      - name: my-app
+        image: simple-app
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kbld-simple-app-build-local2
+spec:
+  selector:
+    matchLabels:
+      app: kbld-simple-app-build-local2
+  template:
+    metadata:
+      labels:
+        app: kbld-simple-app-build-local2
+    spec:
+      containers:
+      - name: my-app2
+        image: simple-app2
 ---
 apiVersion: kbld.k14s.io/v1alpha1
 kind: ImageOverrides
