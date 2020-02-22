@@ -16,14 +16,14 @@ jobs:
     - name: Run Tests
       run: |
         set -e -x
-        sudo apt-get update
-        sudo apt-get -y install git
         export GOPATH=$(echo `pwd`/../../../../)
         # install ytt for build
         mkdir -p tmp/bin/
         wget -O- https://k14s.io/install.sh | K14SIO_INSTALL_BIN_DIR=tmp/bin bash
         rm -f tmp/bin/kbld
         export PATH=`pwd`/tmp/bin:$PATH
+        git config --global user.email "dummy@k14s.io"
+        git config --global user.name "Dummy dummy"
         ./hack/build.sh
         ./hack/test.sh
         ./hack/build-binaries.sh
