@@ -16,6 +16,8 @@ jobs:
     - name: Run Tests
       run: |
         set -e -x
+        apt-get update
+        apt-get install git
         export GOPATH=$(echo `pwd`/../../../../)
         # install ytt for build
         mkdir -p tmp/bin/
