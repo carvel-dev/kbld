@@ -64,7 +64,7 @@ $ ytt -f ./some-app | <span class="green">kbld -f -</span> | kapp -y deploy -a s
                 <th>stdout</th>
               </tr>
               <tr>
-                <td colspan="2"><p>Resolves name-tag pair reference (<code>nginx:1.7.9</code>) into digest reference (<code>index.docker.io/library/nginx@sha256:c398dc3f2...</code>)</p></td>
+                <td colspan="2"><p>Resolves name-tag pair reference (<code>nginx:1.17</code>) into digest reference (<code>index.docker.io/library/nginx@sha256:2539d4344...</code>)</p></td>
               </tr>
               <tr>
                 <td class="before">
@@ -87,7 +87,7 @@ spec:
     spec:
       containers:
       - name: nginx
-        <span class="green">image: nginx:1.7.9</span>
+        <span class="green">image: nginx:1.17</span>
         ports:
         - containerPort: 80</pre>
                 </td>
@@ -102,10 +102,10 @@ metadata:
   annotations:
     <span class="green">kbld.k14s.io/images: |
       - Metas:
-        - Tag: 1.7.9
+        - Tag: 1.17
           Type: resolved
-          URL: nginx:1.7.9
-        URL: index.docker.io/library/nginx@sha256:c398dc3f2...</span>
+          URL: nginx:1.17
+        URL: index.docker.io/library/nginx@sha256:2539d4344...</span>
 spec:
   replicas: 3
   selector:
@@ -118,7 +118,7 @@ spec:
     spec:
       containers:
       - name: nginx
-        <span class="green">image: index.docker.io/library/nginx@sha256:c398dc3f2...</span>
+        <span class="green">image: index.docker.io/library/nginx@sha256:2539d4344...</span>
         ports:
         - containerPort: 80</pre>
                 </td>
