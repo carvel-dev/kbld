@@ -3,25 +3,23 @@ package cmd
 import (
 	"github.com/cppforlife/go-cli-ui/ui"
 	uitable "github.com/cppforlife/go-cli-ui/ui/table"
-	cmdcore "github.com/k14s/kbld/pkg/kbld/cmd/core"
 	ctlconf "github.com/k14s/kbld/pkg/kbld/config"
 	ctlres "github.com/k14s/kbld/pkg/kbld/resources"
 	"github.com/spf13/cobra"
 )
 
 type InspectOptions struct {
-	ui          ui.UI
-	depsFactory cmdcore.DepsFactory
+	ui ui.UI
 
 	FileFlags     FileFlags
 	RegistryFlags RegistryFlags
 }
 
-func NewInspectOptions(ui ui.UI, depsFactory cmdcore.DepsFactory) *InspectOptions {
-	return &InspectOptions{ui: ui, depsFactory: depsFactory}
+func NewInspectOptions(ui ui.UI) *InspectOptions {
+	return &InspectOptions{ui: ui}
 }
 
-func NewInspectCmd(o *InspectOptions, flagsFactory cmdcore.FlagsFactory) *cobra.Command {
+func NewInspectCmd(o *InspectOptions) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "inspect",
 		Aliases: []string{"i", "is", "insp"},

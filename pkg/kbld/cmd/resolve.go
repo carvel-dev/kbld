@@ -8,7 +8,6 @@ import (
 	"strings"
 
 	"github.com/cppforlife/go-cli-ui/ui"
-	cmdcore "github.com/k14s/kbld/pkg/kbld/cmd/core"
 	ctlconf "github.com/k14s/kbld/pkg/kbld/config"
 	ctlimg "github.com/k14s/kbld/pkg/kbld/image"
 	ctlres "github.com/k14s/kbld/pkg/kbld/resources"
@@ -16,8 +15,7 @@ import (
 )
 
 type ResolveOptions struct {
-	ui          ui.UI
-	depsFactory cmdcore.DepsFactory
+	ui ui.UI
 
 	FileFlags        FileFlags
 	RegistryFlags    RegistryFlags
@@ -26,11 +24,11 @@ type ResolveOptions struct {
 	ImageMapFile     string
 }
 
-func NewResolveOptions(ui ui.UI, depsFactory cmdcore.DepsFactory) *ResolveOptions {
-	return &ResolveOptions{ui: ui, depsFactory: depsFactory}
+func NewResolveOptions(ui ui.UI) *ResolveOptions {
+	return &ResolveOptions{ui: ui}
 }
 
-func NewResolveCmd(o *ResolveOptions, flagsFactory cmdcore.FlagsFactory) *cobra.Command {
+func NewResolveCmd(o *ResolveOptions) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "resolve",
 		Short: "Build images and update references",

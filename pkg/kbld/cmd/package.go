@@ -6,7 +6,6 @@ import (
 
 	"github.com/cppforlife/go-cli-ui/ui"
 	regname "github.com/google/go-containerregistry/pkg/name"
-	cmdcore "github.com/k14s/kbld/pkg/kbld/cmd/core"
 	ctlconf "github.com/k14s/kbld/pkg/kbld/config"
 	ctlimg "github.com/k14s/kbld/pkg/kbld/image"
 	regtarball "github.com/k14s/kbld/pkg/kbld/imagetarball"
@@ -15,8 +14,7 @@ import (
 )
 
 type PackageOptions struct {
-	ui          ui.UI
-	depsFactory cmdcore.DepsFactory
+	ui ui.UI
 
 	FileFlags     FileFlags
 	RegistryFlags RegistryFlags
@@ -25,11 +23,11 @@ type PackageOptions struct {
 
 var _ regtarball.TarDescriptorsMetadata = ctlimg.Registry{}
 
-func NewPackageOptions(ui ui.UI, depsFactory cmdcore.DepsFactory) *PackageOptions {
-	return &PackageOptions{ui: ui, depsFactory: depsFactory}
+func NewPackageOptions(ui ui.UI) *PackageOptions {
+	return &PackageOptions{ui: ui}
 }
 
-func NewPackageCmd(o *PackageOptions, flagsFactory cmdcore.FlagsFactory) *cobra.Command {
+func NewPackageCmd(o *PackageOptions) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "package",
 		Aliases: []string{"pkg"},

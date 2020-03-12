@@ -7,7 +7,6 @@ import (
 	"github.com/cppforlife/go-cli-ui/ui"
 	"github.com/ghodss/yaml"
 	regname "github.com/google/go-containerregistry/pkg/name"
-	cmdcore "github.com/k14s/kbld/pkg/kbld/cmd/core"
 	ctlconf "github.com/k14s/kbld/pkg/kbld/config"
 	ctlimg "github.com/k14s/kbld/pkg/kbld/image"
 	regtarball "github.com/k14s/kbld/pkg/kbld/imagetarball"
@@ -16,8 +15,7 @@ import (
 )
 
 type UnpackageOptions struct {
-	ui          ui.UI
-	depsFactory cmdcore.DepsFactory
+	ui ui.UI
 
 	FileFlags     FileFlags
 	RegistryFlags RegistryFlags
@@ -25,11 +23,11 @@ type UnpackageOptions struct {
 	Repository    string
 }
 
-func NewUnpackageOptions(ui ui.UI, depsFactory cmdcore.DepsFactory) *UnpackageOptions {
-	return &UnpackageOptions{ui: ui, depsFactory: depsFactory}
+func NewUnpackageOptions(ui ui.UI) *UnpackageOptions {
+	return &UnpackageOptions{ui: ui}
 }
 
-func NewUnpackageCmd(o *UnpackageOptions, flagsFactory cmdcore.FlagsFactory) *cobra.Command {
+func NewUnpackageCmd(o *UnpackageOptions) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "unpackage",
 		Aliases: []string{"unpkg"},

@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/cppforlife/go-cli-ui/ui"
-	cmdcore "github.com/k14s/kbld/pkg/kbld/cmd/core"
 	"github.com/spf13/cobra"
 )
 
@@ -20,7 +19,7 @@ func NewVersionOptions(ui ui.UI) *VersionOptions {
 	return &VersionOptions{ui}
 }
 
-func NewVersionCmd(o *VersionOptions, flagsFactory cmdcore.FlagsFactory) *cobra.Command {
+func NewVersionCmd(o *VersionOptions) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "version",
 		Short: "Print client version",
