@@ -114,3 +114,14 @@ kind: ImageKeys
 keys:
 - sidecarImage
 ```
+
+### Matching images
+
+Available as of 0.15.0+
+
+`Sources`, `ImageDestinations`, and `ImageOverrides` have ability to match images in following ways:
+
+- via `image` to match exact content
+  - e.g. `image: image1` which would only match `image1`
+- via `imageRepo` to match only by registry+repo combination
+  - e.g. `imageRepo: gcr.io/org/app1` which would match `gcr.io/org/app1:latest` or `gcr.io/org/app1@sha256:...` or just `gcr.io/org/app1`

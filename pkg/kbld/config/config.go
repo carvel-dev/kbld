@@ -30,22 +30,27 @@ type Config struct {
 }
 
 type Source struct {
-	Image string
-	Path  string
+	ImageRef
+	Path string
 
 	Docker *SourceDockerOpts
 	Pack   *SourcePackOpts
 }
 
 type ImageOverride struct {
-	Image       string
+	ImageRef
 	NewImage    string `json:"newImage"`
 	Preresolved bool
 }
 
 type ImageDestination struct {
-	Image    string
+	ImageRef
 	NewImage string `json:"newImage"`
+}
+
+type ImageRef struct {
+	Image     string
+	ImageRepo string `json:"imageRepo"`
 }
 
 func NewConfigFromResource(res ctlres.Resource) (Config, error) {
@@ -108,8 +113,9 @@ func (d Config) Validate() error {
 }
 
 func (d Source) Validate() error {
-	if len(d.Image) == 0 {
-		return fmt.Errorf("Expected Image to be non-empty")
+	err := d.ImageRef.Validate()
+	if err != nil {
+		return err
 	}
 	if len(d.Path) == 0 {
 		return fmt.Errorf("Expected Path to be non-empty")
@@ -118,8 +124,9 @@ func (d Source) Validate() error {
 }
 
 func (d ImageOverride) Validate() error {
-	if len(d.Image) == 0 {
-		return fmt.Errorf("Expected Image to be non-empty")
+	err := d.ImageRef.Validate()
+	if err != nil {
+		return err
 	}
 	if len(d.NewImage) == 0 {
 		return fmt.Errorf("Expected NewImage to be non-empty")
@@ -128,14 +135,12 @@ func (d ImageOverride) Validate() error {
 }
 
 func (d ImageDestination) Validate() error {
-	if len(d.Image) == 0 {
-		return fmt.Errorf("Expected Image to be non-empty")
+	return d.ImageRef.Validate()
+}
+
+func (r ImageRef) Validate() error {
+	if len(r.Image) == 0 && len(r.ImageRepo) == 0 {
+		return fmt.Errorf("Expected Image or ImageRepo to be non-empty")
 	}
 	return nil
 }
-
-func (d Source) Matches(url string) bool { return d.Image == url }
-
-func (d ImageOverride) Matches(url string) bool { return d.Image == url }
-
-func (d ImageDestination) Matches(url string) bool { return d.Image == url }

@@ -189,7 +189,9 @@ func (o *ResolveOptions) withImageMapConf(conf ctlconf.Conf) (ctlconf.Conf, erro
 
 	for k, v := range mapping {
 		additionalConfig.Overrides = append(additionalConfig.Overrides, ctlconf.ImageOverride{
-			Image:       k,
+			ImageRef: ctlconf.ImageRef{
+				Image: k,
+			},
 			NewImage:    v,
 			Preresolved: true,
 		})

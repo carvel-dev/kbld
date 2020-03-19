@@ -51,8 +51,9 @@ func (f Factory) New(url string) Image {
 }
 
 func (f Factory) shouldOverride(url string) (ctlconf.ImageOverride, bool) {
+	urlMatcher := Matcher{url}
 	for _, override := range f.conf.ImageOverrides() {
-		if override.Matches(url) {
+		if urlMatcher.Matches(override.ImageRef) {
 			return override, true
 		}
 	}
@@ -60,8 +61,9 @@ func (f Factory) shouldOverride(url string) (ctlconf.ImageOverride, bool) {
 }
 
 func (f Factory) shouldBuild(url string) (ctlconf.Source, bool) {
+	urlMatcher := Matcher{url}
 	for _, src := range f.conf.Sources() {
-		if src.Matches(url) {
+		if urlMatcher.Matches(src.ImageRef) {
 			return src, true
 		}
 	}
@@ -69,8 +71,9 @@ func (f Factory) shouldBuild(url string) (ctlconf.Source, bool) {
 }
 
 func (f Factory) shouldPush(url string) (ctlconf.ImageDestination, bool) {
+	urlMatcher := Matcher{url}
 	for _, dst := range f.conf.ImageDestinations() {
-		if dst.Matches(url) {
+		if urlMatcher.Matches(dst.ImageRef) {
 			return dst, true
 		}
 	}
