@@ -5,6 +5,7 @@ import (
 
 	"github.com/cppforlife/cobrautil"
 	"github.com/cppforlife/go-cli-ui/ui"
+	"github.com/k14s/kbld/pkg/kbld/version"
 	"github.com/spf13/cobra"
 )
 
@@ -26,7 +27,7 @@ func NewKbldCmd(o *KbldOptions) *cobra.Command {
 
 	cmd.Use = "kbld"
 	cmd.Short = "kbld prepares Docker images to deploy to Kubernetes"
-	cmd.Version = Version
+	cmd.Version = version.Version
 
 	// Affects children as well
 	cmd.SilenceErrors = true
