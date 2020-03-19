@@ -115,6 +115,15 @@ keys:
 - sidecarImage
 ```
 
+### Config
+
+```yaml
+---
+apiVersion: kbld.k14s.io/v1alpha1
+kind: Config
+minimumRequiredVersion: 0.15.0
+```
+
 ### Matching images
 
 Available as of 0.15.0+

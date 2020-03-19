@@ -4,11 +4,14 @@ import (
 	"fmt"
 
 	"github.com/ghodss/yaml"
+	semver "github.com/hashicorp/go-version"
 	ctlres "github.com/k14s/kbld/pkg/kbld/resources"
+	"github.com/k14s/kbld/pkg/kbld/version"
 )
 
 const (
 	configAPIVersion      = "kbld.k14s.io/v1alpha1"
+	configKind            = "Config"
 	sourcesKind           = "Sources"           // specify list of sources for building images
 	imageOverridesKind    = "ImageOverrides"    // specify alternative image urls
 	imageDestinationsKind = "ImageDestinations" // specify image push destinations
@@ -16,12 +19,14 @@ const (
 )
 
 var (
-	configKinds = []string{sourcesKind, imageOverridesKind, imageDestinationsKind, imageKeysKind}
+	configKinds = []string{configKind, sourcesKind, imageOverridesKind, imageDestinationsKind, imageKeysKind}
 )
 
 type Config struct {
 	APIVersion string `json:"apiVersion"`
 	Kind       string
+
+	MinimumRequiredVersion string `json:"minimumRequiredVersion,omitempty"`
 
 	Sources      []Source
 	Overrides    []ImageOverride
@@ -82,6 +87,27 @@ func NewConfigFromResource(res ctlres.Resource) (Config, error) {
 }
 
 func (d Config) Validate() error {
+	if len(d.MinimumRequiredVersion) > 0 {
+		if d.MinimumRequiredVersion[0] == 'v' {
+			return fmt.Errorf("Validating minimum version: Must not have prefix 'v' (e.g. '0.8.0')")
+		}
+
+		userConstraint, err := semver.NewConstraint(">=" + d.MinimumRequiredVersion)
+		if err != nil {
+			return fmt.Errorf("Parsing minimum version constraint: %s", err)
+		}
+
+		kbldVersion, err := semver.NewVersion(version.Version)
+		if err != nil {
+			return fmt.Errorf("Parsing version constraint: %s", err)
+		}
+
+		if !userConstraint.Check(kbldVersion) {
+			return fmt.Errorf("kbld version '%s' does "+
+				"not meet the minimum required version '%s'", version.Version, d.MinimumRequiredVersion)
+		}
+	}
+
 	for i, src := range d.Sources {
 		err := src.Validate()
 		if err != nil {

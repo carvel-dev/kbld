@@ -17,6 +17,7 @@ require (
 	github.com/google/go-containerregistry v0.0.0-20190412005658-1d38b9cfdb9d
 	github.com/google/gofuzz v1.1.0 // indirect
 	github.com/gophercloud/gophercloud v0.0.0-20180727150635-f8826f28e31a // indirect
+	github.com/hashicorp/go-version v1.2.0
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
 	github.com/json-iterator/go v1.1.9 // indirect
 	github.com/kr/pty v1.1.8 // indirect
