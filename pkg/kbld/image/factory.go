@@ -52,7 +52,7 @@ func (f Factory) New(url string) Image {
 
 func (f Factory) shouldOverride(url string) (ctlconf.ImageOverride, bool) {
 	for _, override := range f.conf.ImageOverrides() {
-		if override.Image == url {
+		if override.Matches(url) {
 			return override, true
 		}
 	}
@@ -60,9 +60,9 @@ func (f Factory) shouldOverride(url string) (ctlconf.ImageOverride, bool) {
 }
 
 func (f Factory) shouldBuild(url string) (ctlconf.Source, bool) {
-	for _, source := range f.conf.Sources() {
-		if source.Image == url {
-			return source, true
+	for _, src := range f.conf.Sources() {
+		if src.Matches(url) {
+			return src, true
 		}
 	}
 	return ctlconf.Source{}, false
@@ -70,7 +70,7 @@ func (f Factory) shouldBuild(url string) (ctlconf.Source, bool) {
 
 func (f Factory) shouldPush(url string) (ctlconf.ImageDestination, bool) {
 	for _, dst := range f.conf.ImageDestinations() {
-		if dst.Image == url {
+		if dst.Matches(url) {
 			return dst, true
 		}
 	}

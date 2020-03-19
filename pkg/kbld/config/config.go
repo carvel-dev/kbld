@@ -133,3 +133,9 @@ func (d ImageDestination) Validate() error {
 	}
 	return nil
 }
+
+func (d Source) Matches(url string) bool { return d.Image == url }
+
+func (d ImageOverride) Matches(url string) bool { return d.Image == url }
+
+func (d ImageDestination) Matches(url string) bool { return d.Image == url }
