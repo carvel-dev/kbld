@@ -122,3 +122,38 @@ spec:
 		t.Fatalf("Expected >>>%s<<< to match >>>%s<<<", out, expectedOut)
 	}
 }
+
+// Should use base image repo for "nice description" within a tag
+// to avoid having tags that are too long.
+func TestDockerBuildSuccessfulWithImageRepo(t *testing.T) {
+	env := BuildEnv(t)
+	kbld := Kbld{t, env.Namespace, Logger{}}
+
+	input := env.WithRegistries(`
+kind: Object
+spec:
+- image: kbld:simple-app-sha256-402e53420e6919c713b16ed78f09d2024ba25ebf424776072cd253cf044b544f
+---
+apiVersion: kbld.k14s.io/v1alpha1
+kind: Sources
+sources:
+- imageRepo: kbld
+  path: assets/simple-app
+`)
+
+	out, _ := kbld.RunWithOpts([]string{"-f", "-", "--images-annotation=false"}, RunOpts{
+		StdinReader: strings.NewReader(input),
+	})
+
+	out = regexp.MustCompile("sha256\\-[a-z0-9]{64}").ReplaceAllString(out, "SHA256-REPLACED")
+
+	expectedOut := `---
+kind: Object
+spec:
+- image: kbld:kbld-SHA256-REPLACED
+`
+
+	if out != expectedOut {
+		t.Fatalf("Expected >>>%s<<< to match >>>%s<<<", out, expectedOut)
+	}
+}
