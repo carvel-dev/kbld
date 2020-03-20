@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"io/ioutil"
 
 	"github.com/ghodss/yaml"
 	semver "github.com/hashicorp/go-version"
@@ -24,14 +25,14 @@ var (
 
 type Config struct {
 	APIVersion string `json:"apiVersion"`
-	Kind       string
+	Kind       string `json:"kind,omitempty"`
 
 	MinimumRequiredVersion string `json:"minimumRequiredVersion,omitempty"`
 
-	Sources      []Source
-	Overrides    []ImageOverride
-	Destinations []ImageDestination
-	Keys         []string
+	Sources      []Source           `json:"sources,omitempty"`
+	Overrides    []ImageOverride    `json:"overrides,omitempty"`
+	Destinations []ImageDestination `json:"destinations,omitempty"`
+	Keys         []string           `json:"keys,omitempty"`
 }
 
 type Source struct {
@@ -45,7 +46,7 @@ type Source struct {
 type ImageOverride struct {
 	ImageRef
 	NewImage    string `json:"newImage"`
-	Preresolved bool
+	Preresolved bool   `json:"preresolved,omitempty"`
 }
 
 type ImageDestination struct {
@@ -54,8 +55,15 @@ type ImageDestination struct {
 }
 
 type ImageRef struct {
-	Image     string
-	ImageRepo string `json:"imageRepo"`
+	Image     string `json:"image,omitempty"`
+	ImageRepo string `json:"imageRepo,omitempty"`
+}
+
+func NewConfig() Config {
+	return Config{
+		APIVersion: configAPIVersion,
+		Kind:       configKind,
+	}
 }
 
 func NewConfigFromResource(res ctlres.Resource) (Config, error) {
@@ -168,5 +176,28 @@ func (r ImageRef) Validate() error {
 	if len(r.Image) == 0 && len(r.ImageRepo) == 0 {
 		return fmt.Errorf("Expected Image or ImageRepo to be non-empty")
 	}
+	return nil
+}
+
+func (d Config) AsBytes() ([]byte, error) {
+	bs, err := yaml.Marshal(d)
+	if err != nil {
+		return nil, fmt.Errorf("Marshaling config: %s", err)
+	}
+
+	return bs, nil
+}
+
+func (d Config) WriteToFile(path string) error {
+	bs, err := d.AsBytes()
+	if err != nil {
+		return err
+	}
+
+	err = ioutil.WriteFile(path, bs, 0700)
+	if err != nil {
+		return fmt.Errorf("Writing lock config: %s", err)
+	}
+
 	return nil
 }

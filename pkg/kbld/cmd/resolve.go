@@ -11,6 +11,7 @@ import (
 	ctlconf "github.com/k14s/kbld/pkg/kbld/config"
 	ctlimg "github.com/k14s/kbld/pkg/kbld/image"
 	ctlres "github.com/k14s/kbld/pkg/kbld/resources"
+	"github.com/k14s/kbld/pkg/kbld/version"
 	"github.com/spf13/cobra"
 )
 
@@ -22,6 +23,7 @@ type ResolveOptions struct {
 	BuildConcurrency int
 	ImagesAnnotation bool
 	ImageMapFile     string
+	LockOutput       string
 }
 
 func NewResolveOptions(ui ui.UI) *ResolveOptions {
@@ -39,6 +41,7 @@ func NewResolveCmd(o *ResolveOptions) *cobra.Command {
 	cmd.Flags().IntVar(&o.BuildConcurrency, "build-concurrency", 4, "Set maximum number of concurrent builds")
 	cmd.Flags().BoolVar(&o.ImagesAnnotation, "images-annotation", true, "Annotate resources with images annotation")
 	cmd.Flags().StringVar(&o.ImageMapFile, "image-map-file", "", "Set image map file (/cnab/app/relocation-mapping.json in CNAB)")
+	cmd.Flags().StringVar(&o.LockOutput, "lock-output", "", "File path to emit configuration with resolved image references")
 	return cmd
 }
 
@@ -69,9 +72,14 @@ func (o *ResolveOptions) Run() error {
 		prefixedLogger.WriteStr("final: %s -> %s\n", imgURL, img.URL)
 	}
 
-	resBss, err := o.updateRefsInResources(nonConfigRs, conf, resolvedImages, imgFactory)
+	err = o.emitLockOutput(conf, resolvedImages)
 	if err != nil {
 		return err
+	}
+
+	resBss, err := o.updateRefsInResources(nonConfigRs, conf, resolvedImages, imgFactory)
+	if err != nil {
+		return fmt.Errorf("Updating resource references: %s", err)
 	}
 
 	// Print all resources as one YAML stream
@@ -198,4 +206,27 @@ func (o *ResolveOptions) withImageMapConf(conf ctlconf.Conf) (ctlconf.Conf, erro
 	}
 
 	return conf.WithAdditionalConfig(additionalConfig), nil
+}
+
+func (o *ResolveOptions) emitLockOutput(conf ctlconf.Conf, resolvedImages map[string]Image) error {
+	if len(o.LockOutput) == 0 {
+		return nil
+	}
+
+	c := ctlconf.NewConfig()
+
+	c.MinimumRequiredVersion = version.Version
+	c.Keys = conf.ImageKeysWithoutDefaults()
+
+	for imgURL, img := range resolvedImages {
+		c.Overrides = append(c.Overrides, ctlconf.ImageOverride{
+			ImageRef: ctlconf.ImageRef{
+				Image: imgURL,
+			},
+			NewImage:    img.URL,
+			Preresolved: true,
+		})
+	}
+
+	return c.WriteToFile(o.LockOutput)
 }
