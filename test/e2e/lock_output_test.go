@@ -4,6 +4,8 @@ import (
 	"io/ioutil"
 	"strings"
 	"testing"
+
+	"github.com/k14s/kbld/pkg/kbld/version"
 )
 
 func TestLockOutputSuccessful(t *testing.T) {
@@ -47,11 +49,11 @@ images:
 		t.Fatalf("Expected >>>%s<<< to match >>>%s<<<", out, expectedOut)
 	}
 
-	expectedFileContents := `apiVersion: kbld.k14s.io/v1alpha1
+	expectedFileContents := strings.ReplaceAll(`apiVersion: kbld.k14s.io/v1alpha1
 keys:
 - sidecarImage
 kind: Config
-minimumRequiredVersion: 0.16.0
+minimumRequiredVersion: __ver__
 overrides:
 - image: nginx:1.14.2
   newImage: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
@@ -59,7 +61,7 @@ overrides:
 - image: sample-app
   newImage: index.docker.io/library/nginx@sha256:2539d4344dd18e1df02be842ffc435f8e1f699cfc55516e2cf2cb16b7a9aea0b
   preresolved: true
-`
+`, "__ver__", version.Version)
 
 	bs, err := ioutil.ReadFile(path)
 	if err != nil {
