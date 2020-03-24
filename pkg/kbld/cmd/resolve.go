@@ -68,8 +68,8 @@ func (o *ResolveOptions) Run() error {
 	}
 
 	// Record final image transformation
-	for imgURL, img := range resolvedImages {
-		prefixedLogger.WriteStr("final: %s -> %s\n", imgURL, img.URL)
+	for _, pair := range resolvedImages.All() {
+		prefixedLogger.WriteStr("final: %s -> %s\n", pair.UnprocessedImageURL.URL, pair.Image.URL)
 	}
 
 	err = o.emitLockOutput(conf, resolvedImages)
@@ -92,16 +92,16 @@ func (o *ResolveOptions) Run() error {
 }
 
 func (o *ResolveOptions) resolveImages(nonConfigRs []ctlres.Resource,
-	conf ctlconf.Conf, imgFactory ctlimg.Factory) (map[string]Image, error) {
+	conf ctlconf.Conf, imgFactory ctlimg.Factory) (*ProcessedImages, error) {
 
-	foundImages := map[string]struct{}{}
+	imageURLs := NewUnprocessedImageURLs()
 
 	for _, res := range nonConfigRs {
 		imageKVs := ImageKVs{res.DeepCopyRaw(), conf.ImageKeys()}
 
 		imageKVs.Visit(func(val interface{}) (interface{}, bool) {
 			if imgURL, ok := val.(string); ok {
-				foundImages[imgURL] = struct{}{}
+				imageURLs.Add(UnprocessedImageURL{imgURL})
 			}
 			return nil, false
 		})
@@ -109,7 +109,7 @@ func (o *ResolveOptions) resolveImages(nonConfigRs []ctlres.Resource,
 
 	queue := NewImageQueue(imgFactory)
 
-	resolvedImages, err := queue.Run(foundImages, o.BuildConcurrency)
+	resolvedImages, err := queue.Run(imageURLs, o.BuildConcurrency)
 	if err != nil {
 		return nil, err
 	}
@@ -118,7 +118,7 @@ func (o *ResolveOptions) resolveImages(nonConfigRs []ctlres.Resource,
 }
 
 func (o *ResolveOptions) updateRefsInResources(nonConfigRs []ctlres.Resource,
-	conf ctlconf.Conf, resolvedImages map[string]Image,
+	conf ctlconf.Conf, resolvedImages *ProcessedImages,
 	imgFactory ctlimg.Factory) ([][]byte, error) {
 
 	var errs []error
@@ -135,7 +135,7 @@ func (o *ResolveOptions) updateRefsInResources(nonConfigRs []ctlres.Resource,
 				return nil, false
 			}
 
-			img, found := resolvedImages[imgURL]
+			img, found := resolvedImages.FindByURL(UnprocessedImageURL{imgURL})
 			if !found {
 				errs = append(errs, fmt.Errorf("Expected to find image for '%s'", imgURL))
 				return nil, false
@@ -208,22 +208,21 @@ func (o *ResolveOptions) withImageMapConf(conf ctlconf.Conf) (ctlconf.Conf, erro
 	return conf.WithAdditionalConfig(additionalConfig), nil
 }
 
-func (o *ResolveOptions) emitLockOutput(conf ctlconf.Conf, resolvedImages map[string]Image) error {
+func (o *ResolveOptions) emitLockOutput(conf ctlconf.Conf, resolvedImages *ProcessedImages) error {
 	if len(o.LockOutput) == 0 {
 		return nil
 	}
 
 	c := ctlconf.NewConfig()
-
 	c.MinimumRequiredVersion = version.Version
 	c.Keys = conf.ImageKeysWithoutDefaults()
 
-	for imgURL, img := range resolvedImages {
+	for _, urlImagePair := range resolvedImages.All() {
 		c.Overrides = append(c.Overrides, ctlconf.ImageOverride{
 			ImageRef: ctlconf.ImageRef{
-				Image: imgURL,
+				Image: urlImagePair.UnprocessedImageURL.URL,
 			},
-			NewImage:    img.URL,
+			NewImage:    urlImagePair.Image.URL,
 			Preresolved: true,
 		})
 	}
