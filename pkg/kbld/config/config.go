@@ -33,6 +33,7 @@ type Config struct {
 	Overrides    []ImageOverride    `json:"overrides,omitempty"`
 	Destinations []ImageDestination `json:"destinations,omitempty"`
 	Keys         []string           `json:"keys,omitempty"`
+	SearchRules  []SearchRule       `json:"searchRules,omitempty"`
 }
 
 type Source struct {
@@ -52,6 +53,24 @@ type ImageOverride struct {
 type ImageDestination struct {
 	ImageRef
 	NewImage string `json:"newImage"`
+}
+
+type SearchRule struct {
+	KeyMatcher   *SearchRuleKeyMatcher   `json:"keyMatcher,omitempty"`
+	ValueMatcher *SearchRuleValueMatcher `json:"valueMatcher,omitempty"`
+	// TODO ResourceMatchers (see kapp's matchers)
+}
+
+type SearchRuleKeyMatcher struct {
+	Name string `json:"name,omitempty"`
+	// TODO Path []interface (see kapp's path)
+	// TODO JSONPath string
+}
+
+type SearchRuleValueMatcher struct {
+	Image     string `json:"image,omitempty"`
+	ImageRepo string `json:"imageRepo,omitempty"`
+	// TODO Regexp    string `json:"regexp,omitempty"`
 }
 
 type ImageRef struct {
@@ -143,6 +162,13 @@ func (d Config) Validate() error {
 		}
 	}
 
+	for i, sr := range d.SearchRules {
+		err := sr.Validate()
+		if err != nil {
+			return fmt.Errorf("Validating SearchRules[%d]: %s", i, err)
+		}
+	}
+
 	return nil
 }
 
@@ -170,6 +196,23 @@ func (d ImageOverride) Validate() error {
 
 func (d ImageDestination) Validate() error {
 	return d.ImageRef.Validate()
+}
+
+func (d SearchRule) Validate() error {
+	if d.KeyMatcher == nil && d.ValueMatcher == nil {
+		return fmt.Errorf("Expected KeyMatcher or ValueMatcher to be non-empty")
+	}
+	if d.KeyMatcher != nil {
+		if len(d.KeyMatcher.Name) == 0 {
+			return fmt.Errorf("Expected KeyMatcher.Name to be non-empty")
+		}
+	}
+	if d.ValueMatcher != nil {
+		if len(d.ValueMatcher.Image) == 0 && len(d.ValueMatcher.ImageRepo) == 0 {
+			return fmt.Errorf("Expected ValueMatcher.Image or ValueMatcher.ImageRepo to be non-empty")
+		}
+	}
+	return nil
 }
 
 func (r ImageRef) Validate() error {

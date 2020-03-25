@@ -25,6 +25,8 @@ func (i BuiltImage) URL() (string, []ImageMeta, error) {
 		return "", nil, err
 	}
 
+	urlRepo, _ := URLRepo(i.url)
+
 	var digestStr string
 
 	switch {
@@ -36,7 +38,7 @@ func (i BuiltImage) URL() (string, []ImageMeta, error) {
 			RawOptions: i.buildSource.Pack.Build.RawOptions,
 		}
 
-		digest, err := i.pack.Build(URLRepo(i.url), i.buildSource.Path, opts)
+		digest, err := i.pack.Build(urlRepo, i.buildSource.Path, opts)
 		if err != nil {
 			return "", nil, err
 		}
@@ -56,7 +58,7 @@ func (i BuiltImage) URL() (string, []ImageMeta, error) {
 			RawOptions: i.buildSource.Docker.Build.RawOptions,
 		}
 
-		digest, err := i.docker.Build(URLRepo(i.url), i.buildSource.Path, opts)
+		digest, err := i.docker.Build(urlRepo, i.buildSource.Path, opts)
 		if err != nil {
 			return "", nil, err
 		}

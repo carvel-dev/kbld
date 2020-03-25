@@ -11,6 +11,7 @@ import (
 	ctlimg "github.com/k14s/kbld/pkg/kbld/image"
 	regtarball "github.com/k14s/kbld/pkg/kbld/imagetarball"
 	ctlres "github.com/k14s/kbld/pkg/kbld/resources"
+	ctlser "github.com/k14s/kbld/pkg/kbld/search"
 	"github.com/spf13/cobra"
 )
 
@@ -87,9 +88,9 @@ func (o *UnpackageOptions) updateRefsInResources(
 
 	for _, res := range nonConfigRs {
 		resContents := res.DeepCopyRaw()
-		imageKVs := ImageKVs{resContents, conf.ImageKeys()}
+		imageRefs := ctlser.NewImageRefs(resContents, conf.SearchRules())
 
-		imageKVs.Visit(func(val interface{}) (interface{}, bool) {
+		imageRefs.Visit(func(val interface{}) (interface{}, bool) {
 			if img, ok := val.(string); ok {
 				if outputImg, found := resolvedImages[img]; found {
 					return outputImg, true

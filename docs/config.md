@@ -105,6 +105,8 @@ For preresolved images, kbld will not connect to registry to obtain any metadata
 
 ### ImageKeys
 
+(Deprecated as of v0.18.0+, use `searchRules` within `Config` kind to specify custom image reference matching rules.)
+
 ImageKeys resource configures kbld to look for additional keys that reference images (in addition to using default `image` key).
 
 ```yaml
@@ -122,7 +124,20 @@ keys:
 apiVersion: kbld.k14s.io/v1alpha1
 kind: Config
 minimumRequiredVersion: 0.15.0
+searchRules:
+- key:
+    name: sidecarImage
+- value:
+    image: exact-image
+    imageRepo: gcr.io/some/repo
 ```
+
+- `searchRules` (optional) allows to specify one or more matchers for finding image references. Key and value matchers could be specified together or separately. If key and value matchers are specified together, both matchers must succeed. This functionality supersedes `ImageKeys` kind. 
+  - `key` (optional) key matcher
+    - `name` (optional; string) specifies key name (e.g. `sidecarImage`)
+  - `value` (optional) value matcher
+    - `image` (optional; string) matches values exactly
+    - `imageRepo` (optional; string) matches values that follow image reference format (`[registry]repo[:tag]\[@sha256:...]`) and expects `repo` portion to match (e.g. `gcr.io/project/app`)
 
 ### Matching images
 

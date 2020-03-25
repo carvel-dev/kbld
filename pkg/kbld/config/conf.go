@@ -67,14 +67,24 @@ func (c Conf) ImageDestinations() []ImageDestination {
 	return result
 }
 
-func (c Conf) ImageKeys() []string {
-	return append([]string{"image"}, c.ImageKeysWithoutDefaults()...)
+func (c Conf) SearchRules() []SearchRule {
+	defaultRule := SearchRule{
+		KeyMatcher: &SearchRuleKeyMatcher{Name: "image"},
+	}
+	return append([]SearchRule{defaultRule}, c.SearchRulesWithoutDefaults()...)
 }
 
-func (c Conf) ImageKeysWithoutDefaults() []string {
-	result := []string{}
+func (c Conf) SearchRulesWithoutDefaults() []SearchRule {
+	result := []SearchRule{}
 	for _, config := range c.configs {
-		result = append(result, config.Keys...)
+		for _, key := range config.Keys {
+			result = append(result, SearchRule{
+				KeyMatcher: &SearchRuleKeyMatcher{Name: key},
+			})
+		}
+	}
+	for _, config := range c.configs {
+		result = append(result, config.SearchRules...)
 	}
 	return result
 }

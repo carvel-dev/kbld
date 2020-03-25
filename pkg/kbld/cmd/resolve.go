@@ -11,6 +11,7 @@ import (
 	ctlconf "github.com/k14s/kbld/pkg/kbld/config"
 	ctlimg "github.com/k14s/kbld/pkg/kbld/image"
 	ctlres "github.com/k14s/kbld/pkg/kbld/resources"
+	ctlser "github.com/k14s/kbld/pkg/kbld/search"
 	"github.com/k14s/kbld/pkg/kbld/version"
 	"github.com/spf13/cobra"
 )
@@ -97,9 +98,9 @@ func (o *ResolveOptions) resolveImages(nonConfigRs []ctlres.Resource,
 	imageURLs := NewUnprocessedImageURLs()
 
 	for _, res := range nonConfigRs {
-		imageKVs := ImageKVs{res.DeepCopyRaw(), conf.ImageKeys()}
+		imageRefs := ctlser.NewImageRefs(res.DeepCopyRaw(), conf.SearchRules())
 
-		imageKVs.Visit(func(val interface{}) (interface{}, bool) {
+		imageRefs.Visit(func(val interface{}) (interface{}, bool) {
 			if imgURL, ok := val.(string); ok {
 				imageURLs.Add(UnprocessedImageURL{imgURL})
 			}
@@ -127,9 +128,9 @@ func (o *ResolveOptions) updateRefsInResources(nonConfigRs []ctlres.Resource,
 	for _, res := range nonConfigRs {
 		resContents := res.DeepCopyRaw()
 		images := []Image{}
-		imageKVs := ImageKVs{resContents, conf.ImageKeys()}
+		imageRefs := ctlser.NewImageRefs(resContents, conf.SearchRules())
 
-		imageKVs.Visit(func(val interface{}) (interface{}, bool) {
+		imageRefs.Visit(func(val interface{}) (interface{}, bool) {
 			imgURL, ok := val.(string)
 			if !ok {
 				return nil, false
@@ -215,7 +216,7 @@ func (o *ResolveOptions) emitLockOutput(conf ctlconf.Conf, resolvedImages *Proce
 
 	c := ctlconf.NewConfig()
 	c.MinimumRequiredVersion = version.Version
-	c.Keys = conf.ImageKeysWithoutDefaults()
+	c.SearchRules = conf.SearchRulesWithoutDefaults()
 
 	for _, urlImagePair := range resolvedImages.All() {
 		c.Overrides = append(c.Overrides, ctlconf.ImageOverride{

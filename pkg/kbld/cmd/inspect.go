@@ -5,6 +5,7 @@ import (
 	uitable "github.com/cppforlife/go-cli-ui/ui/table"
 	ctlconf "github.com/k14s/kbld/pkg/kbld/config"
 	ctlres "github.com/k14s/kbld/pkg/kbld/resources"
+	ctlser "github.com/k14s/kbld/pkg/kbld/search"
 	"github.com/spf13/cobra"
 )
 
@@ -86,9 +87,9 @@ func (o *InspectOptions) findImages(rs []ctlres.Resource,
 	foundImages := []foundResourceWithImage{}
 
 	for _, res := range rs {
-		imageKVs := ImageKVs{res.DeepCopyRaw(), conf.ImageKeys()}
+		imageRefs := ctlser.NewImageRefs(res.DeepCopyRaw(), conf.SearchRules())
 
-		imageKVs.Visit(func(val interface{}) (interface{}, bool) {
+		imageRefs.Visit(func(val interface{}) (interface{}, bool) {
 			if imgURL, ok := val.(string); ok {
 				foundImages = append(foundImages, foundResourceWithImage{URL: imgURL, Resource: res})
 			}

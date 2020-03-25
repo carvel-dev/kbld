@@ -50,8 +50,6 @@ images:
 	}
 
 	expectedFileContents := strings.ReplaceAll(`apiVersion: kbld.k14s.io/v1alpha1
-keys:
-- sidecarImage
 kind: Config
 minimumRequiredVersion: __ver__
 overrides:
@@ -61,6 +59,9 @@ overrides:
 - image: sample-app
   newImage: index.docker.io/library/nginx@sha256:2539d4344dd18e1df02be842ffc435f8e1f699cfc55516e2cf2cb16b7a9aea0b
   preresolved: true
+searchRules:
+- keyMatcher:
+    name: sidecarImage
 `, "__ver__", version.Version)
 
 	bs, err := ioutil.ReadFile(path)

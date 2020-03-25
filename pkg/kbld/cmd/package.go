@@ -10,6 +10,7 @@ import (
 	ctlimg "github.com/k14s/kbld/pkg/kbld/image"
 	regtarball "github.com/k14s/kbld/pkg/kbld/imagetarball"
 	ctlres "github.com/k14s/kbld/pkg/kbld/resources"
+	ctlser "github.com/k14s/kbld/pkg/kbld/search"
 	"github.com/spf13/cobra"
 )
 
@@ -67,9 +68,9 @@ func (o *PackageOptions) findImages(allRs []ctlres.Resource,
 	foundImages := map[string]struct{}{}
 
 	for _, res := range allRs {
-		imageKVs := ImageKVs{res.DeepCopyRaw(), conf.ImageKeys()}
+		imageRefs := ctlser.NewImageRefs(res.DeepCopyRaw(), conf.SearchRules())
 
-		imageKVs.Visit(func(val interface{}) (interface{}, bool) {
+		imageRefs.Visit(func(val interface{}) (interface{}, bool) {
 			if img, ok := val.(string); ok {
 				foundImages[img] = struct{}{}
 			}
