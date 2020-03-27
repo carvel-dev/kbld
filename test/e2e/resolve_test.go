@@ -318,3 +318,36 @@ spec:
 		t.Fatalf("Expected >>>%s<<< to match >>>%s<<<", out, expectedOut)
 	}
 }
+
+func TestResolveSuccessfulWithDuplicateSearchRules(t *testing.T) {
+	env := BuildEnv(t)
+	kbld := Kbld{t, env.Namespace, Logger{}}
+
+	input := `
+kind: Object
+spec:
+- sidecarImage: index.docker.io/library/nginx:1.14.2
+---
+apiVersion: kbld.k14s.io/v1alpha1
+kind: Config
+searchRules:
+- keyMatcher:
+    name: sidecarImage
+- keyMatcher:
+    name: sidecarImage
+`
+
+	out, _ := kbld.RunWithOpts([]string{"-f", "-", "--images-annotation=false"}, RunOpts{
+		StdinReader: strings.NewReader(input),
+	})
+
+	expectedOut := `---
+kind: Object
+spec:
+- sidecarImage: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
+`
+
+	if out != expectedOut {
+		t.Fatalf("Expected >>>%s<<< to match >>>%s<<<", out, expectedOut)
+	}
+}

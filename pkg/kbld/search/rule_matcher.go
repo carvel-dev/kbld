@@ -7,11 +7,17 @@ import (
 	ctlimg "github.com/k14s/kbld/pkg/kbld/image"
 )
 
-type Matcher struct {
+type Matcher interface {
+	Matches(key string, value interface{}) bool
+}
+
+type RuleMatcher struct {
 	rule ctlconf.SearchRule
 }
 
-func (m Matcher) Matches(key string, value interface{}) bool {
+var _ Matcher = RuleMatcher{}
+
+func (m RuleMatcher) Matches(key string, value interface{}) bool {
 	var keyMatched, valueMatched bool
 
 	if m.rule.KeyMatcher != nil {
