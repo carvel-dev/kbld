@@ -17,9 +17,6 @@ images:
 - image: nginx:1.14.2
 - image: sample-app
 - sidecarImage: sample-app
-`
-
-	inputConfig := `
 ---
 apiVersion: kbld.k14s.io/v1alpha1
 kind: ImageOverrides
@@ -36,7 +33,7 @@ keys:
 	path := "/tmp/kbld-test-lock-output-successful"
 
 	out, _ := kbld.RunWithOpts([]string{"-f", "-", "--images-annotation=false", "--lock-output=" + path}, RunOpts{
-		StdinReader: strings.NewReader(input + inputConfig),
+		StdinReader: strings.NewReader(input),
 	})
 
 	expectedOut := `---

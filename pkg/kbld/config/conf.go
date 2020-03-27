@@ -1,6 +1,8 @@
 package config
 
 import (
+	"reflect"
+
 	ctlres "github.com/k14s/kbld/pkg/kbld/resources"
 )
 
@@ -71,7 +73,7 @@ func (c Conf) SearchRules() []SearchRule {
 	defaultRule := SearchRule{
 		KeyMatcher: &SearchRuleKeyMatcher{Name: "image"},
 	}
-	return append([]SearchRule{defaultRule}, c.SearchRulesWithoutDefaults()...)
+	return c.dedupSearchRules(append([]SearchRule{defaultRule}, c.SearchRulesWithoutDefaults()...))
 }
 
 func (c Conf) SearchRulesWithoutDefaults() []SearchRule {
@@ -85,6 +87,23 @@ func (c Conf) SearchRulesWithoutDefaults() []SearchRule {
 	}
 	for _, config := range c.configs {
 		result = append(result, config.SearchRules...)
+	}
+	return c.dedupSearchRules(result)
+}
+
+func (c Conf) dedupSearchRules(rules []SearchRule) []SearchRule {
+	var result []SearchRule
+	for _, rule := range rules {
+		var alreadySaved bool
+		for _, savedRule := range result {
+			if reflect.DeepEqual(rule, savedRule) {
+				alreadySaved = true
+				break
+			}
+		}
+		if !alreadySaved {
+			result = append(result, rule)
+		}
 	}
 	return result
 }
