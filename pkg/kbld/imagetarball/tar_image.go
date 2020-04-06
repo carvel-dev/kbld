@@ -22,11 +22,17 @@ func (i tarImage) Ref() string { return i.itd.Refs[0] }
 func (i tarImage) Layers() ([]regv1.Layer, error) {
 	var layers []regv1.Layer
 	for _, layerTD := range i.itd.Layers {
-		layerFile, err := i.layerFile(layerTD)
-		if err != nil {
-			return nil, err
+		var layer regv1.Layer
+		if layerTD.IsDistributable() {
+			layerFile, err := i.layerFile(layerTD)
+			if err != nil {
+				return nil, err
+			}
+			layer = tarLayer{layerTD, layerFile}
+		} else {
+			layer = foreignLayer{layerTD}
 		}
-		layers = append(layers, tarLayer{layerTD, layerFile})
+		layers = append(layers, layer)
 	}
 	return layers, nil
 }

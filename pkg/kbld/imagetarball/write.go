@@ -77,7 +77,12 @@ func (w *TarWriter) writeImageIndex(td ImageIndexTarDescriptor) error {
 
 func (w *TarWriter) writeImage(td ImageTarDescriptor) error {
 	for _, imgLayer := range td.Layers {
-		w.layersToWrite = append(w.layersToWrite, imgLayer)
+		// TODO anything else we can do to deal with this?
+		// Do not include foreign layers since we cannot
+		// import without changing image digest.
+		if imgLayer.IsDistributable() {
+			w.layersToWrite = append(w.layersToWrite, imgLayer)
+		}
 	}
 	return nil
 }

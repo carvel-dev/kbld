@@ -46,3 +46,41 @@ spec:
 		t.Fatalf("Expected unpackage output >>>%s<<< to match >>>%s<<<", out, expectedOut)
 	}
 }
+
+func TestPkgUnpkgSuccessfulWithForeignLayers(t *testing.T) {
+	env := BuildEnv(t)
+	kbld := Kbld{t, env.Namespace, Logger{}}
+
+	// redis:5.0.4
+	input := `
+kind: Object
+spec:
+- image: index.docker.io/library/mongo@sha256:633ec3ae6db954a65a1abadb482bae73375d0098005cb36a3851b32cd891b22e
+`
+
+	path := "/tmp/kbld-test-pkg-unpkg-successful-foreign-layers"
+
+	out, _ := kbld.RunWithOpts([]string{"package", "-f", "-", "--output", path}, RunOpts{
+		StdinReader: strings.NewReader(input),
+	})
+
+	expectedOut := ""
+
+	if out != expectedOut {
+		t.Fatalf("Expected package output >>>%s<<< to match >>>%s<<<", out, expectedOut)
+	}
+
+	out, _ = kbld.RunWithOpts([]string{"unpackage", "-f", "-", "--input", path, "--repository", env.WithRegistries("docker.io/*username*/kbld-test-pkg-unpkg")}, RunOpts{
+		StdinReader: strings.NewReader(input),
+	})
+
+	expectedOut = env.WithRegistries(`---
+kind: Object
+spec:
+- image: index.docker.io/*username*/kbld-test-pkg-unpkg@sha256:633ec3ae6db954a65a1abadb482bae73375d0098005cb36a3851b32cd891b22e
+`)
+
+	if out != expectedOut {
+		t.Fatalf("Expected unpackage output >>>%s<<< to match >>>%s<<<", out, expectedOut)
+	}
+}
