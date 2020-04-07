@@ -22,7 +22,7 @@ apiVersion: kbld.k14s.io/v1alpha1
 kind: ImageOverrides
 overrides:
 - image: sample-app
-  newImage: nginx:1.17.9
+  newImage: nginx:1.15.1
 ---
 apiVersion: kbld.k14s.io/v1alpha1
 kind: ImageKeys
@@ -39,8 +39,8 @@ keys:
 	expectedOut := `---
 images:
 - image: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
-- image: index.docker.io/library/nginx@sha256:2539d4344dd18e1df02be842ffc435f8e1f699cfc55516e2cf2cb16b7a9aea0b
-- sidecarImage: index.docker.io/library/nginx@sha256:2539d4344dd18e1df02be842ffc435f8e1f699cfc55516e2cf2cb16b7a9aea0b
+- image: index.docker.io/library/nginx@sha256:4a5573037f358b6cdfa2f3e8a9c33a5cf11bcd1675ca72ca76fbe5bd77d0d682
+- sidecarImage: index.docker.io/library/nginx@sha256:4a5573037f358b6cdfa2f3e8a9c33a5cf11bcd1675ca72ca76fbe5bd77d0d682
 `
 	if out != expectedOut {
 		t.Fatalf("Expected >>>%s<<< to match >>>%s<<<", out, expectedOut)
@@ -54,7 +54,7 @@ overrides:
   newImage: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
   preresolved: true
 - image: sample-app
-  newImage: index.docker.io/library/nginx@sha256:2539d4344dd18e1df02be842ffc435f8e1f699cfc55516e2cf2cb16b7a9aea0b
+  newImage: index.docker.io/library/nginx@sha256:4a5573037f358b6cdfa2f3e8a9c33a5cf11bcd1675ca72ca76fbe5bd77d0d682
   preresolved: true
 searchRules:
 - keyMatcher:
