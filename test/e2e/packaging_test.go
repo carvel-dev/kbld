@@ -1,6 +1,7 @@
 package e2e
 
 import (
+	"os"
 	"strings"
 	"testing"
 )
@@ -20,6 +21,7 @@ spec:
 `
 
 	path := "/tmp/kbld-test-pkg-unpkg-successful"
+	defer os.RemoveAll(path)
 
 	out, _ := kbld.RunWithOpts([]string{"package", "-f", "-", "--output", path}, RunOpts{
 		StdinReader: strings.NewReader(input),
@@ -51,7 +53,6 @@ func TestPkgUnpkgSuccessfulWithForeignLayers(t *testing.T) {
 	env := BuildEnv(t)
 	kbld := Kbld{t, env.Namespace, Logger{}}
 
-	// redis:5.0.4
 	input := `
 kind: Object
 spec:
@@ -59,6 +60,7 @@ spec:
 `
 
 	path := "/tmp/kbld-test-pkg-unpkg-successful-foreign-layers"
+	defer os.RemoveAll(path)
 
 	out, _ := kbld.RunWithOpts([]string{"package", "-f", "-", "--output", path}, RunOpts{
 		StdinReader: strings.NewReader(input),
