@@ -118,7 +118,7 @@ spec:
 		AllowError:  true,
 	})
 
-	expectedErr := "- Resolving image 'unknown': UNAUTHORIZED: authentication required;"
+	expectedErr := "- Resolving image 'unknown': GET https://index.docker.io/v2/library/unknown/manifests/latest: UNAUTHORIZED: authentication required;"
 
 	if !strings.Contains(err.Error(), expectedErr) {
 		t.Fatalf("Expected >>>%s<<< to match >>>%s<<<", err, expectedErr)

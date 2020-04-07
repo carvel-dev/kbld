@@ -62,7 +62,12 @@ func (i Registry) WriteImage(ref regname.Reference, img regv1.Image) error {
 		return fmt.Errorf("Getting authz details: %s", err)
 	}
 
-	err = i.retry(func() error { return regremote.Write(ref, img, authz, httpTran) })
+	err = i.retry(func() error {
+		return regremote.Write(ref, img,
+			regremote.WithTransport(httpTran),
+			regremote.WithAuth(authz),
+		)
+	})
 	if err != nil {
 		return fmt.Errorf("Writing image: %s", err)
 	}
@@ -90,7 +95,12 @@ func (i Registry) WriteIndex(ref regname.Reference, idx regv1.ImageIndex) error 
 		return fmt.Errorf("Getting authz details: %s", err)
 	}
 
-	err = i.retry(func() error { return regremote.WriteIndex(ref, idx, authz, httpTran) })
+	err = i.retry(func() error {
+		return regremote.WriteIndex(ref, idx,
+			regremote.WithTransport(httpTran),
+			regremote.WithAuth(authz),
+		)
+	})
 	if err != nil {
 		return fmt.Errorf("Writing image index: %s", err)
 	}
@@ -98,13 +108,13 @@ func (i Registry) WriteIndex(ref regname.Reference, idx regv1.ImageIndex) error 
 	return nil
 }
 
-func (i Registry) imageOpts() ([]regremote.ImageOption, error) {
+func (i Registry) imageOpts() ([]regremote.Option, error) {
 	httpTran, err := i.newHTTPTransport()
 	if err != nil {
 		return nil, err
 	}
 
-	return []regremote.ImageOption{
+	return []regremote.Option{
 		regremote.WithTransport(httpTran),
 		regremote.WithAuthFromKeychain(regauthn.DefaultKeychain),
 	}, nil

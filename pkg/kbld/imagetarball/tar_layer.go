@@ -25,7 +25,7 @@ func (l tarLayer) Uncompressed() (io.ReadCloser, error) {
 	if err != nil {
 		return nil, err
 	}
-	return v1util.GzipReadCloser(rc)
+	return v1util.GzipReadCloser(rc), nil
 }
 
 func (l tarLayer) Size() (int64, error) { return l.iltd.Size, nil }

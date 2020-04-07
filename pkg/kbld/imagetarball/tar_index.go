@@ -25,6 +25,8 @@ func (i tarImageIndex) MediaType() (types.MediaType, error) {
 func (i tarImageIndex) Digest() (regv1.Hash, error)  { return regv1.NewHash(i.iitd.Digest) }
 func (i tarImageIndex) RawManifest() ([]byte, error) { return []byte(i.iitd.Raw), nil }
 
+func (i tarImageIndex) Size() (int64, error) { return int64(len(i.iitd.Raw)), nil }
+
 func (i tarImageIndex) IndexManifest() (*regv1.IndexManifest, error) {
 	var manifest *regv1.IndexManifest
 	err := json.Unmarshal([]byte(i.iitd.Raw), &manifest)

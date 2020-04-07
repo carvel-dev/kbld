@@ -84,6 +84,10 @@ func (i tarImage) RawManifest() ([]byte, error) {
 	return []byte(i.itd.Manifest.Raw), nil
 }
 
+func (i tarImage) Size() (int64, error) {
+	return int64(len(i.itd.Manifest.Raw)), nil
+}
+
 // LayerByDigest returns a Layer for interacting with a particular layer of
 // the image, looking it up by "digest" (the compressed hash).
 func (i tarImage) LayerByDigest(digest regv1.Hash) (regv1.Layer, error) {
