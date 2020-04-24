@@ -3,7 +3,7 @@
 - Website: https://get-kbld.io
 - Slack: [#k14s in Kubernetes slack](https://slack.kubernetes.io)
 - [Docs](docs/README.md) with topics about building, packaging images, blog posts, etc.
-- Install: Grab prebuilt binaries from the [Releases page](https://github.com/k14s/kbld/releases)
+- Install: Grab prebuilt binaries from the [Releases page](https://github.com/k14s/kbld/releases) or [Homebrew k14s tap](https://github.com/k14s/homebrew-tap)
 
 `kbld` (pronounced: `kei·bild`) seamlessly incorporates image building and image pushing into your development and deployment workflows.
 
