@@ -125,17 +125,17 @@ apiVersion: kbld.k14s.io/v1alpha1
 kind: Config
 minimumRequiredVersion: 0.15.0
 searchRules:
-- key:
+- keyMatcher:
     name: sidecarImage
-- value:
+- valueMatcher:
     image: exact-image
     imageRepo: gcr.io/some/repo
 ```
 
 - `searchRules` (optional) allows to specify one or more matchers for finding image references. Key and value matchers could be specified together or separately. If key and value matchers are specified together, both matchers must succeed. This functionality supersedes `ImageKeys` kind. 
-  - `key` (optional) key matcher
+  - `keyMatcher` (optional) key matcher
     - `name` (optional; string) specifies key name (e.g. `sidecarImage`)
-  - `value` (optional) value matcher
+  - `valueMatcher` (optional) value matcher
     - `image` (optional; string) matches values exactly
     - `imageRepo` (optional; string) matches values that follow image reference format (`[registry]repo[:tag]\[@sha256:...]`) and expects `repo` portion to match (e.g. `gcr.io/project/app`)
 
