@@ -12,6 +12,7 @@ import (
 	regtarball "github.com/k14s/kbld/pkg/kbld/imagetarball"
 	ctlres "github.com/k14s/kbld/pkg/kbld/resources"
 	ctlser "github.com/k14s/kbld/pkg/kbld/search"
+	"github.com/k14s/kbld/pkg/kbld/util"
 	"github.com/k14s/kbld/pkg/kbld/version"
 	"github.com/spf13/cobra"
 )
@@ -24,6 +25,7 @@ type UnpackageOptions struct {
 	InputPath     string
 	Repository    string
 	LockOutput    string
+	Concurrency   int
 }
 
 func NewUnpackageOptions(ui ui.UI) *UnpackageOptions {
@@ -42,6 +44,7 @@ func NewUnpackageCmd(o *UnpackageOptions) *cobra.Command {
 	cmd.Flags().StringVarP(&o.InputPath, "input", "i", "", "Input tarball path")
 	cmd.Flags().StringVarP(&o.Repository, "repository", "r", "", "Import images into given image repository (e.g. docker.io/dkalinin/my-project)")
 	cmd.Flags().StringVar(&o.LockOutput, "lock-output", "", "File path to emit configuration with resolved image references")
+	cmd.Flags().IntVar(&o.Concurrency, "concurrency", 5, "Set maximum number of concurrent imports")
 	return cmd
 }
 
@@ -141,20 +144,38 @@ func (o *UnpackageOptions) importImages(logger *ctlimg.LoggerPrefixWriter) (*Pro
 		return nil, fmt.Errorf("Building import repository ref: %s", err)
 	}
 
-	// TODO import in parallel?
-	// TODO tag to avoid registry garbage collection?
+	errCh := make(chan error, len(imgOrIndexes))
+	importThrottle := util.NewThrottle(o.Concurrency)
+
 	for _, item := range imgOrIndexes {
-		existingRef, err := regname.NewDigest(item.Ref())
+		item := item // copy
+
+		go func() {
+			importThrottle.Take()
+			defer importThrottle.Done()
+
+			existingRef, err := regname.NewDigest(item.Ref())
+			if err != nil {
+				errCh <- err
+				return
+			}
+
+			importDigestRef, err := o.importImage(item, existingRef, importRepo, logger)
+			if err != nil {
+				errCh <- fmt.Errorf("Importing image %s: %s", existingRef.Name(), err)
+				return
+			}
+
+			importedImages.Add(UnprocessedImageURL{existingRef.Name()}, Image{URL: importDigestRef.Name()})
+			errCh <- nil
+		}()
+	}
+
+	for i := 0; i < len(imgOrIndexes); i++ {
+		err := <-errCh
 		if err != nil {
 			return nil, err
 		}
-
-		importDigestRef, err := o.importImage(item, existingRef, importRepo, logger)
-		if err != nil {
-			return nil, fmt.Errorf("Importing image %s: %s", existingRef.Name(), err)
-		}
-
-		importedImages.Add(UnprocessedImageURL{existingRef.Name()}, Image{URL: importDigestRef.Name()})
 	}
 
 	return importedImages, nil

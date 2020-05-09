@@ -2,10 +2,12 @@ package cmd
 
 import (
 	"sort"
+	"sync"
 )
 
 type ProcessedImages struct {
-	imgs map[UnprocessedImageURL]Image
+	imgs     map[UnprocessedImageURL]Image
+	imgsLock sync.Mutex
 }
 
 type ProcessedImageItem struct {
@@ -14,19 +16,28 @@ type ProcessedImageItem struct {
 }
 
 func NewProcessedImages() *ProcessedImages {
-	return &ProcessedImages{map[UnprocessedImageURL]Image{}}
+	return &ProcessedImages{imgs: map[UnprocessedImageURL]Image{}}
 }
 
 func (i *ProcessedImages) Add(unprocessedImageURL UnprocessedImageURL, img Image) {
+	i.imgsLock.Lock()
+	defer i.imgsLock.Unlock()
+
 	i.imgs[unprocessedImageURL] = img
 }
 
 func (i *ProcessedImages) FindByURL(unprocessedImageURL UnprocessedImageURL) (Image, bool) {
+	i.imgsLock.Lock()
+	defer i.imgsLock.Unlock()
+
 	img, found := i.imgs[unprocessedImageURL]
 	return img, found
 }
 
 func (i *ProcessedImages) All() []ProcessedImageItem {
+	i.imgsLock.Lock()
+	defer i.imgsLock.Unlock()
+
 	var result []ProcessedImageItem
 	for unprocessedImageURL, img := range i.imgs {
 		result = append(result, ProcessedImageItem{
