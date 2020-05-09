@@ -9,9 +9,6 @@ import (
 
 	"github.com/cppforlife/go-cli-ui/ui"
 	"github.com/k14s/kbld/pkg/kbld/cmd"
-
-	// Import to initialize client auth plugins.
-	_ "k8s.io/client-go/plugin/pkg/client/auth"
 )
 
 func main() {

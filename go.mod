@@ -22,5 +22,4 @@ require (
 	golang.org/x/crypto v0.0.0-20200311171314-f7b00557c8c4 // indirect
 	golang.org/x/sync v0.0.0-20190423024810-112230192c58
 	k8s.io/apimachinery v0.17.4
-	k8s.io/client-go v0.17.4
 )
