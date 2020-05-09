@@ -7,6 +7,7 @@ import (
 	"os"
 	"time"
 
+	uierrs "github.com/cppforlife/go-cli-ui/errors"
 	"github.com/cppforlife/go-cli-ui/ui"
 	"github.com/k14s/kbld/pkg/kbld/cmd"
 )
@@ -26,7 +27,7 @@ func main() {
 
 	err := command.Execute()
 	if err != nil {
-		confUI.ErrorLinef("kbld: Error: %v", err)
+		confUI.ErrorLinef("kbld: Error: %s", uierrs.NewMultiLineError(err))
 		os.Exit(1)
 	}
 
