@@ -4,11 +4,14 @@ import (
 	"fmt"
 	"io"
 	"strings"
+	"sync"
 
 	regname "github.com/google/go-containerregistry/pkg/name"
 	regv1 "github.com/google/go-containerregistry/pkg/v1"
 	regtran "github.com/google/go-containerregistry/pkg/v1/remote/transport"
 	regtypes "github.com/google/go-containerregistry/pkg/v1/types"
+	"github.com/k14s/kbld/pkg/kbld/util"
+	"golang.org/x/sync/errgroup"
 )
 
 type TarDescriptorsMetadata interface {
@@ -18,45 +21,65 @@ type TarDescriptorsMetadata interface {
 }
 
 type TarDescriptors struct {
-	tds         []ImageOrImageIndexTarDescriptor
-	imageLayers map[ImageLayerTarDescriptor]regv1.Layer
-	metadata    TarDescriptorsMetadata
+	metadata TarDescriptorsMetadata
+
+	tds []ImageOrImageIndexTarDescriptor
+
+	imageLayersLock sync.Mutex
+	imageLayers     map[ImageLayerTarDescriptor]regv1.Layer
 }
 
 func NewTarDescriptors(refs []regname.Reference, metadata TarDescriptorsMetadata) (*TarDescriptors, error) {
 	metadata = errTarDescriptorsMetadata{metadata}
 
 	tds := &TarDescriptors{
-		imageLayers: map[ImageLayerTarDescriptor]regv1.Layer{},
 		metadata:    metadata,
+		imageLayers: map[ImageLayerTarDescriptor]regv1.Layer{},
 	}
+
+	var tdsLock sync.Mutex
+	var wg errgroup.Group
+	buildThrottle := util.NewThrottle(10)
 
 	for _, ref := range refs {
-		desc, err := metadata.Generic(ref)
-		if err != nil {
-			return tds, err
-		}
+		ref := ref //copy
 
-		var td ImageOrImageIndexTarDescriptor
+		wg.Go(func() error {
+			buildThrottle.Take()
+			defer buildThrottle.Done()
 
-		if tds.isImageIndex(desc) {
-			imgIndexTd, err := tds.buildImageIndex(ref, desc)
+			desc, err := metadata.Generic(ref)
 			if err != nil {
-				return nil, err
+				return err
 			}
-			td = ImageOrImageIndexTarDescriptor{ImageIndex: &imgIndexTd}
-		} else {
-			imgTd, err := tds.buildImage(ref)
-			if err != nil {
-				return nil, err
-			}
-			td = ImageOrImageIndexTarDescriptor{Image: &imgTd}
-		}
 
-		tds.tds = append(tds.tds, td)
+			var td ImageOrImageIndexTarDescriptor
+
+			if tds.isImageIndex(desc) {
+				imgIndexTd, err := tds.buildImageIndex(ref, desc)
+				if err != nil {
+					return err
+				}
+				td = ImageOrImageIndexTarDescriptor{ImageIndex: &imgIndexTd}
+			} else {
+				imgTd, err := tds.buildImage(ref)
+				if err != nil {
+					return err
+				}
+				td = ImageOrImageIndexTarDescriptor{Image: &imgTd}
+			}
+
+			tdsLock.Lock()
+			tds.tds = append(tds.tds, td)
+			tdsLock.Unlock()
+
+			return nil
+		})
 	}
 
-	return tds, nil
+	err := wg.Wait()
+
+	return tds, err
 }
 
 func (tds *TarDescriptors) buildImageIndex(ref regname.Reference, desc regv1.Descriptor) (ImageIndexTarDescriptor, error) {
@@ -179,7 +202,9 @@ func (tds *TarDescriptors) buildImage(ref regname.Reference) (ImageTarDescriptor
 
 		td.Layers = append(td.Layers, layerTD)
 
+		tds.imageLayersLock.Lock()
 		tds.imageLayers[layerTD] = layer
+		tds.imageLayersLock.Unlock()
 	}
 
 	return td, nil
@@ -194,10 +219,14 @@ func (TarDescriptors) isImageIndex(desc regv1.Descriptor) bool {
 }
 
 func (tds *TarDescriptors) ImageLayerStream(td ImageLayerTarDescriptor) (io.Reader, error) {
+	tds.imageLayersLock.Lock()
+	defer tds.imageLayersLock.Unlock()
+
 	layer, found := tds.imageLayers[td]
 	if !found {
 		panic(fmt.Sprintf("Expected to find stream for %#v", td))
 	}
+
 	reader, err := layer.Compressed()
 	if err != nil {
 		return nil, fmt.Errorf("Getting compressed layer: %s", err)
