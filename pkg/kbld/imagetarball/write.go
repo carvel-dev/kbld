@@ -3,7 +3,6 @@ package tarball
 import (
 	"archive/tar"
 	"bytes"
-	"encoding/json"
 	"io"
 	"sort"
 
@@ -25,7 +24,7 @@ func (w *TarWriter) Write() error {
 	w.tf = tar.NewWriter(w.dst)
 	defer w.tf.Close()
 
-	tdsBytes, err := json.Marshal(w.tds.tds)
+	tdsBytes, err := w.tds.AsBytes()
 	if err != nil {
 		return err
 	}

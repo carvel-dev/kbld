@@ -1,8 +1,10 @@
 package tarball
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
+	"sort"
 	"strings"
 	"sync"
 
@@ -232,6 +234,15 @@ func (tds *TarDescriptors) ImageLayerStream(td ImageLayerTarDescriptor) (io.Read
 		return nil, fmt.Errorf("Getting compressed layer: %s", err)
 	}
 	return reader, nil
+}
+
+func (tds *TarDescriptors) AsBytes() ([]byte, error) {
+	// Ensure result is deterministic
+	sort.Slice(tds.tds, func(i, j int) bool {
+		return tds.tds[i].SortKey() < tds.tds[j].SortKey()
+	})
+
+	return json.Marshal(tds.tds)
 }
 
 func (tds *TarDescriptors) buildRef(otherRef regname.Reference, digest string) regname.Reference {
