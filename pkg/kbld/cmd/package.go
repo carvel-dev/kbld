@@ -63,45 +63,55 @@ func (o *PackageOptions) Run() error {
 }
 
 func (o *PackageOptions) findImages(allRs []ctlres.Resource,
-	conf ctlconf.Conf, logger ctlimg.Logger) (map[string]struct{}, error) {
+	conf ctlconf.Conf, logger ctlimg.Logger) (*UnprocessedImageURLs, error) {
 
-	foundImages := map[string]struct{}{}
+	foundImages := NewUnprocessedImageURLs()
 
 	for _, res := range allRs {
 		imageRefs := ctlser.NewImageRefs(res.DeepCopyRaw(), conf.SearchRules())
 
 		imageRefs.Visit(func(val interface{}) (interface{}, bool) {
 			if img, ok := val.(string); ok {
-				foundImages[img] = struct{}{}
+				foundImages.Add(UnprocessedImageURL{img})
 			}
 			return nil, false
 		})
 	}
 
-	for img, _ := range foundImages {
-		_, err := regname.NewDigest(img)
+	// Include preresolved images since we want to
+	// be able to package up lock files.
+	for _, override := range conf.ImageOverrides() {
+		if override.Preresolved {
+			foundImages.Add(UnprocessedImageURL{override.NewImage})
+		}
+	}
+
+	for _, img := range foundImages.All() {
+		_, err := regname.NewDigest(img.URL)
 		if err != nil {
-			return nil, fmt.Errorf("Expected image '%s' to be in digest form (i.e. image@digest)", img)
+			return nil, fmt.Errorf("Expected image '%s' to be in digest form (i.e. image@digest)", img.URL)
 		}
 	}
 
 	return foundImages, nil
 }
 
-func (o *PackageOptions) exportImages(imgRefsToExport map[string]struct{}, logger *ctlimg.LoggerPrefixWriter) error {
-	logger.WriteStr("exporting %d images...\n", len(imgRefsToExport))
-	defer func() { logger.WriteStr("exported %d images\n", len(imgRefsToExport)) }()
+func (o *PackageOptions) exportImages(foundImages *UnprocessedImageURLs,
+	logger *ctlimg.LoggerPrefixWriter) error {
+
+	logger.WriteStr("exporting %d images...\n", len(foundImages.All()))
+	defer func() { logger.WriteStr("exported %d images\n", len(foundImages.All())) }()
 
 	var refs []regname.Reference
 
-	for imgRef, _ := range imgRefsToExport {
+	for _, img := range foundImages.All() {
 		// Validate strictly as these refs were already resolved
-		ref, err := regname.NewDigest(imgRef, regname.StrictValidation)
+		ref, err := regname.NewDigest(img.URL, regname.StrictValidation)
 		if err != nil {
 			return err
 		}
 
-		logger.Write([]byte(fmt.Sprintf("will export %s\n", imgRef)))
+		logger.Write([]byte(fmt.Sprintf("will export %s\n", img.URL)))
 		refs = append(refs, ref)
 	}
 

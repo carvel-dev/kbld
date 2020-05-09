@@ -12,6 +12,7 @@ import (
 	regtarball "github.com/k14s/kbld/pkg/kbld/imagetarball"
 	ctlres "github.com/k14s/kbld/pkg/kbld/resources"
 	ctlser "github.com/k14s/kbld/pkg/kbld/search"
+	"github.com/k14s/kbld/pkg/kbld/version"
 	"github.com/spf13/cobra"
 )
 
@@ -22,6 +23,7 @@ type UnpackageOptions struct {
 	RegistryFlags RegistryFlags
 	InputPath     string
 	Repository    string
+	LockOutput    string
 }
 
 func NewUnpackageOptions(ui ui.UI) *UnpackageOptions {
@@ -39,6 +41,7 @@ func NewUnpackageCmd(o *UnpackageOptions) *cobra.Command {
 	o.RegistryFlags.Set(cmd)
 	cmd.Flags().StringVarP(&o.InputPath, "input", "i", "", "Input tarball path")
 	cmd.Flags().StringVarP(&o.Repository, "repository", "r", "", "Import images into given image repository (e.g. docker.io/dkalinin/my-project)")
+	cmd.Flags().StringVar(&o.LockOutput, "lock-output", "", "File path to emit configuration with resolved image references")
 	return cmd
 }
 
@@ -64,6 +67,11 @@ func (o *UnpackageOptions) Run() error {
 		return err
 	}
 
+	err = o.emitLockOutput(conf, importedImages)
+	if err != nil {
+		return err
+	}
+
 	// Update previous image references with new references
 	resBss, err := o.updateRefsInResources(nonConfigRs, conf, importedImages)
 	if err != nil {
@@ -81,7 +89,7 @@ func (o *UnpackageOptions) Run() error {
 
 func (o *UnpackageOptions) updateRefsInResources(
 	nonConfigRs []ctlres.Resource, conf ctlconf.Conf,
-	resolvedImages map[string]string) ([][]byte, error) {
+	resolvedImages *ProcessedImages) ([][]byte, error) {
 
 	var missingImageErrs []error
 	var resBss [][]byte
@@ -92,8 +100,9 @@ func (o *UnpackageOptions) updateRefsInResources(
 
 		imageRefs.Visit(func(val interface{}) (interface{}, bool) {
 			if img, ok := val.(string); ok {
-				if outputImg, found := resolvedImages[img]; found {
-					return outputImg, true
+				outputImg, found := resolvedImages.FindByURL(UnprocessedImageURL{img})
+				if found {
+					return outputImg.URL, true
 				}
 				missingImageErrs = append(missingImageErrs, fmt.Errorf("Expected to find image for '%s'", img))
 			}
@@ -116,8 +125,8 @@ func (o *UnpackageOptions) updateRefsInResources(
 	return resBss, nil
 }
 
-func (o *UnpackageOptions) importImages(logger *ctlimg.LoggerPrefixWriter) (map[string]string, error) {
-	importedImages := map[string]string{}
+func (o *UnpackageOptions) importImages(logger *ctlimg.LoggerPrefixWriter) (*ProcessedImages, error) {
+	importedImages := NewProcessedImages()
 
 	imgOrIndexes, err := regtarball.MultiRefReadFromFile(o.InputPath)
 	if err != nil {
@@ -125,7 +134,7 @@ func (o *UnpackageOptions) importImages(logger *ctlimg.LoggerPrefixWriter) (map[
 	}
 
 	logger.WriteStr("importing %d images...\n", len(imgOrIndexes))
-	defer func() { logger.WriteStr("imported %d images\n", len(importedImages)) }()
+	defer func() { logger.WriteStr("imported %d images\n", len(importedImages.All())) }()
 
 	importRepo, err := regname.NewRepository(o.Repository)
 	if err != nil {
@@ -145,7 +154,7 @@ func (o *UnpackageOptions) importImages(logger *ctlimg.LoggerPrefixWriter) (map[
 			return nil, fmt.Errorf("Importing image %s: %s", existingRef.Name(), err)
 		}
 
-		importedImages[existingRef.Name()] = importDigestRef.Name()
+		importedImages.Add(UnprocessedImageURL{existingRef.Name()}, Image{URL: importDigestRef.Name()})
 	}
 
 	return importedImages, nil
@@ -204,8 +213,12 @@ func (o *UnpackageOptions) importImage(item regtarball.TarImageOrIndex,
 	return importDigestRef, nil
 }
 
-func (o *UnpackageOptions) verifyTagDigest(uploadTagRef regname.Reference, importDigestRef regname.Digest) error {
-	resultURL, _, err := ctlimg.NewResolvedImage(uploadTagRef.Name(), ctlimg.NewRegistry(o.RegistryFlags.AsRegistryOpts())).URL()
+func (o *UnpackageOptions) verifyTagDigest(
+	uploadTagRef regname.Reference, importDigestRef regname.Digest) error {
+
+	registry := ctlimg.NewRegistry(o.RegistryFlags.AsRegistryOpts())
+
+	resultURL, _, err := ctlimg.NewResolvedImage(uploadTagRef.Name(), registry).URL()
 	if err != nil {
 		return fmt.Errorf("Verifying imported image %s: %s", uploadTagRef.Name(), err)
 	}
@@ -221,4 +234,44 @@ func (o *UnpackageOptions) verifyTagDigest(uploadTagRef regname.Reference, impor
 	}
 
 	return nil
+}
+
+func (o *UnpackageOptions) emitLockOutput(conf ctlconf.Conf, resolvedImages *ProcessedImages) error {
+	if len(o.LockOutput) == 0 {
+		return nil
+	}
+
+	c := ctlconf.NewConfig()
+	c.MinimumRequiredVersion = version.Version
+	c.SearchRules = conf.SearchRulesWithoutDefaults()
+
+	for _, override := range conf.ImageOverrides() {
+		if override.Preresolved {
+			img, found := resolvedImages.FindByURL(UnprocessedImageURL{override.NewImage})
+			if !found {
+				return fmt.Errorf("Expected to find imported image for '%s'", override.NewImage)
+			}
+
+			c.Overrides = append(c.Overrides, ctlconf.ImageOverride{
+				ImageRef:    override.ImageRef,
+				NewImage:    img.URL,
+				Preresolved: true,
+			})
+		}
+	}
+
+	// TODO should we dedup overrides?
+	for _, urlImagePair := range resolvedImages.All() {
+		c.Overrides = append(c.Overrides, ctlconf.ImageOverride{
+			ImageRef: ctlconf.ImageRef{
+				Image: urlImagePair.UnprocessedImageURL.URL,
+			},
+			NewImage:    urlImagePair.Image.URL,
+			Preresolved: true,
+		})
+	}
+
+	c.Overrides = ctlconf.UniqueImageOverrides(c.Overrides)
+
+	return c.WriteToFile(o.LockOutput)
 }

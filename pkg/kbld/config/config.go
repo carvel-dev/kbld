@@ -244,3 +244,20 @@ func (d Config) WriteToFile(path string) error {
 
 	return nil
 }
+
+func UniqueImageOverrides(overrides []ImageOverride) []ImageOverride {
+	var result []ImageOverride
+	for _, override := range overrides {
+		var found bool
+		for _, addedOverride := range result {
+			if addedOverride == override {
+				found = true
+				break
+			}
+		}
+		if !found {
+			result = append(result, override)
+		}
+	}
+	return result
+}
