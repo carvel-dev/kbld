@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"io"
 	"os"
 
 	"github.com/cppforlife/go-cli-ui/ui"
@@ -20,6 +21,7 @@ type PackageOptions struct {
 	FileFlags     FileFlags
 	RegistryFlags RegistryFlags
 	OutputPath    string
+	Concurrency   int
 }
 
 var _ regtarball.TarDescriptorsMetadata = ctlimg.Registry{}
@@ -38,6 +40,7 @@ func NewPackageCmd(o *PackageOptions) *cobra.Command {
 	o.FileFlags.Set(cmd)
 	o.RegistryFlags.Set(cmd)
 	cmd.Flags().StringVarP(&o.OutputPath, "output", "o", "", "Output tarball path")
+	cmd.Flags().IntVar(&o.Concurrency, "concurrency", 5, "Set maximum number of concurrent imports")
 	return cmd
 }
 
@@ -117,15 +120,26 @@ func (o *PackageOptions) exportImages(foundImages *UnprocessedImageURLs,
 
 	outputFile, err := os.Create(o.OutputPath)
 	if err != nil {
+		return fmt.Errorf("Creating file '%s': %s", o.OutputPath, err)
+	}
+
+	err = outputFile.Close()
+	if err != nil {
 		return err
 	}
 
-	defer outputFile.Close()
+	outputFileOpener := func() (io.WriteCloser, error) {
+		return os.OpenFile(o.OutputPath, os.O_RDWR, 0755)
+	}
 
 	tds, err := regtarball.NewTarDescriptors(refs, ctlimg.NewRegistry(o.RegistryFlags.AsRegistryOpts()))
 	if err != nil {
 		return fmt.Errorf("Collecting packaging metadata: %s", err)
 	}
 
-	return regtarball.NewTarWriter(tds, outputFile).Write()
+	logger.WriteStr("writing layers...\n")
+
+	opts := regtarball.TarWriterOpts{Concurrency: o.Concurrency}
+
+	return regtarball.NewTarWriter(tds, outputFileOpener, opts, logger).Write()
 }

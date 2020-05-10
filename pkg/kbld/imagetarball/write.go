@@ -3,24 +3,51 @@ package tarball
 import (
 	"archive/tar"
 	"bytes"
+	"fmt"
 	"io"
+	"os"
 	"sort"
+	"time"
 
 	regv1 "github.com/google/go-containerregistry/pkg/v1"
+	"github.com/k14s/kbld/pkg/kbld/util"
 )
 
-type TarWriter struct {
-	tds           *TarDescriptors
-	dst           io.Writer
-	tf            *tar.Writer
-	layersToWrite []ImageLayerTarDescriptor
+type Logger interface {
+	WriteStr(str string, args ...interface{}) error
 }
 
-func NewTarWriter(tds *TarDescriptors, dst io.Writer) *TarWriter {
-	return &TarWriter{tds, dst, nil, nil}
+type TarWriterOpts struct {
+	Concurrency int
+}
+
+type TarWriter struct {
+	tds       *TarDescriptors
+	dstOpener func() (io.WriteCloser, error)
+
+	dst           io.WriteCloser
+	tf            *tar.Writer
+	layersToWrite []ImageLayerTarDescriptor
+
+	opts   TarWriterOpts
+	logger Logger
+}
+
+func NewTarWriter(tds *TarDescriptors, dstOpener func() (io.WriteCloser, error),
+	opts TarWriterOpts, logger Logger) *TarWriter {
+	return &TarWriter{tds: tds, dstOpener: dstOpener, opts: opts, logger: logger}
 }
 
 func (w *TarWriter) Write() error {
+	var err error
+
+	w.dst, err = w.dstOpener()
+	if err != nil {
+		return err
+	}
+
+	defer w.dst.Close()
+
 	w.tf = tar.NewWriter(w.dst)
 	defer w.tf.Close()
 
@@ -29,7 +56,7 @@ func (w *TarWriter) Write() error {
 		return err
 	}
 
-	err = w.writeTarEntry("manifest.json", bytes.NewReader(tdsBytes), int64(len(tdsBytes)))
+	err = w.writeTarEntry(w.tf, "manifest.json", bytes.NewReader(tdsBytes), int64(len(tdsBytes)))
 	if err != nil {
 		return err
 	}
@@ -86,14 +113,23 @@ func (w *TarWriter) writeImage(td ImageTarDescriptor) error {
 	return nil
 }
 
+type writtenLayer struct {
+	Name   string
+	Offset int64
+	Layer  ImageLayerTarDescriptor
+}
+
 func (w *TarWriter) writeLayers() error {
 	// Sort layers by digest to have deterministic archive
 	sort.Slice(w.layersToWrite, func(i, j int) bool {
 		return w.layersToWrite[i].Digest < w.layersToWrite[j].Digest
 	})
 
-	writtenLayers := map[string]struct{}{}
+	seekableDst, isSeekable := w.dst.(*os.File)
+	isInflattable := (w.opts.Concurrency > 1) && isSeekable
+	writtenLayers := map[string]writtenLayer{}
 
+	// Inflate tar file so that multiple writes can happen in parallel
 	for _, imgLayer := range w.layersToWrite {
 		digest, err := regv1.NewHash(imgLayer.Digest)
 		if err != nil {
@@ -107,32 +143,150 @@ func (w *TarWriter) writeLayers() error {
 			continue
 		}
 
-		stream, err := w.tds.ImageLayerStream(imgLayer)
+		err = w.tf.Flush()
 		if err != nil {
 			return err
 		}
 
-		err = w.writeTarEntry(name, stream, imgLayer.Size)
-		if err != nil {
-			return err
+		var stream io.Reader
+		var currPos int64
+
+		if isSeekable {
+			currPos, err = seekableDst.Seek(0, 1)
+			if err != nil {
+				return fmt.Errorf("Find current pos: %s", err)
+			}
 		}
 
-		writtenLayers[name] = struct{}{}
+		if isInflattable {
+			stream = io.LimitReader(zeroReader{}, imgLayer.Size)
+		} else {
+			stream, err = w.tds.ImageLayerStream(imgLayer)
+			if err != nil {
+				return err
+			}
+		}
+
+		err = w.writeTarEntry(w.tf, name, stream, imgLayer.Size)
+		if err != nil {
+			return fmt.Errorf("Writing tar entry: %s", err)
+		}
+
+		writtenLayers[name] = writtenLayer{
+			Name:   name,
+			Layer:  imgLayer,
+			Offset: currPos,
+		}
+	}
+
+	err := w.tf.Flush()
+	if err != nil {
+		return err
+	}
+
+	if isInflattable {
+		return w.fillInLayers(writtenLayers)
 	}
 
 	return nil
 }
 
-func (w *TarWriter) writeTarEntry(path string, r io.Reader, size int64) error {
+func (w *TarWriter) fillInLayers(writtenLayers map[string]writtenLayer) error {
+	var sortedWritterLayers []writtenLayer
+
+	for _, writtenLayer := range writtenLayers {
+		sortedWritterLayers = append(sortedWritterLayers, writtenLayer)
+	}
+
+	// Prefer larger sizes first
+	sort.Slice(sortedWritterLayers, func(i, j int) bool {
+		return sortedWritterLayers[i].Layer.Size >= sortedWritterLayers[j].Layer.Size
+	})
+
+	errCh := make(chan error, len(writtenLayers))
+	writeThrottle := util.NewThrottle(w.opts.Concurrency)
+
+	// Fill in actual data
+	for _, writtenLayer := range sortedWritterLayers {
+		writtenLayer := writtenLayer // copy
+
+		go func() {
+			writeThrottle.Take()
+			defer writeThrottle.Done()
+
+			errCh <- w.fillInLayer(writtenLayer)
+		}()
+	}
+
+	for i := 0; i < len(writtenLayers); i++ {
+		err := <-errCh
+		if err != nil {
+			return fmt.Errorf("Filling in a layer: %s", err)
+		}
+	}
+
+	return nil
+}
+
+func (w *TarWriter) fillInLayer(wl writtenLayer) error {
+	file, err := w.dstOpener()
+	if err != nil {
+		return err
+	}
+
+	defer file.Close()
+
+	_, err = file.(*os.File).Seek(wl.Offset, 0)
+	if err != nil {
+		return fmt.Errorf("Seeking to offset: %s", err)
+	}
+
+	tw := tar.NewWriter(file)
+	// Do not close tar writer as it would add unwanted footer
+
+	stream, err := w.tds.ImageLayerStream(wl.Layer)
+	if err != nil {
+		return err
+	}
+
+	err = w.writeTarEntry(tw, wl.Name, stream, wl.Layer.Size)
+	if err != nil {
+		return fmt.Errorf("Rewriting tar entry (%s): %s", wl.Name, err)
+	}
+
+	return tw.Flush()
+}
+
+func (w *TarWriter) writeTarEntry(tw *tar.Writer, path string, r io.Reader, size int64) error {
 	hdr := &tar.Header{
 		Mode:     0644,
 		Typeflag: tar.TypeReg,
 		Size:     size,
 		Name:     path,
 	}
-	if err := w.tf.WriteHeader(hdr); err != nil {
-		return err
+
+	err := tw.WriteHeader(hdr)
+	if err != nil {
+		return fmt.Errorf("Writing header: %s", err)
 	}
-	_, err := io.Copy(w.tf, r)
-	return err
+
+	t1 := time.Now()
+
+	_, err = io.Copy(tw, r)
+	if err != nil {
+		return fmt.Errorf("Copying data: %s", err)
+	}
+
+	w.logger.WriteStr("done: file '%s' (%s)\n", path, time.Now().Sub(t1))
+
+	return nil
+}
+
+type zeroReader struct{}
+
+func (r zeroReader) Read(p []byte) (n int, err error) {
+	for i, _ := range p {
+		p[i] = 0
+	}
+	return len(p), nil
 }
