@@ -2,6 +2,7 @@ package search
 
 import (
 	ctlconf "github.com/k14s/kbld/pkg/kbld/config"
+	ctlres "github.com/k14s/kbld/pkg/kbld/resources"
 )
 
 type RulesMatcher struct {
@@ -14,9 +15,9 @@ func NewRulesMatcher(rules []ctlconf.SearchRule) RulesMatcher {
 
 var _ Matcher = RuleMatcher{}
 
-func (m RulesMatcher) Matches(key string, value interface{}) (bool, ctlconf.SearchRuleUpdateStrategy) {
+func (m RulesMatcher) Matches(keyPath ctlres.Path, value interface{}) (bool, ctlconf.SearchRuleUpdateStrategy) {
 	for _, rule := range m.rules {
-		matches, extraction := (RuleMatcher{rule}).Matches(key, value)
+		matches, extraction := (RuleMatcher{rule}).Matches(keyPath, value)
 		if matches {
 			return true, extraction
 		}

@@ -2,6 +2,7 @@ package search
 
 import (
 	ctlconf "github.com/k14s/kbld/pkg/kbld/config"
+	ctlres "github.com/k14s/kbld/pkg/kbld/resources"
 )
 
 type Fields struct {
@@ -16,36 +17,57 @@ func NewFields(res interface{}, matcher Matcher) Fields {
 }
 
 func (f Fields) Visit(visitorFunc FieldsVisitorFunc) {
-	f.visit(f.res, visitorFunc)
+	f.visit(ctlres.Path{}, f.res, visitorFunc)
 }
 
-func (f Fields) visit(res interface{}, visitorFunc FieldsVisitorFunc) {
+func (f Fields) visit(keyPath ctlres.Path, res interface{}, visitorFunc FieldsVisitorFunc) {
 	switch typedObj := res.(type) {
 	case map[string]interface{}:
 		for k, v := range typedObj {
-			if matched, ext := f.matcher.Matches(k, v); matched {
+			k := k // copy
+			newKeyPath := append(f.newPath(keyPath), &ctlres.PathPart{MapKey: &k})
+
+			if matched, ext := f.matcher.Matches(newKeyPath, v); matched {
 				if newVal, update := visitorFunc(v, ext); update {
 					typedObj[k] = newVal
 				}
 			} else {
-				f.visit(typedObj[k], visitorFunc)
+				f.visit(newKeyPath, typedObj[k], visitorFunc)
 			}
 		}
 
 	case map[string]string:
 		for k, v := range typedObj {
-			if matched, ext := f.matcher.Matches(k, v); matched {
+			k := k // copy
+			newKeyPath := append(f.newPath(keyPath), &ctlres.PathPart{MapKey: &k})
+
+			if matched, ext := f.matcher.Matches(newKeyPath, v); matched {
 				if newVal, update := visitorFunc(v, ext); update {
 					typedObj[k] = newVal.(string)
 				}
 			} else {
-				f.visit(typedObj[k], visitorFunc)
+				f.visit(newKeyPath, typedObj[k], visitorFunc)
 			}
 		}
 
 	case []interface{}:
-		for _, o := range typedObj {
-			f.visit(o, visitorFunc)
+		for i, o := range typedObj {
+			i := i // copy
+			newKeyPath := append(f.newPath(keyPath), &ctlres.PathPart{
+				ArrayIndex: &ctlres.PathPartArrayIndex{Index: &i},
+			})
+
+			if matched, ext := f.matcher.Matches(newKeyPath, o); matched {
+				if newVal, update := visitorFunc(o, ext); update {
+					typedObj[i] = newVal
+				}
+			} else {
+				f.visit(newKeyPath, o, visitorFunc)
+			}
 		}
 	}
+}
+
+func (Fields) newPath(p ctlres.Path) ctlres.Path {
+	return ctlres.Path(append(ctlres.Path{}, p...))
 }

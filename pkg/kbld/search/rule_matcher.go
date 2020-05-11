@@ -5,10 +5,11 @@ import (
 
 	ctlconf "github.com/k14s/kbld/pkg/kbld/config"
 	ctlimg "github.com/k14s/kbld/pkg/kbld/image"
+	ctlres "github.com/k14s/kbld/pkg/kbld/resources"
 )
 
 type Matcher interface {
-	Matches(key string, value interface{}) (bool, ctlconf.SearchRuleUpdateStrategy)
+	Matches(keyPath ctlres.Path, value interface{}) (bool, ctlconf.SearchRuleUpdateStrategy)
 }
 
 type RuleMatcher struct {
@@ -17,12 +18,20 @@ type RuleMatcher struct {
 
 var _ Matcher = RuleMatcher{}
 
-func (m RuleMatcher) Matches(key string, value interface{}) (bool, ctlconf.SearchRuleUpdateStrategy) {
+func (m RuleMatcher) Matches(keyPath ctlres.Path, value interface{}) (bool, ctlconf.SearchRuleUpdateStrategy) {
 	var keyMatched, valueMatched bool
 
 	if m.rule.KeyMatcher != nil {
-		if m.rule.KeyMatcher.Name == key {
-			keyMatched = true
+		switch {
+		case len(m.rule.KeyMatcher.Name) > 0:
+			name := m.rule.KeyMatcher.Name
+			keyMatched = keyPath.HasMatchingSuffix(ctlres.Path{{MapKey: &name}})
+
+		case len(m.rule.KeyMatcher.Path) > 0:
+			keyMatched = m.rule.KeyMatcher.Path.Matches(keyPath)
+
+		default:
+			panic("Unknown search rule key matcher")
 		}
 	} else {
 		keyMatched = true

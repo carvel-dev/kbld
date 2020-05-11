@@ -63,8 +63,8 @@ type SearchRule struct {
 }
 
 type SearchRuleKeyMatcher struct {
-	Name string `json:"name,omitempty"`
-	// TODO Path []interface (see kapp's path)
+	Name string      `json:"name,omitempty"`
+	Path ctlres.Path `json:"path,omitempty"`
 	// TODO JSONPath string
 }
 
@@ -220,8 +220,8 @@ func (d SearchRule) Validate() error {
 		return fmt.Errorf("Expected KeyMatcher or ValueMatcher to be non-empty")
 	}
 	if d.KeyMatcher != nil {
-		if len(d.KeyMatcher.Name) == 0 {
-			return fmt.Errorf("Expected KeyMatcher.Name to be non-empty")
+		if len(d.KeyMatcher.Name) == 0 && len(d.KeyMatcher.Path) == 0 {
+			return fmt.Errorf("Expected KeyMatcher.Name or KeyMatcher.Path to be non-empty")
 		}
 	}
 	if d.ValueMatcher != nil {

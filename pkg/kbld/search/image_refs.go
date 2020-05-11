@@ -8,6 +8,7 @@ import (
 
 	"github.com/ghodss/yaml"
 	ctlconf "github.com/k14s/kbld/pkg/kbld/config"
+	ctlres "github.com/k14s/kbld/pkg/kbld/resources"
 )
 
 type ImageRefs struct {
@@ -145,7 +146,7 @@ type tmpRefMatcher struct {
 
 var _ Matcher = tmpRefMatcher{}
 
-func (m tmpRefMatcher) Matches(key string, value interface{}) (bool, ctlconf.SearchRuleUpdateStrategy) {
+func (m tmpRefMatcher) Matches(key ctlres.Path, value interface{}) (bool, ctlconf.SearchRuleUpdateStrategy) {
 	if valStr, ok := value.(string); ok {
 		return strings.HasPrefix(valStr, m.prefix), (ctlconf.SearchRule{}).UpdateStrategyWithDefaults()
 	}

@@ -296,6 +296,11 @@ spec:
     data: |
       nested:
         image: nginx:1.14.2
+- images:
+  - nginx:1.14.2
+  - nginxImage: nginx:1.14.2
+    nginxImages:
+      value: nginx:1.14.2
 ---
 apiVersion: kbld.k14s.io/v1alpha1
 kind: Config
@@ -311,6 +316,12 @@ searchRules:
       searchRules:
       - keyMatcher:
           name: image
+- keyMatcher:
+    path: [spec, {allIndexes: true}, images, {index: 0}]
+- keyMatcher:
+    path: [spec, {allIndexes: true}, nginxImage]
+- keyMatcher:
+    path: [spec, {allIndexes: true}, nginxImages, value]
 `
 
 	out, _ := kbld.RunWithOpts([]string{"-f", "-", "--images-annotation=false"}, RunOpts{
@@ -327,6 +338,11 @@ spec:
     data: |
       nested:
         image: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
+- images:
+  - index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
+  - nginxImage: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
+    nginxImages:
+      value: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
 `
 
 	if out != expectedOut {

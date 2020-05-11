@@ -135,6 +135,7 @@ searchRules:
 - `searchRules` (optional) allows to specify one or more matchers for finding image references. Key and value matchers could be specified together or separately. If key and value matchers are specified together, both matchers must succeed. This functionality supersedes `ImageKeys` kind. 
   - `keyMatcher` (optional) key matcher
     - `name` (optional; string) specifies key name (e.g. `sidecarImage`)
+    - `path` (optional; array) specifies key path from the root of the YAML document (e.g. `[data, sidecarImage]`, `[spec, images, {allIndexes: true}]`)
   - `valueMatcher` (optional) value matcher
     - `image` (optional; string) matches values exactly
     - `imageRepo` (optional; string) matches values that follow image reference format (`[registry]repo[:tag]\[@sha256:...]`) and expects `repo` portion to match (e.g. `gcr.io/project/app`)
