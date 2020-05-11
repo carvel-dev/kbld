@@ -75,12 +75,12 @@ type SearchRuleValueMatcher struct {
 }
 
 type SearchRuleUpdateStrategy struct {
-	EntireValue *SearchRuleUpdateStrategyEntireValue `json:"entireValue,omitempty"`
-	JSON        *SearchRuleUpdateStrategyJSON        `json:"json,omitempty"`
-	YAML        *SearchRuleUpdateStrategyYAML        `json:"yaml,omitempty"`
+	EntireString *SearchRuleUpdateStrategyEntireString `json:"entireValue,omitempty"`
+	JSON         *SearchRuleUpdateStrategyJSON         `json:"json,omitempty"`
+	YAML         *SearchRuleUpdateStrategyYAML         `json:"yaml,omitempty"`
 }
 
-type SearchRuleUpdateStrategyEntireValue struct{}
+type SearchRuleUpdateStrategyEntireString struct{}
 
 type SearchRuleUpdateStrategyJSON struct {
 	SearchRules []SearchRule `json:"searchRules,omitempty"`
@@ -284,6 +284,6 @@ func (r SearchRule) UpdateStrategyWithDefaults() SearchRuleUpdateStrategy {
 		return *r.UpdateStrategy
 	}
 	return SearchRuleUpdateStrategy{
-		EntireValue: &SearchRuleUpdateStrategyEntireValue{},
+		EntireString: &SearchRuleUpdateStrategyEntireString{},
 	}
 }

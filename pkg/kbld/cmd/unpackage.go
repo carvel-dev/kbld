@@ -101,15 +101,13 @@ func (o *UnpackageOptions) updateRefsInResources(
 		resContents := res.DeepCopyRaw()
 		imageRefs := ctlser.NewImageRefs(resContents, conf.SearchRules())
 
-		imageRefs.Visit(func(val interface{}) (interface{}, bool) {
-			if img, ok := val.(string); ok {
-				outputImg, found := resolvedImages.FindByURL(UnprocessedImageURL{img})
-				if found {
-					return outputImg.URL, true
-				}
-				missingImageErrs = append(missingImageErrs, fmt.Errorf("Expected to find image for '%s'", img))
+		imageRefs.Visit(func(imgURL string) (string, bool) {
+			outputImg, found := resolvedImages.FindByURL(UnprocessedImageURL{imgURL})
+			if found {
+				return outputImg.URL, true
 			}
-			return nil, false
+			missingImageErrs = append(missingImageErrs, fmt.Errorf("Expected to find image for '%s'", imgURL))
+			return "", false
 		})
 
 		resBs, err := yaml.Marshal(resContents)

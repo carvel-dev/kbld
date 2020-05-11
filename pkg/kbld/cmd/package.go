@@ -73,11 +73,9 @@ func (o *PackageOptions) findImages(allRs []ctlres.Resource,
 	for _, res := range allRs {
 		imageRefs := ctlser.NewImageRefs(res.DeepCopyRaw(), conf.SearchRules())
 
-		imageRefs.Visit(func(val interface{}) (interface{}, bool) {
-			if img, ok := val.(string); ok {
-				foundImages.Add(UnprocessedImageURL{img})
-			}
-			return nil, false
+		imageRefs.Visit(func(imgURL string) (string, bool) {
+			foundImages.Add(UnprocessedImageURL{imgURL})
+			return "", false
 		})
 	}
 

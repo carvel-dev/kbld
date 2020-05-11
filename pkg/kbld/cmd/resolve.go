@@ -100,11 +100,9 @@ func (o *ResolveOptions) resolveImages(nonConfigRs []ctlres.Resource,
 	for _, res := range nonConfigRs {
 		imageRefs := ctlser.NewImageRefs(res.DeepCopyRaw(), conf.SearchRules())
 
-		imageRefs.Visit(func(val interface{}) (interface{}, bool) {
-			if imgURL, ok := val.(string); ok {
-				imageURLs.Add(UnprocessedImageURL{imgURL})
-			}
-			return nil, false
+		imageRefs.Visit(func(imgURL string) (string, bool) {
+			imageURLs.Add(UnprocessedImageURL{imgURL})
+			return "", false
 		})
 	}
 
@@ -130,16 +128,11 @@ func (o *ResolveOptions) updateRefsInResources(nonConfigRs []ctlres.Resource,
 		images := []Image{}
 		imageRefs := ctlser.NewImageRefs(resContents, conf.SearchRules())
 
-		imageRefs.Visit(func(val interface{}) (interface{}, bool) {
-			imgURL, ok := val.(string)
-			if !ok {
-				return nil, false
-			}
-
+		imageRefs.Visit(func(imgURL string) (string, bool) {
 			img, found := resolvedImages.FindByURL(UnprocessedImageURL{imgURL})
 			if !found {
 				errs = append(errs, fmt.Errorf("Expected to find image for '%s'", imgURL))
-				return nil, false
+				return "", false
 			}
 
 			if o.ImagesAnnotation {

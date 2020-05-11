@@ -15,7 +15,7 @@ type ImageRefs struct {
 	searchRules []ctlconf.SearchRule
 }
 
-type ImageRefsVisitorFunc func(interface{}) (interface{}, bool)
+type ImageRefsVisitorFunc func(string) (string, bool)
 
 func NewImageRefs(res interface{}, searchRules []ctlconf.SearchRule) ImageRefs {
 	return ImageRefs{res, searchRules}
@@ -26,14 +26,14 @@ func (refs ImageRefs) Visit(visitorFunc ImageRefsVisitorFunc) {
 }
 
 func (v ImageRefsVisitorFunc) Apply(res interface{}, searchRules []ctlconf.SearchRule) {
-	tmpRefs := map[string]interface{}{}
+	tmpRefs := map[string]string{}
 	tmpRefPrefix := v.randomPrefix()
 	tmpRefIdx := 0
 
-	insertTmpRefsFunc := func(val interface{}) (interface{}, bool) {
+	insertTmpRefsFunc := func(val string) (string, bool) {
 		newVal, updated := v(val)
 		if !updated {
-			return nil, false
+			return "", false
 		}
 		// Only use temporary references for values that are updated;
 		// otherwise future search rules may find tmp refs
@@ -48,14 +48,12 @@ func (v ImageRefsVisitorFunc) Apply(res interface{}, searchRules []ctlconf.Searc
 	// even if it matches multiple search rules
 	NewFields(res, RulesMatcher{searchRules}).Visit(v.extractValueFunc(insertTmpRefsFunc))
 
-	resolveTmpRefsFunc := func(val interface{}) (interface{}, bool) {
-		if valStr, ok := val.(string); ok {
-			if actualRef, found := tmpRefs[valStr]; found {
-				delete(tmpRefs, valStr)
-				return actualRef, true
-			}
+	resolveTmpRefsFunc := func(val string) (string, bool) {
+		if actualRef, found := tmpRefs[val]; found {
+			delete(tmpRefs, val)
+			return actualRef, true
 		}
-		return nil, false
+		return "", false // TODO panic?
 	}
 
 	NewFields(res, tmpRefMatcher{tmpRefPrefix}).Visit(v.extractValueFunc(resolveTmpRefsFunc))
@@ -68,8 +66,12 @@ func (v ImageRefsVisitorFunc) Apply(res interface{}, searchRules []ctlconf.Searc
 func (v ImageRefsVisitorFunc) extractValueFunc(visitorFunc ImageRefsVisitorFunc) FieldsVisitorFunc {
 	return func(val interface{}, ext ctlconf.SearchRuleUpdateStrategy) (interface{}, bool) {
 		switch {
-		case ext.EntireValue != nil:
-			return visitorFunc(val)
+		case ext.EntireString != nil:
+			valStr, ok := val.(string)
+			if !ok {
+				return val, false
+			}
+			return visitorFunc(valStr)
 
 		case ext.JSON != nil:
 			return v.extractValueAsJSONorYAML(val, ext.JSON.SearchRules, false)

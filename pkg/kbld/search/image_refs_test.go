@@ -250,9 +250,9 @@ path:
 		refs := ctlser.NewImageRefs(ex.InputResource, ex.SearchRules)
 
 		foundImages := []string{}
-		refs.Visit(func(val interface{}) (interface{}, bool) {
-			foundImages = append(foundImages, val.(string))
-			return "found:" + val.(string), true
+		refs.Visit(func(val string) (string, bool) {
+			foundImages = append(foundImages, val)
+			return "found:" + val, true
 		})
 
 		sort.Strings(foundImages)
