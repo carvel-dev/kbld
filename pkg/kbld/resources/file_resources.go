@@ -69,15 +69,15 @@ func (r FileResource) Description() string { return r.fileSrc.Description() }
 func (r FileResource) Resources() ([]Resource, error) {
 	docs, err := NewYAMLFile(r.fileSrc).Docs()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("Parsing file '%s': %s", r.Description(), err)
 	}
 
 	var resources []Resource
 
-	for _, doc := range docs {
+	for i, doc := range docs {
 		rs, err := NewResourcesFromBytes(doc)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("Parsing file '%s' doc %d: %s", r.Description(), i+1, err)
 		}
 
 		resources = append(resources, rs...)
