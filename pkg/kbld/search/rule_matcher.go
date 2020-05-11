@@ -8,7 +8,7 @@ import (
 )
 
 type Matcher interface {
-	Matches(key string, value interface{}) bool
+	Matches(key string, value interface{}) (bool, ctlconf.SearchRuleUpdateStrategy)
 }
 
 type RuleMatcher struct {
@@ -17,7 +17,7 @@ type RuleMatcher struct {
 
 var _ Matcher = RuleMatcher{}
 
-func (m RuleMatcher) Matches(key string, value interface{}) bool {
+func (m RuleMatcher) Matches(key string, value interface{}) (bool, ctlconf.SearchRuleUpdateStrategy) {
 	var keyMatched, valueMatched bool
 
 	if m.rule.KeyMatcher != nil {
@@ -50,5 +50,5 @@ func (m RuleMatcher) Matches(key string, value interface{}) bool {
 		valueMatched = true
 	}
 
-	return keyMatched && valueMatched
+	return keyMatched && valueMatched, m.rule.UpdateStrategyWithDefaults()
 }

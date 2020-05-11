@@ -292,6 +292,10 @@ spec:
 - image: nginx:1.14.2
 - sidecarImage: index.docker.io/library/nginx:1.14.2
 - some_key: nginx:1.14.2
+- nestedkey:
+    data: |
+      nested:
+        image: nginx:1.14.2
 ---
 apiVersion: kbld.k14s.io/v1alpha1
 kind: Config
@@ -300,6 +304,13 @@ searchRules:
     name: sidecarImage
 - valueMatcher:
     imageRepo: nginx
+- keyMatcher:
+    name: data
+  updateStrategy:
+    yaml:
+      searchRules:
+      - keyMatcher:
+          name: image
 `
 
 	out, _ := kbld.RunWithOpts([]string{"-f", "-", "--images-annotation=false"}, RunOpts{
@@ -312,6 +323,10 @@ spec:
 - image: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
 - sidecarImage: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
 - some_key: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
+- nestedkey:
+    data: |
+      nested:
+        image: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
 `
 
 	if out != expectedOut {

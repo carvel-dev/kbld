@@ -3,6 +3,7 @@ package search_test
 import (
 	"encoding/json"
 	"reflect"
+	"sort"
 	"testing"
 
 	ctlconf "github.com/k14s/kbld/pkg/kbld/config"
@@ -122,6 +123,127 @@ func TestImageRefsMatches(t *testing.T) {
 			}},
 			OutputImages: []string{"gcr.io/repo:something"},
 		},
+		// JSON extraction
+		{
+			InputResource: map[string]interface{}{
+				"nested": map[string]interface{}{
+					"key": `{"nestedimage":"nginx1"}`,
+				},
+				"nestedimage": "nginx2",
+			},
+			OutputResource: map[string]interface{}{
+				"nested": map[string]interface{}{
+					"key": `{"nestedimage":"found:nginx1"}`,
+				},
+				"nestedimage": "nginx2",
+			},
+			SearchRules: []ctlconf.SearchRule{{
+				KeyMatcher: &ctlconf.SearchRuleKeyMatcher{
+					Name: "key",
+				},
+				UpdateStrategy: &ctlconf.SearchRuleUpdateStrategy{
+					JSON: &ctlconf.SearchRuleUpdateStrategyJSON{
+						SearchRules: []ctlconf.SearchRule{{
+							KeyMatcher: &ctlconf.SearchRuleKeyMatcher{
+								Name: "nestedimage",
+							}},
+						},
+					},
+				},
+			}},
+			OutputImages: []string{"nginx1"},
+		},
+		// YAML extraction
+		{
+			InputResource: map[string]interface{}{
+				"nested": map[string]interface{}{
+					"key": `{"nestedimage":"nginx1"}`,
+				},
+				"nestedimage": "nginx2",
+				"key":         `nestedimage: nginx3`,
+			},
+			OutputResource: map[string]interface{}{
+				"nested": map[string]interface{}{
+					"key": `{"nestedimage":"found:nginx1"}`,
+				},
+				"nestedimage": "nginx2",
+				"key":         `nestedimage: found:nginx3` + "\n",
+			},
+			SearchRules: []ctlconf.SearchRule{{
+				KeyMatcher: &ctlconf.SearchRuleKeyMatcher{
+					Name: "key",
+				},
+				UpdateStrategy: &ctlconf.SearchRuleUpdateStrategy{
+					YAML: &ctlconf.SearchRuleUpdateStrategyYAML{
+						SearchRules: []ctlconf.SearchRule{{
+							KeyMatcher: &ctlconf.SearchRuleKeyMatcher{
+								Name: "nestedimage",
+							}},
+						},
+					},
+				},
+			}},
+			OutputImages: []string{"nginx1", "nginx3"},
+		},
+		// Nested YAML extraction
+		{
+			InputResource: map[string]interface{}{
+				"nested": map[string]interface{}{
+					"key": `{"nestedimage":"nginx1"}`,
+				},
+				"data": `
+path:
+- nestedimage: |
+    something: nginx3
+`,
+			},
+			OutputResource: map[string]interface{}{
+				"nested": map[string]interface{}{
+					"key": `{"nestedimage":"found:nginx1"}`,
+				},
+				"data": `path:
+- nestedimage: |
+    something: found:nginx3
+`,
+			},
+			SearchRules: []ctlconf.SearchRule{{
+				KeyMatcher: &ctlconf.SearchRuleKeyMatcher{
+					Name: "key",
+				},
+				UpdateStrategy: &ctlconf.SearchRuleUpdateStrategy{
+					YAML: &ctlconf.SearchRuleUpdateStrategyYAML{
+						SearchRules: []ctlconf.SearchRule{{
+							KeyMatcher: &ctlconf.SearchRuleKeyMatcher{
+								Name: "nestedimage",
+							}},
+						},
+					},
+				},
+			}, {
+				KeyMatcher: &ctlconf.SearchRuleKeyMatcher{
+					Name: "data",
+				},
+				UpdateStrategy: &ctlconf.SearchRuleUpdateStrategy{
+					YAML: &ctlconf.SearchRuleUpdateStrategyYAML{
+						SearchRules: []ctlconf.SearchRule{{
+							KeyMatcher: &ctlconf.SearchRuleKeyMatcher{
+								Name: "nestedimage",
+							},
+							UpdateStrategy: &ctlconf.SearchRuleUpdateStrategy{
+								YAML: &ctlconf.SearchRuleUpdateStrategyYAML{
+									SearchRules: []ctlconf.SearchRule{{
+										KeyMatcher: &ctlconf.SearchRuleKeyMatcher{
+											Name: "something",
+										}},
+									},
+								},
+							}},
+						},
+					},
+				},
+			}},
+			OutputImages: []string{"nginx1", "nginx3"},
+		},
 	}
 
 	for _, ex := range exs {
@@ -132,6 +254,8 @@ func TestImageRefsMatches(t *testing.T) {
 			foundImages = append(foundImages, val.(string))
 			return "found:" + val.(string), true
 		})
+
+		sort.Strings(foundImages)
 
 		if !reflect.DeepEqual(ex.InputResource, ex.OutputResource) {
 			inBs, _ := json.Marshal(ex.InputResource)

@@ -56,8 +56,9 @@ type ImageDestination struct {
 }
 
 type SearchRule struct {
-	KeyMatcher   *SearchRuleKeyMatcher   `json:"keyMatcher,omitempty"`
-	ValueMatcher *SearchRuleValueMatcher `json:"valueMatcher,omitempty"`
+	KeyMatcher     *SearchRuleKeyMatcher     `json:"keyMatcher,omitempty"`
+	ValueMatcher   *SearchRuleValueMatcher   `json:"valueMatcher,omitempty"`
+	UpdateStrategy *SearchRuleUpdateStrategy `json:"updateStrategy,omitempty"`
 	// TODO ResourceMatchers (see kapp's matchers)
 }
 
@@ -71,6 +72,22 @@ type SearchRuleValueMatcher struct {
 	Image     string `json:"image,omitempty"`
 	ImageRepo string `json:"imageRepo,omitempty"`
 	// TODO Regexp    string `json:"regexp,omitempty"`
+}
+
+type SearchRuleUpdateStrategy struct {
+	EntireValue *SearchRuleUpdateStrategyEntireValue `json:"entireValue,omitempty"`
+	JSON        *SearchRuleUpdateStrategyJSON        `json:"json,omitempty"`
+	YAML        *SearchRuleUpdateStrategyYAML        `json:"yaml,omitempty"`
+}
+
+type SearchRuleUpdateStrategyEntireValue struct{}
+
+type SearchRuleUpdateStrategyJSON struct {
+	SearchRules []SearchRule `json:"searchRules,omitempty"`
+}
+
+type SearchRuleUpdateStrategyYAML struct {
+	SearchRules []SearchRule `json:"searchRules,omitempty"`
 }
 
 type ImageRef struct {
@@ -260,4 +277,13 @@ func UniqueImageOverrides(overrides []ImageOverride) []ImageOverride {
 		}
 	}
 	return result
+}
+
+func (r SearchRule) UpdateStrategyWithDefaults() SearchRuleUpdateStrategy {
+	if r.UpdateStrategy != nil {
+		return *r.UpdateStrategy
+	}
+	return SearchRuleUpdateStrategy{
+		EntireValue: &SearchRuleUpdateStrategyEntireValue{},
+	}
 }

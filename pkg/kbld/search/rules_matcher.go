@@ -14,11 +14,12 @@ func NewRulesMatcher(rules []ctlconf.SearchRule) RulesMatcher {
 
 var _ Matcher = RuleMatcher{}
 
-func (m RulesMatcher) Matches(key string, value interface{}) bool {
+func (m RulesMatcher) Matches(key string, value interface{}) (bool, ctlconf.SearchRuleUpdateStrategy) {
 	for _, rule := range m.rules {
-		if (RuleMatcher{rule}).Matches(key, value) {
-			return true
+		matches, extraction := (RuleMatcher{rule}).Matches(key, value)
+		if matches {
+			return true, extraction
 		}
 	}
-	return false
+	return false, ctlconf.SearchRuleUpdateStrategy{}
 }
