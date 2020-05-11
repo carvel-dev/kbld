@@ -138,6 +138,36 @@ searchRules:
   - `valueMatcher` (optional) value matcher
     - `image` (optional; string) matches values exactly
     - `imageRepo` (optional; string) matches values that follow image reference format (`[registry]repo[:tag]\[@sha256:...]`) and expects `repo` portion to match (e.g. `gcr.io/project/app`)
+  - `updateStrategy` (optional) strategy for finding and updating image references within value
+    - `entireString` (optional; default) uses entire value as an image ref
+    - `json` (optional) parses JSON and identifies image refs by specified search rules
+      - `searchRules` ... (recursive)
+    - `yaml` (optional) parses YAML and identifies image refs by specified search rules
+      - `searchRules` ... (recursive)
+
+#### Example for `updateStrategy` that parses YAML
+
+```yaml
+kind: ConfigMap
+metadata:
+  name: config
+data:
+  data.yml: |
+    name: nginx
+    image: nginx # <-- below config finds and updates this image
+---
+apiVersion: kbld.k14s.io/v1alpha1
+kind: Config
+minimumRequiredVersion: 0.15.0
+searchRules:
+- keyMatcher:
+    name: data.yml
+  updateStrategy:
+    yaml:
+      searchRules:
+      - keyMatcher:
+          name: image
+```
 
 ### Matching images
 
