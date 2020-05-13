@@ -75,10 +75,17 @@ func (v ImageRefsVisitorFunc) extractValueFunc(visitorFunc ImageRefsVisitorFunc)
 			return visitorFunc(valStr)
 
 		case ext.JSON != nil:
-			return v.extractValueAsJSONorYAML(val, ext.JSON.SearchRules, false)
+			return v.extractValueAsJSON(val, ext.JSON.SearchRules)
 
 		case ext.YAML != nil:
-			return v.extractValueAsJSONorYAML(val, ext.YAML.SearchRules, true)
+			// Prefer to decode as JSON since JSON is valid YAML.
+			// Only works for a single YAML document value.
+			val, updated := v.extractValueAsJSON(val, ext.YAML.SearchRules)
+			if updated {
+				return val, updated
+			}
+
+			return v.extractValueAsYAML(val, ext.YAML.SearchRules)
 
 		default:
 			panic("Unknown extraction type")
@@ -86,38 +93,22 @@ func (v ImageRefsVisitorFunc) extractValueFunc(visitorFunc ImageRefsVisitorFunc)
 	}
 }
 
-func (v ImageRefsVisitorFunc) extractValueAsJSONorYAML(val interface{},
-	searchRules []ctlconf.SearchRule, allowYAML bool) (interface{}, bool) {
+func (v ImageRefsVisitorFunc) extractValueAsJSON(val interface{},
+	searchRules []ctlconf.SearchRule) (interface{}, bool) {
 
 	valStr, ok := val.(string)
 	if !ok {
 		return val, false
 	}
 
-	var decodedVal, decodedJSONVal, decodedYAMLVal interface{}
-	var decodedAsYAML bool
+	var decodedVal interface{}
 
-	jsonErr := json.Unmarshal([]byte(valStr), &decodedJSONVal)
-	yamlErr := yaml.Unmarshal([]byte(valStr), &decodedYAMLVal)
-	switch {
-	case jsonErr == nil:
-		decodedVal = decodedJSONVal
-	case allowYAML && jsonErr != nil && yamlErr == nil:
-		decodedVal = decodedYAMLVal
-		decodedAsYAML = true
-	default:
+	err := json.Unmarshal([]byte(valStr), &decodedVal)
+	if err != nil {
 		return val, false
 	}
 
 	v.Apply(decodedVal, searchRules)
-
-	if decodedAsYAML {
-		valBs, err := yaml.Marshal(decodedVal)
-		if err != nil {
-			panic(fmt.Sprintf("ObjVisitor: Encoding as YAML: %s", err))
-		}
-		return string(valBs), true
-	}
 
 	valBs, err := json.Marshal(decodedVal)
 	if err != nil {
@@ -125,6 +116,52 @@ func (v ImageRefsVisitorFunc) extractValueAsJSONorYAML(val interface{},
 	}
 
 	return string(valBs), true
+}
+
+func (v ImageRefsVisitorFunc) extractValueAsYAML(val interface{},
+	searchRules []ctlconf.SearchRule) (interface{}, bool) {
+
+	valStr, ok := val.(string)
+	if !ok {
+		return val, false
+	}
+
+	docs, err := ctlres.NewYAMLFile(ctlres.NewBytesSource([]byte(valStr))).Docs()
+	if err != nil {
+		return val, false
+	}
+
+	var decodedVals []interface{}
+
+	// Parse all documents before trying to search thru them
+	for _, doc := range docs {
+		var decodedVal interface{}
+
+		err := yaml.Unmarshal(doc, &decodedVal)
+		if err != nil {
+			return val, false
+		}
+
+		// Skip over empty documents
+		if decodedVal != nil {
+			decodedVals = append(decodedVals, decodedVal)
+		}
+	}
+
+	var result string
+
+	for _, decodedVal := range decodedVals {
+		v.Apply(decodedVal, searchRules)
+
+		valBs, err := yaml.Marshal(decodedVal)
+		if err != nil {
+			panic(fmt.Sprintf("ObjVisitor: Encoding as YAML: %s", err))
+		}
+
+		result += "---\n" + string(valBs)
+	}
+
+	return result, true
 }
 
 func (ImageRefsVisitorFunc) randomPrefix() string {

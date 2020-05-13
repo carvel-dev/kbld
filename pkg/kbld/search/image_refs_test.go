@@ -160,14 +160,25 @@ func TestImageRefsMatches(t *testing.T) {
 					"key": `{"nestedimage":"nginx1"}`,
 				},
 				"nestedimage": "nginx2",
-				"key":         `nestedimage: nginx3`,
+				"key": `
+nestedimage: nginx3
+---
+---
+null
+---
+nestedimage: nginx4
+`,
 			},
 			OutputResource: map[string]interface{}{
 				"nested": map[string]interface{}{
 					"key": `{"nestedimage":"found:nginx1"}`,
 				},
 				"nestedimage": "nginx2",
-				"key":         `nestedimage: found:nginx3` + "\n",
+				"key": `---
+nestedimage: found:nginx3
+---
+nestedimage: found:nginx4
+`,
 			},
 			SearchRules: []ctlconf.SearchRule{{
 				KeyMatcher: &ctlconf.SearchRuleKeyMatcher{
@@ -183,7 +194,7 @@ func TestImageRefsMatches(t *testing.T) {
 					},
 				},
 			}},
-			OutputImages: []string{"nginx1", "nginx3"},
+			OutputImages: []string{"nginx1", "nginx3", "nginx4"},
 		},
 		// Nested YAML extraction
 		{
@@ -201,8 +212,10 @@ path:
 				"nested": map[string]interface{}{
 					"key": `{"nestedimage":"found:nginx1"}`,
 				},
-				"data": `path:
+				"data": `---
+path:
 - nestedimage: |
+    ---
     something: found:nginx3
 `,
 			},

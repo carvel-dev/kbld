@@ -67,3 +67,14 @@ func (s HTTPFileSource) Bytes() ([]byte, error) {
 
 	return result, nil
 }
+
+type BytesSource struct {
+	bs []byte
+}
+
+var _ FileSource = BytesSource{}
+
+func NewBytesSource(bs []byte) BytesSource { return BytesSource{bs} }
+
+func (s BytesSource) Description() string    { return "bytes" }
+func (s BytesSource) Bytes() ([]byte, error) { return s.bs, nil }
