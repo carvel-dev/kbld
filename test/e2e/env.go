@@ -7,13 +7,15 @@ import (
 )
 
 type Env struct {
-	Namespace         string
-	DockerHubUsername string
+	Namespace            string
+	DockerHubUsername    string
+	SkipCFImagesDownload bool
 }
 
 func BuildEnv(t *testing.T) Env {
 	env := Env{
-		DockerHubUsername: os.Getenv("KBLD_E2E_DOCKERHUB_USERNAME"),
+		DockerHubUsername:    os.Getenv("KBLD_E2E_DOCKERHUB_USERNAME"),
+		SkipCFImagesDownload: os.Getenv("KBLD_E2E_SKIP_CF_IMAGES_DOWNLOAD") == "true",
 	}
 	env.Validate(t)
 	return env

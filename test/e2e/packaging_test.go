@@ -155,6 +155,12 @@ spec:
 
 func TestPkgUnpkgSuccessfulCfManyImages(t *testing.T) {
 	env := BuildEnv(t)
+
+	if env.SkipCFImagesDownload {
+		fmt.Printf("Skipping CF images download")
+		return
+	}
+
 	kbld := Kbld{t, env.Namespace, Logger{}}
 
 	input := `
