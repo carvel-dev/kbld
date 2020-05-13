@@ -6,6 +6,80 @@ kbld can be used to package all referenced container images into a single tarbal
 - moving images from one registry to another
 - backing up images
 
+There are two approaches to do this (both use same commands):
+
+- With lock file (recommended)
+- Directly against configuration
+
+### With lock file
+
+For example, to package referenced images into a single tarball:
+
+1. Produce lock file for referenced images in configuration
+
+    ```bash
+    $ cat /tmp/manifest
+    images:
+    - image: nginx
+    - image: haproxy
+
+    $ kbld -f /tmp/manifest --lock-output /tmp/manifest.lock
+    ...
+
+    $ cat /tmp/manifest.lock
+    apiVersion: kbld.k14s.io/v1alpha1
+    kind: Config
+    minimumRequiredVersion: 0.21.0
+    overrides:
+    - image: haproxy
+      newImage: index.docker.io/library/haproxy@sha256:e6f9faf0c2a0cf2d2d5a53307351fa896d90ca9ccd62817c24026460d97dde92
+      preresolved: true
+    - image: nginx
+      newImage: index.docker.io/library/nginx@sha256:86ae264c3f4acb99b2dee4d0098c40cb8c46dcf9e1148f05d3a51c4df6758c12
+      preresolved: true
+    ```
+
+1. Feed `/tmp/manifest.lock` to `kbld pkg` command to download images and pack them into a single tarball `/tmp/packaged-images.tar`:
+
+    ```bash
+    $ kbld pkg -f /tmp/manifest.lock --output /tmp/packaged-images.tar
+    package | exporting 2 images...
+    package | will export index.docker.io/library/nginx@sha256:e71b1bf4281f25533cf15e6e5f9be4dac74d2328152edf7ecde23abc54e16c1c
+    package | will export index.docker.io/library/haproxy@sha256:6dae9c8674e2e5f418c3dd040041a05f6b490597315139c0bcacadf65a46cfd5
+    package | exported 2 images
+
+    $ ls -lah /tmp/packaged-images.tar
+    -rw-r--r-- 1 root root 314M May  3 18:59 /tmp/packaged-images.tar
+    ```
+
+    Note: Depending on your internet connection this may be slow.
+
+To import packaged images from a tarball:
+
+1. Specify new repository location `docker.io/dkalinin/app1` and provide tarball:
+
+    ```bash
+    $ kbld unpkg -f /tmp/manifest.lock --input /tmp/packaged-images.tar --repository docker.io/dkalinin/app1 --lock-output /tmp/manifest.lock.copied
+    unpackage | importing 2 images...
+    unpackage | importing index.docker.io/library/nginx@sha256:e71b1bf4281f25533cf15e6e5f9be4dac74d2328152edf7ecde23abc54e16c1c -> docker.io/dkalinin/app1@sha256:e71b1bf4281f25533cf15e6e5f9be4dac74d2328152edf7ecde23abc54e16c1c...
+    unpackage | importing index.docker.io/library/haproxy@sha256:6dae9c8674e2e5f418c3dd040041a05f6b490597315139c0bcacadf65a46cfd5 -> docker.io/dkalinin/app1@sha256:6dae9c8674e2e5f418c3dd040041a05f6b490597315139c0bcacadf65a46cfd5...
+    unpackage | imported 2 images
+    ```
+
+    Images will be imported under a single new repository `docker.io/dkalinin/app1`. **You are guaranteed that images are exactly same as they are referenced by the same digests in produced YAML configuration (though under a different repository name)**.
+
+1. Use newely generated lock file with configuration to get updated results
+
+    ```bash
+    $ kbld -f /tmp/manifest -f /tmp/manifest.lock.copied
+    images:
+    - image: docker.io/dkalinin/app1@sha256:e71b1bf4281f25533cf15e6e5f9be4dac74d2328152edf7ecde23abc54e16c1c
+    - image: docker.io/dkalinin/app1@sha256:6dae9c8674e2e5f418c3dd040041a05f6b490597315139c0bcacadf65a46cfd5
+    ```
+
+---
+### Directly against configuration
+
 For example, to package referenced images into a single tarball:
 
 1. First make sure all image references are in their digest form
@@ -58,6 +132,7 @@ To import packaged images from a tarball:
 
     Images will be imported under a single new repository `docker.io/dkalinin/app1`. **You are guaranteed that images are exactly same as they are referenced by the same digests in produced YAML configuration (though under a different repository name)**.
 
+---
 ### Authentication
 
 See general authentication steps in [Authentication doc](auth.md).
