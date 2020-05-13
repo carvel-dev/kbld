@@ -57,15 +57,10 @@ func (i Registry) WriteImage(ref regname.Reference, img regv1.Image) error {
 		return err
 	}
 
-	authz, err := regauthn.DefaultKeychain.Resolve(ref.Context().Registry)
-	if err != nil {
-		return fmt.Errorf("Getting authz details: %s", err)
-	}
-
 	err = i.retry(func() error {
 		return regremote.Write(ref, img,
 			regremote.WithTransport(httpTran),
-			regremote.WithAuth(authz),
+			regremote.WithAuthFromKeychain(regauthn.DefaultKeychain),
 		)
 	})
 	if err != nil {
@@ -90,15 +85,10 @@ func (i Registry) WriteIndex(ref regname.Reference, idx regv1.ImageIndex) error 
 		return err
 	}
 
-	authz, err := regauthn.DefaultKeychain.Resolve(ref.Context().Registry)
-	if err != nil {
-		return fmt.Errorf("Getting authz details: %s", err)
-	}
-
 	err = i.retry(func() error {
 		return regremote.WriteIndex(ref, idx,
 			regremote.WithTransport(httpTran),
-			regremote.WithAuth(authz),
+			regremote.WithAuthFromKeychain(regauthn.DefaultKeychain),
 		)
 	})
 	if err != nil {
