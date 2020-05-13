@@ -301,6 +301,7 @@ spec:
   - nginxImage: nginx:1.14.2
     nginxImages:
       value: nginx:1.14.2
+- image: skip
 ---
 apiVersion: kbld.k14s.io/v1alpha1
 kind: Config
@@ -322,6 +323,10 @@ searchRules:
     path: [spec, {allIndexes: true}, nginxImage]
 - keyMatcher:
     path: [spec, {allIndexes: true}, nginxImages, value]
+- valueMatcher:
+    image: skip
+  updateStrategy:
+    none: {}
 `
 
 	out, _ := kbld.RunWithOpts([]string{"-f", "-", "--images-annotation=false"}, RunOpts{
@@ -344,6 +349,7 @@ spec:
   - nginxImage: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
     nginxImages:
       value: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
+- image: skip
 `
 
 	if out != expectedOut {

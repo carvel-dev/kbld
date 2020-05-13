@@ -70,10 +70,15 @@ func (c Conf) ImageDestinations() []ImageDestination {
 }
 
 func (c Conf) SearchRules() []SearchRule {
-	defaultRule := SearchRule{
+	result := append([]SearchRule{}, c.SearchRulesWithoutDefaults()...)
+
+	// Add default image rule at the end so that
+	// there is an opportunity to match image kv with other rules
+	result = append(result, SearchRule{
 		KeyMatcher: &SearchRuleKeyMatcher{Name: "image"},
-	}
-	return c.dedupSearchRules(append([]SearchRule{defaultRule}, c.SearchRulesWithoutDefaults()...))
+	})
+
+	return c.dedupSearchRules(result)
 }
 
 func (c Conf) SearchRulesWithoutDefaults() []SearchRule {
