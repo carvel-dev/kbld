@@ -2,6 +2,7 @@ package image
 
 import (
 	ctlconf "github.com/k14s/kbld/pkg/kbld/config"
+	ctlreg "github.com/k14s/kbld/pkg/kbld/registry"
 )
 
 type Image interface {
@@ -14,11 +15,11 @@ type ImageMeta interface {
 
 type Factory struct {
 	conf     ctlconf.Conf
-	registry Registry
+	registry ctlreg.Registry
 	logger   Logger
 }
 
-func NewFactory(conf ctlconf.Conf, registry Registry, logger Logger) Factory {
+func NewFactory(conf ctlconf.Conf, registry ctlreg.Registry, logger Logger) Factory {
 	return Factory{conf, registry, logger}
 }
 

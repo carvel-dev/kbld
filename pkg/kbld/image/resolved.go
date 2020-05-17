@@ -4,12 +4,13 @@ import (
 	"fmt"
 
 	regname "github.com/google/go-containerregistry/pkg/name"
+	ctlreg "github.com/k14s/kbld/pkg/kbld/registry"
 )
 
 // ResolvedImage respresents an image that will be resolved into url+digest
 type ResolvedImage struct {
 	url      string
-	registry Registry
+	registry ctlreg.Registry
 }
 
 type ResolvedImageSourceURL struct {
@@ -20,7 +21,7 @@ type ResolvedImageSourceURL struct {
 
 func (ResolvedImageSourceURL) meta() {}
 
-func NewResolvedImage(url string, registry Registry) ResolvedImage {
+func NewResolvedImage(url string, registry ctlreg.Registry) ResolvedImage {
 	return ResolvedImage{url, registry}
 }
 

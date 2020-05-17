@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	ctlimg "github.com/k14s/kbld/pkg/kbld/image"
+	ctlreg "github.com/k14s/kbld/pkg/kbld/registry"
 	"github.com/spf13/cobra"
 )
 
@@ -15,9 +15,9 @@ func (s *RegistryFlags) Set(cmd *cobra.Command) {
 	cmd.Flags().BoolVar(&s.VerifyCerts, "registry-verify-certs", true, "Set whether to verify server's certificate chain and host name")
 }
 
-func (s *RegistryFlags) AsRegistryOpts() ctlimg.RegistryOpts {
-	return ctlimg.RegistryOpts{
-		CACertPaths: s.CACertPaths,
-		VerifyCerts: s.VerifyCerts,
+func (s *RegistryFlags) AsRegistryOpts() ctlreg.RegistryOpts {
+	return ctlreg.RegistryOpts{
+		CACertPaths:   s.CACertPaths,
+		VerifyCerts:   s.VerifyCerts,
 	}
 }

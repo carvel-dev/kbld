@@ -10,6 +10,7 @@ import (
 	"github.com/cppforlife/go-cli-ui/ui"
 	ctlconf "github.com/k14s/kbld/pkg/kbld/config"
 	ctlimg "github.com/k14s/kbld/pkg/kbld/image"
+	ctlreg "github.com/k14s/kbld/pkg/kbld/registry"
 	ctlres "github.com/k14s/kbld/pkg/kbld/resources"
 	ctlser "github.com/k14s/kbld/pkg/kbld/search"
 	"github.com/k14s/kbld/pkg/kbld/version"
@@ -60,7 +61,7 @@ func (o *ResolveOptions) Run() error {
 		return err
 	}
 
-	registry := ctlimg.NewRegistry(o.RegistryFlags.AsRegistryOpts())
+	registry := ctlreg.NewRegistry(o.RegistryFlags.AsRegistryOpts())
 	imgFactory := ctlimg.NewFactory(conf, registry, logger)
 
 	resolvedImages, err := o.resolveImages(nonConfigRs, conf, imgFactory)

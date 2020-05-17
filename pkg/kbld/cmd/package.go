@@ -10,6 +10,7 @@ import (
 	ctlconf "github.com/k14s/kbld/pkg/kbld/config"
 	ctlimg "github.com/k14s/kbld/pkg/kbld/image"
 	regtarball "github.com/k14s/kbld/pkg/kbld/imagetarball"
+	ctlreg "github.com/k14s/kbld/pkg/kbld/registry"
 	ctlres "github.com/k14s/kbld/pkg/kbld/resources"
 	ctlser "github.com/k14s/kbld/pkg/kbld/search"
 	"github.com/spf13/cobra"
@@ -24,7 +25,7 @@ type PackageOptions struct {
 	Concurrency   int
 }
 
-var _ regtarball.TarDescriptorsMetadata = ctlimg.Registry{}
+var _ regtarball.TarDescriptorsMetadata = ctlreg.Registry{}
 
 func NewPackageOptions(ui ui.UI) *PackageOptions {
 	return &PackageOptions{ui: ui}
@@ -130,7 +131,7 @@ func (o *PackageOptions) exportImages(foundImages *UnprocessedImageURLs,
 		return os.OpenFile(o.OutputPath, os.O_RDWR, 0755)
 	}
 
-	tds, err := regtarball.NewTarDescriptors(refs, ctlimg.NewRegistry(o.RegistryFlags.AsRegistryOpts()))
+	tds, err := regtarball.NewTarDescriptors(refs, ctlreg.NewRegistry(o.RegistryFlags.AsRegistryOpts()))
 	if err != nil {
 		return fmt.Errorf("Collecting packaging metadata: %s", err)
 	}

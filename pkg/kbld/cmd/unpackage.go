@@ -10,6 +10,7 @@ import (
 	ctlconf "github.com/k14s/kbld/pkg/kbld/config"
 	ctlimg "github.com/k14s/kbld/pkg/kbld/image"
 	regtarball "github.com/k14s/kbld/pkg/kbld/imagetarball"
+	ctlreg "github.com/k14s/kbld/pkg/kbld/registry"
 	ctlres "github.com/k14s/kbld/pkg/kbld/resources"
 	ctlser "github.com/k14s/kbld/pkg/kbld/search"
 	"github.com/k14s/kbld/pkg/kbld/util"
@@ -201,7 +202,7 @@ func (o *UnpackageOptions) importImage(item regtarball.TarImageOrIndex,
 
 	logger.Write([]byte(fmt.Sprintf("importing %s -> %s...\n", existingRef.Name(), importDigestRef.Name())))
 
-	registry := ctlimg.NewRegistry(o.RegistryFlags.AsRegistryOpts())
+	registry := ctlreg.NewRegistry(o.RegistryFlags.AsRegistryOpts())
 
 	switch {
 	case item.Image != nil:
@@ -235,7 +236,7 @@ func (o *UnpackageOptions) importImage(item regtarball.TarImageOrIndex,
 func (o *UnpackageOptions) verifyTagDigest(
 	uploadTagRef regname.Reference, importDigestRef regname.Digest) error {
 
-	registry := ctlimg.NewRegistry(o.RegistryFlags.AsRegistryOpts())
+	registry := ctlreg.NewRegistry(o.RegistryFlags.AsRegistryOpts())
 
 	resultURL, _, err := ctlimg.NewResolvedImage(uploadTagRef.Name(), registry).URL()
 	if err != nil {
