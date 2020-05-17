@@ -16,16 +16,19 @@ import (
 )
 
 type RegistryOpts struct {
-	CACertPaths []string
-	VerifyCerts bool
+	CACertPaths   []string
+	VerifyCerts   bool
+	EnvAuthPrefix string
 }
 
 type Registry struct {
-	opts RegistryOpts
+	keychain regauthn.Keychain
+	opts     RegistryOpts
 }
 
 func NewRegistry(opts RegistryOpts) Registry {
-	return Registry{opts}
+	keychain := regauthn.NewMultiKeychain(NewEnvKeychain(opts.EnvAuthPrefix), regauthn.DefaultKeychain)
+	return Registry{keychain: keychain, opts: opts}
 }
 
 func (i Registry) Generic(ref regname.Reference) (regv1.Descriptor, error) {
@@ -60,7 +63,7 @@ func (i Registry) WriteImage(ref regname.Reference, img regv1.Image) error {
 	err = i.retry(func() error {
 		return regremote.Write(ref, img,
 			regremote.WithTransport(httpTran),
-			regremote.WithAuthFromKeychain(regauthn.DefaultKeychain),
+			regremote.WithAuthFromKeychain(i.keychain),
 		)
 	})
 	if err != nil {
@@ -88,7 +91,7 @@ func (i Registry) WriteIndex(ref regname.Reference, idx regv1.ImageIndex) error 
 	err = i.retry(func() error {
 		return regremote.WriteIndex(ref, idx,
 			regremote.WithTransport(httpTran),
-			regremote.WithAuthFromKeychain(regauthn.DefaultKeychain),
+			regremote.WithAuthFromKeychain(i.keychain),
 		)
 	})
 	if err != nil {
@@ -106,7 +109,7 @@ func (i Registry) imageOpts() ([]regremote.Option, error) {
 
 	return []regremote.Option{
 		regremote.WithTransport(httpTran),
-		regremote.WithAuthFromKeychain(regauthn.DefaultKeychain),
+		regremote.WithAuthFromKeychain(i.keychain),
 	}, nil
 }
 

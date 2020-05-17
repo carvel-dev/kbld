@@ -1,6 +1,37 @@
 ## Authentication
 
-Even though `kbld` commands use registry APIs directly, by default they rely on credentials stored in `~/.docker/config.json` which are typically generated via `docker login` command.
+### Via Docker config
+
+Even though `kbld` commands use registry APIs directly, by default it uses credentials stored in `~/.docker/config.json` which are typically generated via `docker login` command.
+
+Example generated `~/.docker/config.json`:
+
+```json
+{
+  "auths": {
+    "https://index.docker.io/v1/": {
+      "auth": "dXNlcjpwYXNzd29yZA=="
+    },
+  },
+  "HttpHeaders": {
+    "User-Agent": "Docker-Client/18.09.6 (darwin)"
+  }
+}
+```
+
+where `dXNlcjpwYXNzd29yZA==` is `base64("username:password")`.
+
+### Via Environment Variables
+
+As of v0.23.0+, kbld can also use following environment variables:
+
+- `KBLD_REGISTRY_HOSTNAME` to specify registry hostname (e.g. gcr.io, docker.io)
+- `KBLD_REGISTRY_USERNAME` to specify registry username
+- `KBLD_REGISTRY_PASSWORD` to specify registry password
+
+Since you may need to provide multiple registry credentials, above environment variables multiple times with a suffix like so `KBLD_REGISTRY_HOSTNAME_0` (suffix can be 1+ alphanumeric characters). Use same suffix for hostname, username and password.
+
+Currently credentials provided via environment variables do not apply when building images with Docker. Continue using `docker login` to authenticate Docker daemon.
 
 ### gcr.io
 
@@ -25,27 +56,27 @@ Example ECR policy from https://docs.aws.amazon.com/AmazonECR/latest/userguide/e
 
 ```json
 {
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Effect": "Allow",
-            "Action": [
-                "ecr:GetAuthorizationToken",
-                "ecr:BatchCheckLayerAvailability",
-                "ecr:GetDownloadUrlForLayer",
-                "ecr:GetRepositoryPolicy",
-                "ecr:DescribeRepositories",
-                "ecr:ListImages",
-                "ecr:DescribeImages",
-                "ecr:BatchGetImage",
-                "ecr:InitiateLayerUpload",
-                "ecr:UploadLayerPart",
-                "ecr:CompleteLayerUpload",
-                "ecr:PutImage"
-            ],
-            "Resource": "*"
-        }
-    ]
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "ecr:GetAuthorizationToken",
+        "ecr:BatchCheckLayerAvailability",
+        "ecr:GetDownloadUrlForLayer",
+        "ecr:GetRepositoryPolicy",
+        "ecr:DescribeRepositories",
+        "ecr:ListImages",
+        "ecr:DescribeImages",
+        "ecr:BatchGetImage",
+        "ecr:InitiateLayerUpload",
+        "ecr:UploadLayerPart",
+        "ecr:CompleteLayerUpload",
+        "ecr:PutImage"
+      ],
+      "Resource": "*"
+    }
+  ]
 }
 ```
 

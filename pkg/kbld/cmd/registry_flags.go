@@ -19,5 +19,6 @@ func (s *RegistryFlags) AsRegistryOpts() ctlreg.RegistryOpts {
 	return ctlreg.RegistryOpts{
 		CACertPaths:   s.CACertPaths,
 		VerifyCerts:   s.VerifyCerts,
+		EnvAuthPrefix: "KBLD_REGISTRY",
 	}
 }
