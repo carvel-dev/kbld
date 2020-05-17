@@ -139,7 +139,8 @@ searchRules:
   - `valueMatcher` (optional) value matcher
     - `image` (optional; string) matches values exactly
     - `imageRepo` (optional; string) matches values that follow image reference format (`[registry]repo[:tag]\[@sha256:...]`) and expects `repo` portion to match (e.g. `gcr.io/project/app`)
-  - `updateStrategy` (optional) strategy for finding and updating image references within value
+  - `updateStrategy` (optional) strategy for finding and updating image references within value (v0.21.0+)
+    - `none` (optional) excludes value from processing (v0.22.0+)
     - `entireString` (optional; default) uses entire value as an image ref
     - `json` (optional) parses JSON and identifies image refs by specified search rules
       - `searchRules` ... (recursive)
