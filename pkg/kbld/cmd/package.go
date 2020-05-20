@@ -57,7 +57,7 @@ func (o *PackageOptions) Run() error {
 		return err
 	}
 
-	foundImages, err := o.findImages(rs, conf, logger)
+	foundImages, err := FindImages(rs, conf)
 	if err != nil {
 		return err
 	}
@@ -68,8 +68,7 @@ func (o *PackageOptions) Run() error {
 	return imageSet.Export(foundImages, o.OutputPath, registry)
 }
 
-func (o *PackageOptions) findImages(allRs []ctlres.Resource,
-	conf ctlconf.Conf, logger ctlimg.Logger) (*UnprocessedImageURLs, error) {
+func FindImages(allRs []ctlres.Resource, conf ctlconf.Conf) (*UnprocessedImageURLs, error) {
 
 	foundImages := NewUnprocessedImageURLs()
 

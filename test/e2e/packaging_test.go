@@ -119,6 +119,7 @@ func TestPkgUnpkgSuccessfulWithForeignLayers(t *testing.T) {
 	env := BuildEnv(t)
 	kbld := Kbld{t, env.Namespace, env.KbldBinaryPath, Logger{}}
 
+	// Mongo has 2 foreign layers
 	input := `
 kind: Object
 spec:
