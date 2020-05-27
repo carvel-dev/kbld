@@ -64,7 +64,12 @@ func (o *RelocateOptions) Run() error {
 		return err
 	}
 
-	foundImages, err := o.findImages(rs, conf)
+	pkgOpts := &PackageOptions{
+		ui:            o.ui,
+		FileFlags:     o.FileFlags,
+		RegistryFlags: o.RegistryFlags,
+	}
+	foundImages, err := pkgOpts.FindImages(rs, conf, logger)
 	if err != nil {
 		return err
 	}
