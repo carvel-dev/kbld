@@ -2,6 +2,7 @@ package tarball
 
 import (
 	"encoding/json"
+	"io"
 	"io/ioutil"
 
 	regv1 "github.com/google/go-containerregistry/pkg/v1"
@@ -15,6 +16,14 @@ type ImageWithRef interface {
 type ImageIndexWithRef interface {
 	regv1.ImageIndex
 	Ref() string
+}
+
+type LayerContents interface {
+	Open() (io.ReadCloser, error)
+}
+
+type LayerProvider interface {
+	FindLayer(ImageLayerTarDescriptor) (LayerContents, error)
 }
 
 type TarImageOrIndex struct {

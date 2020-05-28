@@ -9,8 +9,8 @@ import (
 )
 
 type tarImage struct {
-	itd  ImageTarDescriptor
-	file tarFile
+	itd           ImageTarDescriptor
+	layerProvider LayerProvider
 }
 
 var _ regv1.Image = tarImage{}
@@ -24,7 +24,7 @@ func (i tarImage) Layers() ([]regv1.Layer, error) {
 	for _, layerTD := range i.itd.Layers {
 		var layer regv1.Layer
 		if layerTD.IsDistributable() {
-			layerFile, err := i.layerFile(layerTD)
+			layerFile, err := i.layerProvider.FindLayer(layerTD)
 			if err != nil {
 				return nil, err
 			}
@@ -35,14 +35,6 @@ func (i tarImage) Layers() ([]regv1.Layer, error) {
 		layers = append(layers, layer)
 	}
 	return layers, nil
-}
-
-func (i tarImage) layerFile(layerTD ImageLayerTarDescriptor) (tarFileChunk, error) {
-	digest, err := regv1.NewHash(layerTD.Digest)
-	if err != nil {
-		return tarFileChunk{}, err
-	}
-	return i.file.Chunk(digest.Algorithm + "-" + digest.Hex + ".tar.gz"), nil
 }
 
 // MediaType of this image's manifest.
@@ -99,7 +91,7 @@ func (i tarImage) Size() (int64, error) {
 func (i tarImage) LayerByDigest(digest regv1.Hash) (regv1.Layer, error) {
 	for _, layerTD := range i.itd.Layers {
 		if layerTD.Digest == digest.String() {
-			layerFile, err := i.layerFile(layerTD)
+			layerFile, err := i.layerProvider.FindLayer(layerTD)
 			if err != nil {
 				return nil, err
 			}
@@ -114,7 +106,7 @@ func (i tarImage) LayerByDigest(digest regv1.Hash) (regv1.Layer, error) {
 func (i tarImage) LayerByDiffID(diffID regv1.Hash) (regv1.Layer, error) {
 	for _, layerTD := range i.itd.Layers {
 		if layerTD.DiffID == diffID.String() {
-			layerFile, err := i.layerFile(layerTD)
+			layerFile, err := i.layerProvider.FindLayer(layerTD)
 			if err != nil {
 				return nil, err
 			}

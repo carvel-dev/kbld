@@ -9,8 +9,8 @@ import (
 )
 
 type tarLayer struct {
-	iltd      ImageLayerTarDescriptor
-	fileChunk tarFileChunk
+	iltd     ImageLayerTarDescriptor
+	contents LayerContents
 }
 
 var _ regv1.Layer = tarLayer{}
@@ -18,10 +18,10 @@ var _ regv1.Layer = tarLayer{}
 func (l tarLayer) Digest() (regv1.Hash, error) { return regv1.NewHash(l.iltd.Digest) }
 func (l tarLayer) DiffID() (regv1.Hash, error) { return regv1.NewHash(l.iltd.DiffID) }
 
-func (l tarLayer) Compressed() (io.ReadCloser, error) { return l.fileChunk.Open() }
+func (l tarLayer) Compressed() (io.ReadCloser, error) { return l.contents.Open() }
 
 func (l tarLayer) Uncompressed() (io.ReadCloser, error) {
-	rc, err := l.fileChunk.Open()
+	rc, err := l.contents.Open()
 	if err != nil {
 		return nil, err
 	}
