@@ -65,18 +65,18 @@ func MultiRefReadFromFile(path string) ([]TarImageOrIndex, error) {
 		return nil, err
 	}
 
-	tds, err := NewTarDescriptorsFromBytes(manifestBytes)
+	ids, err := NewImageRefDescriptorsFromBytes(manifestBytes)
 	if err != nil {
 		return nil, err
 	}
 
-	return ReadFromTds(tds, file), nil
+	return ReadFromTds(ids, file), nil
 }
 
-func ReadFromTds(tds *TarDescriptors, layerProvider LayerProvider) []TarImageOrIndex {
+func ReadFromTds(ids *ImageRefDescriptors, layerProvider LayerProvider) []TarImageOrIndex {
 	var result []TarImageOrIndex
 
-	for _, td := range tds.tds {
+	for _, td := range ids.descs {
 		switch {
 		case td.Image != nil:
 			var img ImageWithRef = tarImage{*td.Image, layerProvider}

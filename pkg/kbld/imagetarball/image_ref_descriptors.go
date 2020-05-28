@@ -16,41 +16,41 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
-type TarDescriptorsMetadata interface {
+type Registry interface {
 	Generic(regname.Reference) (regv1.Descriptor, error)
 	Index(regname.Reference) (regv1.ImageIndex, error)
 	Image(regname.Reference) (regv1.Image, error)
 }
 
-type TarDescriptors struct {
-	metadata TarDescriptorsMetadata
+type ImageRefDescriptors struct {
+	registry Registry
 
-	tds []ImageOrImageIndexTarDescriptor
+	descs []ImageOrImageIndexTarDescriptor
 
 	imageLayersLock sync.Mutex
 	imageLayers     map[ImageLayerTarDescriptor]regv1.Layer
 }
 
-func NewTarDescriptorsFromBytes(data []byte) (*TarDescriptors, error) {
-	var tds []ImageOrImageIndexTarDescriptor
+func NewImageRefDescriptorsFromBytes(data []byte) (*ImageRefDescriptors, error) {
+	var descs []ImageOrImageIndexTarDescriptor
 
-	err := json.Unmarshal(data, &tds)
+	err := json.Unmarshal(data, &descs)
 	if err != nil {
 		return nil, err
 	}
 
-	return &TarDescriptors{tds: tds}, nil
+	return &ImageRefDescriptors{descs: descs}, nil
 }
 
-func NewTarDescriptors(refs []regname.Reference, metadata TarDescriptorsMetadata) (*TarDescriptors, error) {
-	metadata = errTarDescriptorsMetadata{metadata}
+func NewImageRefDescriptors(refs []regname.Reference, registry Registry) (*ImageRefDescriptors, error) {
+	registry = errRegistry{registry}
 
-	tds := &TarDescriptors{
-		metadata:    metadata,
+	imageRefDescs := &ImageRefDescriptors{
+		registry:    registry,
 		imageLayers: map[ImageLayerTarDescriptor]regv1.Layer{},
 	}
 
-	var tdsLock sync.Mutex
+	var imageRefDescsLock sync.Mutex
 	var wg errgroup.Group
 	buildThrottle := util.NewThrottle(10)
 
@@ -61,30 +61,30 @@ func NewTarDescriptors(refs []regname.Reference, metadata TarDescriptorsMetadata
 			buildThrottle.Take()
 			defer buildThrottle.Done()
 
-			desc, err := metadata.Generic(ref)
+			desc, err := registry.Generic(ref)
 			if err != nil {
 				return err
 			}
 
 			var td ImageOrImageIndexTarDescriptor
 
-			if tds.isImageIndex(desc) {
-				imgIndexTd, err := tds.buildImageIndex(ref, desc)
+			if imageRefDescs.isImageIndex(desc) {
+				imgIndexTd, err := imageRefDescs.buildImageIndex(ref, desc)
 				if err != nil {
 					return err
 				}
 				td = ImageOrImageIndexTarDescriptor{ImageIndex: &imgIndexTd}
 			} else {
-				imgTd, err := tds.buildImage(ref)
+				imgTd, err := imageRefDescs.buildImage(ref)
 				if err != nil {
 					return err
 				}
 				td = ImageOrImageIndexTarDescriptor{Image: &imgTd}
 			}
 
-			tdsLock.Lock()
-			tds.tds = append(tds.tds, td)
-			tdsLock.Unlock()
+			imageRefDescsLock.Lock()
+			imageRefDescs.descs = append(imageRefDescs.descs, td)
+			imageRefDescsLock.Unlock()
 
 			return nil
 		})
@@ -92,17 +92,17 @@ func NewTarDescriptors(refs []regname.Reference, metadata TarDescriptorsMetadata
 
 	err := wg.Wait()
 
-	return tds, err
+	return imageRefDescs, err
 }
 
-func (tds *TarDescriptors) buildImageIndex(ref regname.Reference, desc regv1.Descriptor) (ImageIndexTarDescriptor, error) {
+func (ids *ImageRefDescriptors) buildImageIndex(ref regname.Reference, desc regv1.Descriptor) (ImageIndexTarDescriptor, error) {
 	td := ImageIndexTarDescriptor{
 		Refs:      []string{ref.Name()},
 		MediaType: string(desc.MediaType),
 		Digest:    desc.Digest.String(),
 	}
 
-	imgIndex, err := tds.metadata.Index(ref)
+	imgIndex, err := ids.registry.Index(ref)
 	if err != nil {
 		return td, err
 	}
@@ -120,14 +120,14 @@ func (tds *TarDescriptors) buildImageIndex(ref regname.Reference, desc regv1.Des
 	}
 
 	for _, manDesc := range imgIndexManifest.Manifests {
-		if tds.isImageIndex(manDesc) {
-			imgIndexTd, err := tds.buildImageIndex(tds.buildRef(ref, manDesc.Digest.String()), manDesc)
+		if ids.isImageIndex(manDesc) {
+			imgIndexTd, err := ids.buildImageIndex(ids.buildRef(ref, manDesc.Digest.String()), manDesc)
 			if err != nil {
 				return ImageIndexTarDescriptor{}, err
 			}
 			td.Indexes = append(td.Indexes, imgIndexTd)
 		} else {
-			imgTd, err := tds.buildImage(tds.buildRef(ref, manDesc.Digest.String()))
+			imgTd, err := ids.buildImage(ids.buildRef(ref, manDesc.Digest.String()))
 			if err != nil {
 				return ImageIndexTarDescriptor{}, err
 			}
@@ -138,10 +138,10 @@ func (tds *TarDescriptors) buildImageIndex(ref regname.Reference, desc regv1.Des
 	return td, nil
 }
 
-func (tds *TarDescriptors) buildImage(ref regname.Reference) (ImageTarDescriptor, error) {
+func (ids *ImageRefDescriptors) buildImage(ref regname.Reference) (ImageTarDescriptor, error) {
 	td := ImageTarDescriptor{}
 
-	img, err := tds.metadata.Image(ref)
+	img, err := ids.registry.Image(ref)
 	if err != nil {
 		return td, err
 	}
@@ -215,15 +215,15 @@ func (tds *TarDescriptors) buildImage(ref regname.Reference) (ImageTarDescriptor
 
 		td.Layers = append(td.Layers, layerTD)
 
-		tds.imageLayersLock.Lock()
-		tds.imageLayers[layerTD] = layer
-		tds.imageLayersLock.Unlock()
+		ids.imageLayersLock.Lock()
+		ids.imageLayers[layerTD] = layer
+		ids.imageLayersLock.Unlock()
 	}
 
 	return td, nil
 }
 
-func (TarDescriptors) isImageIndex(desc regv1.Descriptor) bool {
+func (ImageRefDescriptors) isImageIndex(desc regv1.Descriptor) bool {
 	switch desc.MediaType {
 	case regtypes.OCIImageIndex, regtypes.DockerManifestList:
 		return true
@@ -245,11 +245,11 @@ func (lc wrappedCompressedLayerContents) Open() (io.ReadCloser, error) {
 	return rc, nil
 }
 
-func (tds *TarDescriptors) FindLayer(layerTD ImageLayerTarDescriptor) (LayerContents, error) {
-	tds.imageLayersLock.Lock()
-	defer tds.imageLayersLock.Unlock()
+func (ids *ImageRefDescriptors) FindLayer(layerTD ImageLayerTarDescriptor) (LayerContents, error) {
+	ids.imageLayersLock.Lock()
+	defer ids.imageLayersLock.Unlock()
 
-	layer, found := tds.imageLayers[layerTD]
+	layer, found := ids.imageLayers[layerTD]
 	if !found {
 		panic(fmt.Sprintf("Expected to find stream for %#v", layerTD))
 	}
@@ -257,16 +257,16 @@ func (tds *TarDescriptors) FindLayer(layerTD ImageLayerTarDescriptor) (LayerCont
 	return wrappedCompressedLayerContents{layer}, nil
 }
 
-func (tds *TarDescriptors) AsBytes() ([]byte, error) {
+func (ids *ImageRefDescriptors) AsBytes() ([]byte, error) {
 	// Ensure result is deterministic
-	sort.Slice(tds.tds, func(i, j int) bool {
-		return tds.tds[i].SortKey() < tds.tds[j].SortKey()
+	sort.Slice(ids.descs, func(i, j int) bool {
+		return ids.descs[i].SortKey() < ids.descs[j].SortKey()
 	})
 
-	return json.Marshal(tds.tds)
+	return json.Marshal(ids.descs)
 }
 
-func (tds *TarDescriptors) buildRef(otherRef regname.Reference, digest string) regname.Reference {
+func (ids *ImageRefDescriptors) buildRef(otherRef regname.Reference, digest string) regname.Reference {
 	newRef, err := regname.NewDigest(fmt.Sprintf("%s@%s", otherRef.Context().Name(), digest))
 	if err != nil {
 		panic(fmt.Sprintf("Building new ref"))
@@ -274,26 +274,26 @@ func (tds *TarDescriptors) buildRef(otherRef regname.Reference, digest string) r
 	return newRef
 }
 
-type errTarDescriptorsMetadata struct {
-	delegate TarDescriptorsMetadata
+type errRegistry struct {
+	delegate Registry
 }
 
-func (m errTarDescriptorsMetadata) Generic(ref regname.Reference) (regv1.Descriptor, error) {
+func (m errRegistry) Generic(ref regname.Reference) (regv1.Descriptor, error) {
 	desc, err := m.delegate.Generic(ref)
 	return desc, m.betterErr(ref, err)
 }
 
-func (m errTarDescriptorsMetadata) Index(ref regname.Reference) (regv1.ImageIndex, error) {
+func (m errRegistry) Index(ref regname.Reference) (regv1.ImageIndex, error) {
 	idx, err := m.delegate.Index(ref)
 	return idx, m.betterErr(ref, err)
 }
 
-func (m errTarDescriptorsMetadata) Image(ref regname.Reference) (regv1.Image, error) {
+func (m errRegistry) Image(ref regname.Reference) (regv1.Image, error) {
 	img, err := m.delegate.Image(ref)
 	return img, m.betterErr(ref, err)
 }
 
-func (m errTarDescriptorsMetadata) betterErr(ref regname.Reference, err error) error {
+func (m errRegistry) betterErr(ref regname.Reference, err error) error {
 	if err != nil {
 		if strings.Contains(err.Error(), string(regtran.ManifestUnknownErrorCode)) {
 			err = fmt.Errorf("Encountered an error most likely because this image is in Docker Registry v1 format; only v2 or OCI image format is supported (underlying error: %s)", err)

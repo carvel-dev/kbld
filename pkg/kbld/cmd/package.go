@@ -24,7 +24,7 @@ type PackageOptions struct {
 	Concurrency   int
 }
 
-var _ regtarball.TarDescriptorsMetadata = ctlreg.Registry{}
+var _ regtarball.Registry = ctlreg.Registry{}
 
 func NewPackageOptions(ui ui.UI) *PackageOptions {
 	return &PackageOptions{ui: ui}

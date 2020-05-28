@@ -22,7 +22,7 @@ type TarWriterOpts struct {
 }
 
 type TarWriter struct {
-	tds       *TarDescriptors
+	ids       *ImageRefDescriptors
 	dstOpener func() (io.WriteCloser, error)
 
 	dst           io.WriteCloser
@@ -33,9 +33,9 @@ type TarWriter struct {
 	logger Logger
 }
 
-func NewTarWriter(tds *TarDescriptors, dstOpener func() (io.WriteCloser, error),
+func NewTarWriter(ids *ImageRefDescriptors, dstOpener func() (io.WriteCloser, error),
 	opts TarWriterOpts, logger Logger) *TarWriter {
-	return &TarWriter{tds: tds, dstOpener: dstOpener, opts: opts, logger: logger}
+	return &TarWriter{ids: ids, dstOpener: dstOpener, opts: opts, logger: logger}
 }
 
 func (w *TarWriter) Write() error {
@@ -51,17 +51,17 @@ func (w *TarWriter) Write() error {
 	w.tf = tar.NewWriter(w.dst)
 	defer w.tf.Close()
 
-	tdsBytes, err := w.tds.AsBytes()
+	idsBytes, err := w.ids.AsBytes()
 	if err != nil {
 		return err
 	}
 
-	err = w.writeTarEntry(w.tf, "manifest.json", bytes.NewReader(tdsBytes), int64(len(tdsBytes)))
+	err = w.writeTarEntry(w.tf, "manifest.json", bytes.NewReader(idsBytes), int64(len(idsBytes)))
 	if err != nil {
 		return err
 	}
 
-	for _, td := range w.tds.tds {
+	for _, td := range w.ids.descs {
 		switch {
 		case td.Image != nil:
 			err := w.writeImage(*td.Image)
@@ -161,7 +161,7 @@ func (w *TarWriter) writeLayers() error {
 		if isInflattable {
 			stream = io.LimitReader(zeroReader{}, imgLayer.Size)
 		} else {
-			foundLayer, err := w.tds.FindLayer(imgLayer)
+			foundLayer, err := w.ids.FindLayer(imgLayer)
 			if err != nil {
 				return err
 			}
@@ -249,7 +249,7 @@ func (w *TarWriter) fillInLayer(wl writtenLayer) error {
 	tw := tar.NewWriter(file)
 	// Do not close tar writer as it would add unwanted footer
 
-	foundLayer, err := w.tds.FindLayer(wl.Layer)
+	foundLayer, err := w.ids.FindLayer(wl.Layer)
 	if err != nil {
 		return err
 	}

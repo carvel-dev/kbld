@@ -20,12 +20,12 @@ type ImageSet struct {
 func (o ImageSet) Relocate(foundImages *UnprocessedImageURLs,
 	importRepo regname.Repository, registry ctlreg.Registry) (*ProcessedImages, error) {
 
-	tds, err := o.export2(foundImages, registry)
+	ids, err := o.export2(foundImages, registry)
 	if err != nil {
 		return nil, err
 	}
 
-	return o.Import(regtarball.ReadFromTds(tds, tds), importRepo, registry)
+	return o.Import(regtarball.ReadFromTds(ids, ids), importRepo, registry)
 }
 
 func (o ImageSet) Export(foundImages *UnprocessedImageURLs,
@@ -34,16 +34,16 @@ func (o ImageSet) Export(foundImages *UnprocessedImageURLs,
 	o.logger.WriteStr("exporting %d images...\n", len(foundImages.All()))
 	defer func() { o.logger.WriteStr("exported %d images\n", len(foundImages.All())) }()
 
-	tds, err := o.export2(foundImages, registry)
+	ids, err := o.export2(foundImages, registry)
 	if err != nil {
 		return err
 	}
 
-	return o.exportAsTar(tds, outputPath)
+	return o.exportAsTar(ids, outputPath)
 }
 
 func (o ImageSet) export2(foundImages *UnprocessedImageURLs,
-	registry ctlreg.Registry) (*regtarball.TarDescriptors, error) {
+	registry ctlreg.Registry) (*regtarball.ImageRefDescriptors, error) {
 
 	var refs []regname.Reference
 
@@ -58,15 +58,15 @@ func (o ImageSet) export2(foundImages *UnprocessedImageURLs,
 		refs = append(refs, ref)
 	}
 
-	tds, err := regtarball.NewTarDescriptors(refs, registry)
+	ids, err := regtarball.NewImageRefDescriptors(refs, registry)
 	if err != nil {
 		return nil, fmt.Errorf("Collecting packaging metadata: %s", err)
 	}
 
-	return tds, nil
+	return ids, nil
 }
 
-func (o ImageSet) exportAsTar(tds *regtarball.TarDescriptors, outputPath string) error {
+func (o ImageSet) exportAsTar(ids *regtarball.ImageRefDescriptors, outputPath string) error {
 	outputFile, err := os.Create(outputPath)
 	if err != nil {
 		return fmt.Errorf("Creating file '%s': %s", outputPath, err)
@@ -85,7 +85,7 @@ func (o ImageSet) exportAsTar(tds *regtarball.TarDescriptors, outputPath string)
 
 	o.logger.WriteStr("writing layers...\n")
 
-	return regtarball.NewTarWriter(tds, outputFileOpener, opts, o.logger).Write()
+	return regtarball.NewTarWriter(ids, outputFileOpener, opts, o.logger).Write()
 }
 
 func (o *ImageSet) Import(imgOrIndexes []regtarball.TarImageOrIndex,
