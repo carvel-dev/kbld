@@ -31,6 +31,17 @@ type TarDescriptors struct {
 	imageLayers     map[ImageLayerTarDescriptor]regv1.Layer
 }
 
+func NewTarDescriptorsFromBytes(data []byte) (*TarDescriptors, error) {
+	var tds []ImageOrImageIndexTarDescriptor
+
+	err := json.Unmarshal(data, &tds)
+	if err != nil {
+		return nil, err
+	}
+
+	return &TarDescriptors{tds: tds}, nil
+}
+
 func NewTarDescriptors(refs []regname.Reference, metadata TarDescriptorsMetadata) (*TarDescriptors, error) {
 	metadata = errTarDescriptorsMetadata{metadata}
 
@@ -220,20 +231,30 @@ func (TarDescriptors) isImageIndex(desc regv1.Descriptor) bool {
 	return false
 }
 
-func (tds *TarDescriptors) ImageLayerStream(td ImageLayerTarDescriptor) (io.Reader, error) {
-	tds.imageLayersLock.Lock()
-	defer tds.imageLayersLock.Unlock()
+type wrappedCompressedLayerContents struct {
+	layer regv1.Layer
+}
 
-	layer, found := tds.imageLayers[td]
-	if !found {
-		panic(fmt.Sprintf("Expected to find stream for %#v", td))
-	}
+var _ LayerContents = wrappedCompressedLayerContents{}
 
-	reader, err := layer.Compressed()
+func (lc wrappedCompressedLayerContents) Open() (io.ReadCloser, error) {
+	rc, err := lc.layer.Compressed()
 	if err != nil {
 		return nil, fmt.Errorf("Getting compressed layer: %s", err)
 	}
-	return reader, nil
+	return rc, nil
+}
+
+func (tds *TarDescriptors) FindLayer(layerTD ImageLayerTarDescriptor) (LayerContents, error) {
+	tds.imageLayersLock.Lock()
+	defer tds.imageLayersLock.Unlock()
+
+	layer, found := tds.imageLayers[layerTD]
+	if !found {
+		panic(fmt.Sprintf("Expected to find stream for %#v", layerTD))
+	}
+
+	return wrappedCompressedLayerContents{layer}, nil
 }
 
 func (tds *TarDescriptors) AsBytes() ([]byte, error) {

@@ -161,7 +161,12 @@ func (w *TarWriter) writeLayers() error {
 		if isInflattable {
 			stream = io.LimitReader(zeroReader{}, imgLayer.Size)
 		} else {
-			stream, err = w.tds.ImageLayerStream(imgLayer)
+			foundLayer, err := w.tds.FindLayer(imgLayer)
+			if err != nil {
+				return err
+			}
+
+			stream, err = foundLayer.Open()
 			if err != nil {
 				return err
 			}
@@ -244,7 +249,12 @@ func (w *TarWriter) fillInLayer(wl writtenLayer) error {
 	tw := tar.NewWriter(file)
 	// Do not close tar writer as it would add unwanted footer
 
-	stream, err := w.tds.ImageLayerStream(wl.Layer)
+	foundLayer, err := w.tds.FindLayer(wl.Layer)
+	if err != nil {
+		return err
+	}
+
+	stream, err := foundLayer.Open()
 	if err != nil {
 		return err
 	}

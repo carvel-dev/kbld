@@ -1,7 +1,6 @@
 package tarball
 
 import (
-	"encoding/json"
 	"io"
 	"io/ioutil"
 
@@ -66,22 +65,25 @@ func MultiRefReadFromFile(path string) ([]TarImageOrIndex, error) {
 		return nil, err
 	}
 
-	var tds []ImageOrImageIndexTarDescriptor
-	var result []TarImageOrIndex
-
-	err = json.Unmarshal(manifestBytes, &tds)
+	tds, err := NewTarDescriptorsFromBytes(manifestBytes)
 	if err != nil {
 		return nil, err
 	}
 
-	for _, td := range tds {
+	return ReadFromTds(tds, file), nil
+}
+
+func ReadFromTds(tds *TarDescriptors, layerProvider LayerProvider) []TarImageOrIndex {
+	var result []TarImageOrIndex
+
+	for _, td := range tds.tds {
 		switch {
 		case td.Image != nil:
-			var img ImageWithRef = tarImage{*td.Image, file}
+			var img ImageWithRef = tarImage{*td.Image, layerProvider}
 			result = append(result, TarImageOrIndex{Image: &img})
 
 		case td.ImageIndex != nil:
-			idx := buildIndex(*td.ImageIndex, file)
+			idx := buildIndex(*td.ImageIndex, layerProvider)
 			result = append(result, TarImageOrIndex{Index: &idx})
 
 		default:
@@ -89,18 +91,18 @@ func MultiRefReadFromFile(path string) ([]TarImageOrIndex, error) {
 		}
 	}
 
-	return result, nil
+	return result
 }
 
-func buildIndex(iitd ImageIndexTarDescriptor, file tarFile) ImageIndexWithRef {
+func buildIndex(iitd ImageIndexTarDescriptor, layerProvider LayerProvider) ImageIndexWithRef {
 	var images []regv1.Image
 	var indexes []regv1.ImageIndex
 
 	for _, imgTD := range iitd.Images {
-		images = append(images, tarImage{imgTD, file})
+		images = append(images, tarImage{imgTD, layerProvider})
 	}
 	for _, indexTD := range iitd.Indexes {
-		indexes = append(indexes, buildIndex(indexTD, file))
+		indexes = append(indexes, buildIndex(indexTD, layerProvider))
 	}
 
 	return tarImageIndex{iitd, images, indexes}
