@@ -17,11 +17,31 @@ type ImageSet struct {
 	logger      *ctlimg.LoggerPrefixWriter
 }
 
+// func (o ImageSet) Relocate(foundImages *UnprocessedImageURLs, registry ctlreg.Registry) (*ProcessedImages, error) {
+// 	imgOrIndexes, err := o.Export(foundImages, outputPath, registry)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+
+// 	return o.Import(imgOrIndexes, importRepo, registry)
+// }
+
 func (o ImageSet) Export(foundImages *UnprocessedImageURLs,
 	outputPath string, registry ctlreg.Registry) error {
 
 	o.logger.WriteStr("exporting %d images...\n", len(foundImages.All()))
 	defer func() { o.logger.WriteStr("exported %d images\n", len(foundImages.All())) }()
+
+	tds, err := o.export2(foundImages, registry)
+	if err != nil {
+		return err
+	}
+
+	return o.exportAsTar(tds, outputPath)
+}
+
+func (o ImageSet) export2(foundImages *UnprocessedImageURLs,
+	registry ctlreg.Registry) (*regtarball.TarDescriptors, error) {
 
 	var refs []regname.Reference
 
@@ -29,13 +49,22 @@ func (o ImageSet) Export(foundImages *UnprocessedImageURLs,
 		// Validate strictly as these refs were already resolved
 		ref, err := regname.NewDigest(img.URL, regname.StrictValidation)
 		if err != nil {
-			return err
+			return nil, err
 		}
 
 		o.logger.Write([]byte(fmt.Sprintf("will export %s\n", img.URL)))
 		refs = append(refs, ref)
 	}
 
+	tds, err := regtarball.NewTarDescriptors(refs, registry)
+	if err != nil {
+		return nil, fmt.Errorf("Collecting packaging metadata: %s", err)
+	}
+
+	return tds, nil
+}
+
+func (o ImageSet) exportAsTar(tds *regtarball.TarDescriptors, outputPath string) error {
 	outputFile, err := os.Create(outputPath)
 	if err != nil {
 		return fmt.Errorf("Creating file '%s': %s", outputPath, err)
@@ -50,14 +79,9 @@ func (o ImageSet) Export(foundImages *UnprocessedImageURLs,
 		return os.OpenFile(outputPath, os.O_RDWR, 0755)
 	}
 
-	tds, err := regtarball.NewTarDescriptors(refs, registry)
-	if err != nil {
-		return fmt.Errorf("Collecting packaging metadata: %s", err)
-	}
+	opts := regtarball.TarWriterOpts{Concurrency: o.concurrency}
 
 	o.logger.WriteStr("writing layers...\n")
-
-	opts := regtarball.TarWriterOpts{Concurrency: o.concurrency}
 
 	return regtarball.NewTarWriter(tds, outputFileOpener, opts, o.logger).Write()
 }
