@@ -41,7 +41,7 @@ func ReadFromTds(ids *ImageRefDescriptors, layerProvider LayerProvider) []ImageO
 	for _, td := range ids.descs {
 		switch {
 		case td.Image != nil:
-			var img ImageWithRef = tarImage{*td.Image, layerProvider}
+			var img ImageWithRef = describedImage{*td.Image, layerProvider}
 			result = append(result, ImageOrIndex{Image: &img})
 
 		case td.ImageIndex != nil:
@@ -61,11 +61,11 @@ func buildIndex(iitd ImageIndexDescriptor, layerProvider LayerProvider) ImageInd
 	var indexes []regv1.ImageIndex
 
 	for _, imgTD := range iitd.Images {
-		images = append(images, tarImage{imgTD, layerProvider})
+		images = append(images, describedImage{imgTD, layerProvider})
 	}
 	for _, indexTD := range iitd.Indexes {
 		indexes = append(indexes, buildIndex(indexTD, layerProvider))
 	}
 
-	return tarImageIndex{iitd, images, indexes}
+	return describedImageIndex{iitd, images, indexes}
 }

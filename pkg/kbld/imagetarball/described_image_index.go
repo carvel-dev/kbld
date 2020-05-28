@@ -8,26 +8,26 @@ import (
 	"github.com/google/go-containerregistry/pkg/v1/types"
 )
 
-type tarImageIndex struct {
+type describedImageIndex struct {
 	iitd    ImageIndexDescriptor
 	images  []regv1.Image
 	indexes []regv1.ImageIndex
 }
 
-var _ regv1.ImageIndex = tarImageIndex{}
+var _ regv1.ImageIndex = describedImageIndex{}
 
-func (i tarImageIndex) Ref() string { return i.iitd.Refs[0] }
+func (i describedImageIndex) Ref() string { return i.iitd.Refs[0] }
 
-func (i tarImageIndex) MediaType() (types.MediaType, error) {
+func (i describedImageIndex) MediaType() (types.MediaType, error) {
 	return types.MediaType(i.iitd.MediaType), nil
 }
 
-func (i tarImageIndex) Digest() (regv1.Hash, error)  { return regv1.NewHash(i.iitd.Digest) }
-func (i tarImageIndex) RawManifest() ([]byte, error) { return []byte(i.iitd.Raw), nil }
+func (i describedImageIndex) Digest() (regv1.Hash, error)  { return regv1.NewHash(i.iitd.Digest) }
+func (i describedImageIndex) RawManifest() ([]byte, error) { return []byte(i.iitd.Raw), nil }
 
-func (i tarImageIndex) Size() (int64, error) { return int64(len(i.iitd.Raw)), nil }
+func (i describedImageIndex) Size() (int64, error) { return int64(len(i.iitd.Raw)), nil }
 
-func (i tarImageIndex) IndexManifest() (*regv1.IndexManifest, error) {
+func (i describedImageIndex) IndexManifest() (*regv1.IndexManifest, error) {
 	var manifest *regv1.IndexManifest
 	err := json.Unmarshal([]byte(i.iitd.Raw), &manifest)
 	if err != nil {
@@ -36,7 +36,7 @@ func (i tarImageIndex) IndexManifest() (*regv1.IndexManifest, error) {
 	return manifest, nil
 }
 
-func (i tarImageIndex) Image(digest regv1.Hash) (regv1.Image, error) {
+func (i describedImageIndex) Image(digest regv1.Hash) (regv1.Image, error) {
 	for _, img := range i.images {
 		imgDigest, err := img.Digest()
 		if err != nil {
@@ -49,7 +49,7 @@ func (i tarImageIndex) Image(digest regv1.Hash) (regv1.Image, error) {
 	return nil, fmt.Errorf("Expected to find image '%s' by digest", digest)
 }
 
-func (i tarImageIndex) ImageIndex(digest regv1.Hash) (regv1.ImageIndex, error) {
+func (i describedImageIndex) ImageIndex(digest regv1.Hash) (regv1.ImageIndex, error) {
 	for _, idx := range i.indexes {
 		idxDigest, err := idx.Digest()
 		if err != nil {
