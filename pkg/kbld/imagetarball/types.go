@@ -93,3 +93,25 @@ func (td ImageOrImageIndexDescriptor) SortKey() string {
 
 func (td ImageIndexDescriptor) SortKey() string { return td.Digest }
 func (td ImageDescriptor) SortKey() string      { return td.Manifest.Digest + "/" + td.Config.Digest }
+
+func (t ImageOrIndex) Digest() (regv1.Hash, error) {
+	switch {
+	case t.Image != nil:
+		return (*t.Image).Digest()
+	case t.Index != nil:
+		return (*t.Index).Digest()
+	default:
+		panic("Unknown item")
+	}
+}
+
+func (t ImageOrIndex) Ref() string {
+	switch {
+	case t.Image != nil:
+		return (*t.Image).Ref()
+	case t.Index != nil:
+		return (*t.Index).Ref()
+	default:
+		panic("Unknown item")
+	}
+}

@@ -64,7 +64,7 @@ func (o *UnpackageOptions) Run() error {
 		return err
 	}
 
-	imgOrIndexes, err := regtarball.MultiRefReadFromFile(o.InputPath)
+	imgOrIndexes, err := regtarball.NewTarReader(o.InputPath).Read()
 	if err != nil {
 		return err
 	}

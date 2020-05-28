@@ -6,30 +6,16 @@ import (
 	regv1 "github.com/google/go-containerregistry/pkg/v1"
 )
 
-func (t ImageOrIndex) Digest() (regv1.Hash, error) {
-	switch {
-	case t.Image != nil:
-		return (*t.Image).Digest()
-	case t.Index != nil:
-		return (*t.Index).Digest()
-	default:
-		panic("Unknown item")
-	}
+type TarReader struct {
+	path string
 }
 
-func (t ImageOrIndex) Ref() string {
-	switch {
-	case t.Image != nil:
-		return (*t.Image).Ref()
-	case t.Index != nil:
-		return (*t.Index).Ref()
-	default:
-		panic("Unknown item")
-	}
+func NewTarReader(path string) TarReader {
+	return TarReader{path}
 }
 
-func MultiRefReadFromFile(path string) ([]ImageOrIndex, error) {
-	file := tarFile{path}
+func (r TarReader) Read() ([]ImageOrIndex, error) {
+	file := tarFile{r.path}
 
 	manifestFile, err := file.Chunk("manifest.json").Open()
 	if err != nil {
