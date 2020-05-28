@@ -3,7 +3,6 @@ package imagetar
 import (
 	"io/ioutil"
 
-	regv1 "github.com/google/go-containerregistry/pkg/v1"
 	"github.com/k14s/kbld/pkg/kbld/imagedesc"
 )
 
@@ -33,42 +32,5 @@ func (r TarReader) Read() ([]imagedesc.ImageOrIndex, error) {
 		return nil, err
 	}
 
-	return ReadFromTds(ids, file), nil
-}
-
-func ReadFromTds(ids *imagedesc.ImageRefDescriptors, layerProvider imagedesc.LayerProvider) []imagedesc.ImageOrIndex {
-	var result []imagedesc.ImageOrIndex
-
-	for _, td := range ids.Descriptors() {
-		switch {
-		case td.Image != nil:
-			var img imagedesc.ImageWithRef = imagedesc.NewDescribedImage(*td.Image, layerProvider)
-			result = append(result, imagedesc.ImageOrIndex{Image: &img})
-
-		case td.ImageIndex != nil:
-			idx := buildIndex(*td.ImageIndex, layerProvider)
-			result = append(result, imagedesc.ImageOrIndex{Index: &idx})
-
-		default:
-			panic("Unknown item")
-		}
-	}
-
-	return result
-}
-
-func buildIndex(iitd imagedesc.ImageIndexDescriptor,
-	layerProvider imagedesc.LayerProvider) imagedesc.ImageIndexWithRef {
-
-	var images []regv1.Image
-	var indexes []regv1.ImageIndex
-
-	for _, imgTD := range iitd.Images {
-		images = append(images, imagedesc.NewDescribedImage(imgTD, layerProvider))
-	}
-	for _, indexTD := range iitd.Indexes {
-		indexes = append(indexes, buildIndex(indexTD, layerProvider))
-	}
-
-	return imagedesc.NewDescribedImageIndex(iitd, images, indexes)
+	return imagedesc.NewDescribedReader(ids, file).Read(), nil
 }

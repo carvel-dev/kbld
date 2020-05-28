@@ -26,7 +26,7 @@ func (o ImageSet) Relocate(foundImages *UnprocessedImageURLs,
 		return nil, err
 	}
 
-	return o.Import(imagetar.ReadFromTds(ids, ids), importRepo, registry)
+	return o.Import(imagedesc.NewDescribedReader(ids, ids).Read(), importRepo, registry)
 }
 
 func (o ImageSet) Export(foundImages *UnprocessedImageURLs,
