@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"fmt"
-	"io"
 	"os"
 
 	"github.com/cppforlife/go-cli-ui/ui"
@@ -63,7 +62,9 @@ func (o *PackageOptions) Run() error {
 		return err
 	}
 
-	return o.exportImages(foundImages, prefixedLogger)
+	srcRegistry := ctlreg.NewRegistry(o.RegistryFlags.AsRegistryOpts())
+
+	return ImageSet{o.Concurrency, prefixedLogger}.Export(foundImages, o.OutputPath, srcRegistry)
 }
 
 func (o *PackageOptions) FindImages(allRs []ctlres.Resource,
@@ -96,49 +97,4 @@ func (o *PackageOptions) FindImages(allRs []ctlres.Resource,
 	}
 
 	return foundImages, nil
-}
-
-func (o *PackageOptions) exportImages(foundImages *UnprocessedImageURLs,
-	logger *ctlimg.LoggerPrefixWriter) error {
-
-	logger.WriteStr("exporting %d images...\n", len(foundImages.All()))
-	defer func() { logger.WriteStr("exported %d images\n", len(foundImages.All())) }()
-
-	var refs []regname.Reference
-
-	for _, img := range foundImages.All() {
-		// Validate strictly as these refs were already resolved
-		ref, err := regname.NewDigest(img.URL, regname.StrictValidation)
-		if err != nil {
-			return err
-		}
-
-		logger.Write([]byte(fmt.Sprintf("will export %s\n", img.URL)))
-		refs = append(refs, ref)
-	}
-
-	outputFile, err := os.Create(o.OutputPath)
-	if err != nil {
-		return fmt.Errorf("Creating file '%s': %s", o.OutputPath, err)
-	}
-
-	err = outputFile.Close()
-	if err != nil {
-		return err
-	}
-
-	outputFileOpener := func() (io.WriteCloser, error) {
-		return os.OpenFile(o.OutputPath, os.O_RDWR, 0755)
-	}
-
-	tds, err := regtarball.NewTarDescriptors(refs, ctlreg.NewRegistry(o.RegistryFlags.AsRegistryOpts()))
-	if err != nil {
-		return fmt.Errorf("Collecting packaging metadata: %s", err)
-	}
-
-	logger.WriteStr("writing layers...\n")
-
-	opts := regtarball.TarWriterOpts{Concurrency: o.Concurrency}
-
-	return regtarball.NewTarWriter(tds, outputFileOpener, opts, logger).Write()
 }

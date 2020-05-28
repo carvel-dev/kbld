@@ -2,6 +2,8 @@ package cmd
 
 import (
 	"fmt"
+	"io"
+	"os"
 
 	regname "github.com/google/go-containerregistry/pkg/name"
 	ctlimg "github.com/k14s/kbld/pkg/kbld/image"
@@ -13,6 +15,51 @@ import (
 type ImageSet struct {
 	concurrency int
 	logger      *ctlimg.LoggerPrefixWriter
+}
+
+func (o ImageSet) Export(foundImages *UnprocessedImageURLs,
+	outputPath string, registry ctlreg.Registry) error {
+
+	o.logger.WriteStr("exporting %d images...\n", len(foundImages.All()))
+	defer func() { o.logger.WriteStr("exported %d images\n", len(foundImages.All())) }()
+
+	var refs []regname.Reference
+
+	for _, img := range foundImages.All() {
+		// Validate strictly as these refs were already resolved
+		ref, err := regname.NewDigest(img.URL, regname.StrictValidation)
+		if err != nil {
+			return err
+		}
+
+		o.logger.Write([]byte(fmt.Sprintf("will export %s\n", img.URL)))
+		refs = append(refs, ref)
+	}
+
+	outputFile, err := os.Create(outputPath)
+	if err != nil {
+		return fmt.Errorf("Creating file '%s': %s", outputPath, err)
+	}
+
+	err = outputFile.Close()
+	if err != nil {
+		return err
+	}
+
+	outputFileOpener := func() (io.WriteCloser, error) {
+		return os.OpenFile(outputPath, os.O_RDWR, 0755)
+	}
+
+	tds, err := regtarball.NewTarDescriptors(refs, registry)
+	if err != nil {
+		return fmt.Errorf("Collecting packaging metadata: %s", err)
+	}
+
+	o.logger.WriteStr("writing layers...\n")
+
+	opts := regtarball.TarWriterOpts{Concurrency: o.concurrency}
+
+	return regtarball.NewTarWriter(tds, outputFileOpener, opts, o.logger).Write()
 }
 
 func (o *ImageSet) Import(imgOrIndexes []regtarball.TarImageOrIndex,
