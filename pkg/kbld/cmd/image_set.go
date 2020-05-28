@@ -17,14 +17,16 @@ type ImageSet struct {
 	logger      *ctlimg.LoggerPrefixWriter
 }
 
-// func (o ImageSet) Relocate(foundImages *UnprocessedImageURLs, registry ctlreg.Registry) (*ProcessedImages, error) {
-// 	imgOrIndexes, err := o.Export(foundImages, outputPath, registry)
-// 	if err != nil {
-// 		return nil, err
-// 	}
+func (o ImageSet) Relocate(foundImages *UnprocessedImageURLs,
+	importRepo regname.Repository, registry ctlreg.Registry) (*ProcessedImages, error) {
 
-// 	return o.Import(imgOrIndexes, importRepo, registry)
-// }
+	tds, err := o.export2(foundImages, registry)
+	if err != nil {
+		return nil, err
+	}
+
+	return o.Import(regtarball.ReadFromTds(tds, tds), importRepo, registry)
+}
 
 func (o ImageSet) Export(foundImages *UnprocessedImageURLs,
 	outputPath string, registry ctlreg.Registry) error {
