@@ -8,7 +8,7 @@ import (
 	regname "github.com/google/go-containerregistry/pkg/name"
 	ctlimg "github.com/k14s/kbld/pkg/kbld/image"
 	"github.com/k14s/kbld/pkg/kbld/imagedesc"
-	regtarball "github.com/k14s/kbld/pkg/kbld/imagetarball"
+	"github.com/k14s/kbld/pkg/kbld/imagetar"
 	ctlreg "github.com/k14s/kbld/pkg/kbld/registry"
 	"github.com/k14s/kbld/pkg/kbld/util"
 )
@@ -26,7 +26,7 @@ func (o ImageSet) Relocate(foundImages *UnprocessedImageURLs,
 		return nil, err
 	}
 
-	return o.Import(regtarball.ReadFromTds(ids, ids), importRepo, registry)
+	return o.Import(imagetar.ReadFromTds(ids, ids), importRepo, registry)
 }
 
 func (o ImageSet) Export(foundImages *UnprocessedImageURLs,
@@ -82,11 +82,11 @@ func (o ImageSet) exportAsTar(ids *imagedesc.ImageRefDescriptors, outputPath str
 		return os.OpenFile(outputPath, os.O_RDWR, 0755)
 	}
 
-	opts := regtarball.TarWriterOpts{Concurrency: o.concurrency}
+	opts := imagetar.TarWriterOpts{Concurrency: o.concurrency}
 
 	o.logger.WriteStr("writing layers...\n")
 
-	return regtarball.NewTarWriter(ids, outputFileOpener, opts, o.logger).Write()
+	return imagetar.NewTarWriter(ids, outputFileOpener, opts, o.logger).Write()
 }
 
 func (o *ImageSet) Import(imgOrIndexes []imagedesc.ImageOrIndex,

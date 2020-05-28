@@ -9,7 +9,7 @@ import (
 	regname "github.com/google/go-containerregistry/pkg/name"
 	ctlconf "github.com/k14s/kbld/pkg/kbld/config"
 	ctlimg "github.com/k14s/kbld/pkg/kbld/image"
-	regtarball "github.com/k14s/kbld/pkg/kbld/imagetarball"
+	"github.com/k14s/kbld/pkg/kbld/imagetar"
 	ctlreg "github.com/k14s/kbld/pkg/kbld/registry"
 	ctlres "github.com/k14s/kbld/pkg/kbld/resources"
 	ctlser "github.com/k14s/kbld/pkg/kbld/search"
@@ -64,7 +64,7 @@ func (o *UnpackageOptions) Run() error {
 		return err
 	}
 
-	imgOrIndexes, err := regtarball.NewTarReader(o.InputPath).Read()
+	imgOrIndexes, err := imagetar.NewTarReader(o.InputPath).Read()
 	if err != nil {
 		return err
 	}
