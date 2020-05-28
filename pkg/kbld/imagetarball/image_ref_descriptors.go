@@ -61,15 +61,15 @@ func NewImageRefDescriptors(refs []regname.Reference, registry Registry) (*Image
 			buildThrottle.Take()
 			defer buildThrottle.Done()
 
-			desc, err := registry.Generic(ref)
+			regDesc, err := registry.Generic(ref)
 			if err != nil {
 				return err
 			}
 
 			var td ImageOrImageIndexTarDescriptor
 
-			if imageRefDescs.isImageIndex(desc) {
-				imgIndexTd, err := imageRefDescs.buildImageIndex(ref, desc)
+			if imageRefDescs.isImageIndex(regDesc) {
+				imgIndexTd, err := imageRefDescs.buildImageIndex(ref, regDesc)
 				if err != nil {
 					return err
 				}
@@ -95,11 +95,11 @@ func NewImageRefDescriptors(refs []regname.Reference, registry Registry) (*Image
 	return imageRefDescs, err
 }
 
-func (ids *ImageRefDescriptors) buildImageIndex(ref regname.Reference, desc regv1.Descriptor) (ImageIndexTarDescriptor, error) {
+func (ids *ImageRefDescriptors) buildImageIndex(ref regname.Reference, regDesc regv1.Descriptor) (ImageIndexTarDescriptor, error) {
 	td := ImageIndexTarDescriptor{
 		Refs:      []string{ref.Name()},
-		MediaType: string(desc.MediaType),
-		Digest:    desc.Digest.String(),
+		MediaType: string(regDesc.MediaType),
+		Digest:    regDesc.Digest.String(),
 	}
 
 	imgIndex, err := ids.registry.Index(ref)
@@ -223,8 +223,8 @@ func (ids *ImageRefDescriptors) buildImage(ref regname.Reference) (ImageTarDescr
 	return td, nil
 }
 
-func (ImageRefDescriptors) isImageIndex(desc regv1.Descriptor) bool {
-	switch desc.MediaType {
+func (ImageRefDescriptors) isImageIndex(regDesc regv1.Descriptor) bool {
+	switch regDesc.MediaType {
 	case regtypes.OCIImageIndex, regtypes.DockerManifestList:
 		return true
 	}
@@ -279,8 +279,8 @@ type errRegistry struct {
 }
 
 func (m errRegistry) Generic(ref regname.Reference) (regv1.Descriptor, error) {
-	desc, err := m.delegate.Generic(ref)
-	return desc, m.betterErr(ref, err)
+	regDesc, err := m.delegate.Generic(ref)
+	return regDesc, m.betterErr(ref, err)
 }
 
 func (m errRegistry) Index(ref regname.Reference) (regv1.ImageIndex, error) {
