@@ -9,7 +9,7 @@ import (
 )
 
 type tarImage struct {
-	itd           ImageTarDescriptor
+	itd           ImageDescriptor
 	layerProvider LayerProvider
 }
 

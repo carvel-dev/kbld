@@ -22,7 +22,7 @@ type LayerContents interface {
 }
 
 type LayerProvider interface {
-	FindLayer(ImageLayerTarDescriptor) (LayerContents, error)
+	FindLayer(ImageLayerDescriptor) (LayerContents, error)
 }
 
 type TarImageOrIndex struct {
@@ -94,7 +94,7 @@ func ReadFromTds(ids *ImageRefDescriptors, layerProvider LayerProvider) []TarIma
 	return result
 }
 
-func buildIndex(iitd ImageIndexTarDescriptor, layerProvider LayerProvider) ImageIndexWithRef {
+func buildIndex(iitd ImageIndexDescriptor, layerProvider LayerProvider) ImageIndexWithRef {
 	var images []regv1.Image
 	var indexes []regv1.ImageIndex
 

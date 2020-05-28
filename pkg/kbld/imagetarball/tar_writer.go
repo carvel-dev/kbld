@@ -27,7 +27,7 @@ type TarWriter struct {
 
 	dst           io.WriteCloser
 	tf            *tar.Writer
-	layersToWrite []ImageLayerTarDescriptor
+	layersToWrite []ImageLayerDescriptor
 
 	opts   TarWriterOpts
 	logger Logger
@@ -83,7 +83,7 @@ func (w *TarWriter) Write() error {
 	return w.writeLayers()
 }
 
-func (w *TarWriter) writeImageIndex(td ImageIndexTarDescriptor) error {
+func (w *TarWriter) writeImageIndex(td ImageIndexDescriptor) error {
 	for _, idx := range td.Indexes {
 		err := w.writeImageIndex(idx)
 		if err != nil {
@@ -101,7 +101,7 @@ func (w *TarWriter) writeImageIndex(td ImageIndexTarDescriptor) error {
 	return nil
 }
 
-func (w *TarWriter) writeImage(td ImageTarDescriptor) error {
+func (w *TarWriter) writeImage(td ImageDescriptor) error {
 	for _, imgLayer := range td.Layers {
 		// TODO anything else we can do to deal with this?
 		// Do not include foreign layers since we cannot
@@ -116,7 +116,7 @@ func (w *TarWriter) writeImage(td ImageTarDescriptor) error {
 type writtenLayer struct {
 	Name   string
 	Offset int64
-	Layer  ImageLayerTarDescriptor
+	Layer  ImageLayerDescriptor
 }
 
 func (w *TarWriter) writeLayers() error {

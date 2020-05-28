@@ -9,7 +9,7 @@ import (
 )
 
 type tarLayer struct {
-	iltd     ImageLayerTarDescriptor
+	iltd     ImageLayerDescriptor
 	contents LayerContents
 }
 

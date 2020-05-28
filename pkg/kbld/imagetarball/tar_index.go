@@ -9,7 +9,7 @@ import (
 )
 
 type tarImageIndex struct {
-	iitd    ImageIndexTarDescriptor
+	iitd    ImageIndexDescriptor
 	images  []regv1.Image
 	indexes []regv1.ImageIndex
 }

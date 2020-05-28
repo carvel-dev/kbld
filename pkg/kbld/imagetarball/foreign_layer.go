@@ -8,7 +8,7 @@ import (
 )
 
 type foreignLayer struct {
-	iltd ImageLayerTarDescriptor
+	iltd ImageLayerDescriptor
 }
 
 var _ regv1.Layer = foreignLayer{}

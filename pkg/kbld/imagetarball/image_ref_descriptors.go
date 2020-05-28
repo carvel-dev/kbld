@@ -25,14 +25,14 @@ type Registry interface {
 type ImageRefDescriptors struct {
 	registry Registry
 
-	descs []ImageOrImageIndexTarDescriptor
+	descs []ImageOrImageIndexDescriptor
 
 	imageLayersLock sync.Mutex
-	imageLayers     map[ImageLayerTarDescriptor]regv1.Layer
+	imageLayers     map[ImageLayerDescriptor]regv1.Layer
 }
 
 func NewImageRefDescriptorsFromBytes(data []byte) (*ImageRefDescriptors, error) {
-	var descs []ImageOrImageIndexTarDescriptor
+	var descs []ImageOrImageIndexDescriptor
 
 	err := json.Unmarshal(data, &descs)
 	if err != nil {
@@ -47,7 +47,7 @@ func NewImageRefDescriptors(refs []regname.Reference, registry Registry) (*Image
 
 	imageRefDescs := &ImageRefDescriptors{
 		registry:    registry,
-		imageLayers: map[ImageLayerTarDescriptor]regv1.Layer{},
+		imageLayers: map[ImageLayerDescriptor]regv1.Layer{},
 	}
 
 	var imageRefDescsLock sync.Mutex
@@ -66,20 +66,20 @@ func NewImageRefDescriptors(refs []regname.Reference, registry Registry) (*Image
 				return err
 			}
 
-			var td ImageOrImageIndexTarDescriptor
+			var td ImageOrImageIndexDescriptor
 
 			if imageRefDescs.isImageIndex(regDesc) {
 				imgIndexTd, err := imageRefDescs.buildImageIndex(ref, regDesc)
 				if err != nil {
 					return err
 				}
-				td = ImageOrImageIndexTarDescriptor{ImageIndex: &imgIndexTd}
+				td = ImageOrImageIndexDescriptor{ImageIndex: &imgIndexTd}
 			} else {
 				imgTd, err := imageRefDescs.buildImage(ref)
 				if err != nil {
 					return err
 				}
-				td = ImageOrImageIndexTarDescriptor{Image: &imgTd}
+				td = ImageOrImageIndexDescriptor{Image: &imgTd}
 			}
 
 			imageRefDescsLock.Lock()
@@ -95,8 +95,8 @@ func NewImageRefDescriptors(refs []regname.Reference, registry Registry) (*Image
 	return imageRefDescs, err
 }
 
-func (ids *ImageRefDescriptors) buildImageIndex(ref regname.Reference, regDesc regv1.Descriptor) (ImageIndexTarDescriptor, error) {
-	td := ImageIndexTarDescriptor{
+func (ids *ImageRefDescriptors) buildImageIndex(ref regname.Reference, regDesc regv1.Descriptor) (ImageIndexDescriptor, error) {
+	td := ImageIndexDescriptor{
 		Refs:      []string{ref.Name()},
 		MediaType: string(regDesc.MediaType),
 		Digest:    regDesc.Digest.String(),
@@ -123,13 +123,13 @@ func (ids *ImageRefDescriptors) buildImageIndex(ref regname.Reference, regDesc r
 		if ids.isImageIndex(manDesc) {
 			imgIndexTd, err := ids.buildImageIndex(ids.buildRef(ref, manDesc.Digest.String()), manDesc)
 			if err != nil {
-				return ImageIndexTarDescriptor{}, err
+				return ImageIndexDescriptor{}, err
 			}
 			td.Indexes = append(td.Indexes, imgIndexTd)
 		} else {
 			imgTd, err := ids.buildImage(ids.buildRef(ref, manDesc.Digest.String()))
 			if err != nil {
-				return ImageIndexTarDescriptor{}, err
+				return ImageIndexDescriptor{}, err
 			}
 			td.Images = append(td.Images, imgTd)
 		}
@@ -138,8 +138,8 @@ func (ids *ImageRefDescriptors) buildImageIndex(ref regname.Reference, regDesc r
 	return td, nil
 }
 
-func (ids *ImageRefDescriptors) buildImage(ref regname.Reference) (ImageTarDescriptor, error) {
-	td := ImageTarDescriptor{}
+func (ids *ImageRefDescriptors) buildImage(ref regname.Reference) (ImageDescriptor, error) {
+	td := ImageDescriptor{}
 
 	img, err := ids.registry.Image(ref)
 	if err != nil {
@@ -168,15 +168,15 @@ func (ids *ImageRefDescriptors) buildImage(ref regname.Reference) (ImageTarDescr
 		return td, err
 	}
 
-	td = ImageTarDescriptor{
+	td = ImageDescriptor{
 		Refs: []string{ref.String()},
 
-		Config: ConfigTarDescriptor{
+		Config: ConfigDescriptor{
 			Digest: cfgDigest.String(),
 			Raw:    string(cfgBlob),
 		},
 
-		Manifest: ManifestTarDescriptor{
+		Manifest: ManifestDescriptor{
 			MediaType: string(manifestMediaType),
 			Digest:    manifestDigest.String(),
 			Raw:       string(manifestBlob),
@@ -206,7 +206,7 @@ func (ids *ImageRefDescriptors) buildImage(ref regname.Reference) (ImageTarDescr
 			return td, err
 		}
 
-		layerTD := ImageLayerTarDescriptor{
+		layerTD := ImageLayerDescriptor{
 			MediaType: string(layerMediaType),
 			Digest:    layerDigest.String(),
 			DiffID:    layerDiffID.String(),
@@ -245,7 +245,7 @@ func (lc wrappedCompressedLayerContents) Open() (io.ReadCloser, error) {
 	return rc, nil
 }
 
-func (ids *ImageRefDescriptors) FindLayer(layerTD ImageLayerTarDescriptor) (LayerContents, error) {
+func (ids *ImageRefDescriptors) FindLayer(layerTD ImageLayerDescriptor) (LayerContents, error) {
 	ids.imageLayersLock.Lock()
 	defer ids.imageLayersLock.Unlock()
 
