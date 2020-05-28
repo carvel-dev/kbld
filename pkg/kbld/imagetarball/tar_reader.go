@@ -4,6 +4,7 @@ import (
 	"io/ioutil"
 
 	regv1 "github.com/google/go-containerregistry/pkg/v1"
+	"github.com/k14s/kbld/pkg/kbld/imagedesc"
 )
 
 type TarReader struct {
@@ -14,7 +15,7 @@ func NewTarReader(path string) TarReader {
 	return TarReader{path}
 }
 
-func (r TarReader) Read() ([]ImageOrIndex, error) {
+func (r TarReader) Read() ([]imagedesc.ImageOrIndex, error) {
 	file := tarFile{r.path}
 
 	manifestFile, err := file.Chunk("manifest.json").Open()
@@ -27,7 +28,7 @@ func (r TarReader) Read() ([]ImageOrIndex, error) {
 		return nil, err
 	}
 
-	ids, err := NewImageRefDescriptorsFromBytes(manifestBytes)
+	ids, err := imagedesc.NewImageRefDescriptorsFromBytes(manifestBytes)
 	if err != nil {
 		return nil, err
 	}
@@ -35,18 +36,18 @@ func (r TarReader) Read() ([]ImageOrIndex, error) {
 	return ReadFromTds(ids, file), nil
 }
 
-func ReadFromTds(ids *ImageRefDescriptors, layerProvider LayerProvider) []ImageOrIndex {
-	var result []ImageOrIndex
+func ReadFromTds(ids *imagedesc.ImageRefDescriptors, layerProvider imagedesc.LayerProvider) []imagedesc.ImageOrIndex {
+	var result []imagedesc.ImageOrIndex
 
-	for _, td := range ids.descs {
+	for _, td := range ids.Descriptors() {
 		switch {
 		case td.Image != nil:
-			var img ImageWithRef = describedImage{*td.Image, layerProvider}
-			result = append(result, ImageOrIndex{Image: &img})
+			var img imagedesc.ImageWithRef = imagedesc.NewDescribedImage(*td.Image, layerProvider)
+			result = append(result, imagedesc.ImageOrIndex{Image: &img})
 
 		case td.ImageIndex != nil:
 			idx := buildIndex(*td.ImageIndex, layerProvider)
-			result = append(result, ImageOrIndex{Index: &idx})
+			result = append(result, imagedesc.ImageOrIndex{Index: &idx})
 
 		default:
 			panic("Unknown item")
@@ -56,16 +57,18 @@ func ReadFromTds(ids *ImageRefDescriptors, layerProvider LayerProvider) []ImageO
 	return result
 }
 
-func buildIndex(iitd ImageIndexDescriptor, layerProvider LayerProvider) ImageIndexWithRef {
+func buildIndex(iitd imagedesc.ImageIndexDescriptor,
+	layerProvider imagedesc.LayerProvider) imagedesc.ImageIndexWithRef {
+
 	var images []regv1.Image
 	var indexes []regv1.ImageIndex
 
 	for _, imgTD := range iitd.Images {
-		images = append(images, describedImage{imgTD, layerProvider})
+		images = append(images, imagedesc.NewDescribedImage(imgTD, layerProvider))
 	}
 	for _, indexTD := range iitd.Indexes {
 		indexes = append(indexes, buildIndex(indexTD, layerProvider))
 	}
 
-	return describedImageIndex{iitd, images, indexes}
+	return imagedesc.NewDescribedImageIndex(iitd, images, indexes)
 }

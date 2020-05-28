@@ -7,6 +7,7 @@ import (
 
 	regname "github.com/google/go-containerregistry/pkg/name"
 	ctlimg "github.com/k14s/kbld/pkg/kbld/image"
+	"github.com/k14s/kbld/pkg/kbld/imagedesc"
 	regtarball "github.com/k14s/kbld/pkg/kbld/imagetarball"
 	ctlreg "github.com/k14s/kbld/pkg/kbld/registry"
 	"github.com/k14s/kbld/pkg/kbld/util"
@@ -43,7 +44,7 @@ func (o ImageSet) Export(foundImages *UnprocessedImageURLs,
 }
 
 func (o ImageSet) export2(foundImages *UnprocessedImageURLs,
-	registry ctlreg.Registry) (*regtarball.ImageRefDescriptors, error) {
+	registry ctlreg.Registry) (*imagedesc.ImageRefDescriptors, error) {
 
 	var refs []regname.Reference
 
@@ -58,7 +59,7 @@ func (o ImageSet) export2(foundImages *UnprocessedImageURLs,
 		refs = append(refs, ref)
 	}
 
-	ids, err := regtarball.NewImageRefDescriptors(refs, registry)
+	ids, err := imagedesc.NewImageRefDescriptors(refs, registry)
 	if err != nil {
 		return nil, fmt.Errorf("Collecting packaging metadata: %s", err)
 	}
@@ -66,7 +67,7 @@ func (o ImageSet) export2(foundImages *UnprocessedImageURLs,
 	return ids, nil
 }
 
-func (o ImageSet) exportAsTar(ids *regtarball.ImageRefDescriptors, outputPath string) error {
+func (o ImageSet) exportAsTar(ids *imagedesc.ImageRefDescriptors, outputPath string) error {
 	outputFile, err := os.Create(outputPath)
 	if err != nil {
 		return fmt.Errorf("Creating file '%s': %s", outputPath, err)
@@ -88,7 +89,7 @@ func (o ImageSet) exportAsTar(ids *regtarball.ImageRefDescriptors, outputPath st
 	return regtarball.NewTarWriter(ids, outputFileOpener, opts, o.logger).Write()
 }
 
-func (o *ImageSet) Import(imgOrIndexes []regtarball.ImageOrIndex,
+func (o *ImageSet) Import(imgOrIndexes []imagedesc.ImageOrIndex,
 	importRepo regname.Repository, registry ctlreg.Registry) (*ProcessedImages, error) {
 
 	importedImages := NewProcessedImages()
@@ -133,7 +134,7 @@ func (o *ImageSet) Import(imgOrIndexes []regtarball.ImageOrIndex,
 	return importedImages, nil
 }
 
-func (o *ImageSet) importImage(item regtarball.ImageOrIndex,
+func (o *ImageSet) importImage(item imagedesc.ImageOrIndex,
 	existingRef regname.Digest, importRepo regname.Repository,
 	registry ctlreg.Registry) (regname.Digest, error) {
 

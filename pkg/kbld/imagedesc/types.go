@@ -1,4 +1,4 @@
-package tarball
+package imagedesc
 
 import (
 	"io"

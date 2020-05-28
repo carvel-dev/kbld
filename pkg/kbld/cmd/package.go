@@ -8,7 +8,7 @@ import (
 	regname "github.com/google/go-containerregistry/pkg/name"
 	ctlconf "github.com/k14s/kbld/pkg/kbld/config"
 	ctlimg "github.com/k14s/kbld/pkg/kbld/image"
-	regtarball "github.com/k14s/kbld/pkg/kbld/imagetarball"
+	"github.com/k14s/kbld/pkg/kbld/imagedesc"
 	ctlreg "github.com/k14s/kbld/pkg/kbld/registry"
 	ctlres "github.com/k14s/kbld/pkg/kbld/resources"
 	ctlser "github.com/k14s/kbld/pkg/kbld/search"
@@ -24,7 +24,7 @@ type PackageOptions struct {
 	Concurrency   int
 }
 
-var _ regtarball.Registry = ctlreg.Registry{}
+var _ imagedesc.Registry = ctlreg.Registry{}
 
 func NewPackageOptions(ui ui.UI) *PackageOptions {
 	return &PackageOptions{ui: ui}

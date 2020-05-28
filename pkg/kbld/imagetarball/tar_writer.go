@@ -10,6 +10,7 @@ import (
 	"time"
 
 	regv1 "github.com/google/go-containerregistry/pkg/v1"
+	"github.com/k14s/kbld/pkg/kbld/imagedesc"
 	"github.com/k14s/kbld/pkg/kbld/util"
 )
 
@@ -22,18 +23,18 @@ type TarWriterOpts struct {
 }
 
 type TarWriter struct {
-	ids       *ImageRefDescriptors
+	ids       *imagedesc.ImageRefDescriptors
 	dstOpener func() (io.WriteCloser, error)
 
 	dst           io.WriteCloser
 	tf            *tar.Writer
-	layersToWrite []ImageLayerDescriptor
+	layersToWrite []imagedesc.ImageLayerDescriptor
 
 	opts   TarWriterOpts
 	logger Logger
 }
 
-func NewTarWriter(ids *ImageRefDescriptors, dstOpener func() (io.WriteCloser, error),
+func NewTarWriter(ids *imagedesc.ImageRefDescriptors, dstOpener func() (io.WriteCloser, error),
 	opts TarWriterOpts, logger Logger) *TarWriter {
 	return &TarWriter{ids: ids, dstOpener: dstOpener, opts: opts, logger: logger}
 }
@@ -61,7 +62,7 @@ func (w *TarWriter) Write() error {
 		return err
 	}
 
-	for _, td := range w.ids.descs {
+	for _, td := range w.ids.Descriptors() {
 		switch {
 		case td.Image != nil:
 			err := w.writeImage(*td.Image)
@@ -83,7 +84,7 @@ func (w *TarWriter) Write() error {
 	return w.writeLayers()
 }
 
-func (w *TarWriter) writeImageIndex(td ImageIndexDescriptor) error {
+func (w *TarWriter) writeImageIndex(td imagedesc.ImageIndexDescriptor) error {
 	for _, idx := range td.Indexes {
 		err := w.writeImageIndex(idx)
 		if err != nil {
@@ -101,7 +102,7 @@ func (w *TarWriter) writeImageIndex(td ImageIndexDescriptor) error {
 	return nil
 }
 
-func (w *TarWriter) writeImage(td ImageDescriptor) error {
+func (w *TarWriter) writeImage(td imagedesc.ImageDescriptor) error {
 	for _, imgLayer := range td.Layers {
 		// TODO anything else we can do to deal with this?
 		// Do not include foreign layers since we cannot
@@ -116,7 +117,7 @@ func (w *TarWriter) writeImage(td ImageDescriptor) error {
 type writtenLayer struct {
 	Name   string
 	Offset int64
-	Layer  ImageLayerDescriptor
+	Layer  imagedesc.ImageLayerDescriptor
 }
 
 func (w *TarWriter) writeLayers() error {
