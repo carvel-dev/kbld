@@ -2,13 +2,10 @@ package cmd
 
 import (
 	"fmt"
-	"io"
-	"os"
 
 	regname "github.com/google/go-containerregistry/pkg/name"
 	ctlimg "github.com/k14s/kbld/pkg/kbld/image"
 	"github.com/k14s/kbld/pkg/kbld/imagedesc"
-	"github.com/k14s/kbld/pkg/kbld/imagetar"
 	ctlreg "github.com/k14s/kbld/pkg/kbld/registry"
 	"github.com/k14s/kbld/pkg/kbld/util"
 )
@@ -21,7 +18,7 @@ type ImageSet struct {
 func (o ImageSet) Relocate(foundImages *UnprocessedImageURLs,
 	importRepo regname.Repository, registry ctlreg.Registry) (*ProcessedImages, error) {
 
-	ids, err := o.export2(foundImages, registry)
+	ids, err := o.Export(foundImages, registry)
 	if err != nil {
 		return nil, err
 	}
@@ -30,21 +27,10 @@ func (o ImageSet) Relocate(foundImages *UnprocessedImageURLs,
 }
 
 func (o ImageSet) Export(foundImages *UnprocessedImageURLs,
-	outputPath string, registry ctlreg.Registry) error {
+	registry ctlreg.Registry) (*imagedesc.ImageRefDescriptors, error) {
 
 	o.logger.WriteStr("exporting %d images...\n", len(foundImages.All()))
 	defer func() { o.logger.WriteStr("exported %d images\n", len(foundImages.All())) }()
-
-	ids, err := o.export2(foundImages, registry)
-	if err != nil {
-		return err
-	}
-
-	return o.exportAsTar(ids, outputPath)
-}
-
-func (o ImageSet) export2(foundImages *UnprocessedImageURLs,
-	registry ctlreg.Registry) (*imagedesc.ImageRefDescriptors, error) {
 
 	var refs []regname.Reference
 
@@ -65,28 +51,6 @@ func (o ImageSet) export2(foundImages *UnprocessedImageURLs,
 	}
 
 	return ids, nil
-}
-
-func (o ImageSet) exportAsTar(ids *imagedesc.ImageRefDescriptors, outputPath string) error {
-	outputFile, err := os.Create(outputPath)
-	if err != nil {
-		return fmt.Errorf("Creating file '%s': %s", outputPath, err)
-	}
-
-	err = outputFile.Close()
-	if err != nil {
-		return err
-	}
-
-	outputFileOpener := func() (io.WriteCloser, error) {
-		return os.OpenFile(outputPath, os.O_RDWR, 0755)
-	}
-
-	opts := imagetar.TarWriterOpts{Concurrency: o.concurrency}
-
-	o.logger.WriteStr("writing layers...\n")
-
-	return imagetar.NewTarWriter(ids, outputFileOpener, opts, o.logger).Write()
 }
 
 func (o *ImageSet) Import(imgOrIndexes []imagedesc.ImageOrIndex,

@@ -9,7 +9,6 @@ import (
 	regname "github.com/google/go-containerregistry/pkg/name"
 	ctlconf "github.com/k14s/kbld/pkg/kbld/config"
 	ctlimg "github.com/k14s/kbld/pkg/kbld/image"
-	"github.com/k14s/kbld/pkg/kbld/imagetar"
 	ctlreg "github.com/k14s/kbld/pkg/kbld/registry"
 	ctlres "github.com/k14s/kbld/pkg/kbld/resources"
 	ctlser "github.com/k14s/kbld/pkg/kbld/search"
@@ -64,22 +63,17 @@ func (o *UnpackageOptions) Run() error {
 		return err
 	}
 
-	imgOrIndexes, err := imagetar.NewTarReader(o.InputPath).Read()
-	if err != nil {
-		return err
-	}
-
 	importRepo, err := regname.NewRepository(o.Repository)
 	if err != nil {
 		return fmt.Errorf("Building import repository ref: %s", err)
 	}
 
-	dstRegistry := ctlreg.NewRegistry(o.RegistryFlags.AsRegistryOpts())
+	registry := ctlreg.NewRegistry(o.RegistryFlags.AsRegistryOpts())
 
-	imageSet := ImageSet{o.Concurrency, prefixedLogger}
+	imageSet := TarImageSet{ImageSet{o.Concurrency, prefixedLogger}, o.Concurrency, prefixedLogger}
 
 	// Import images used in the manifests
-	importedImages, err := imageSet.Import(imgOrIndexes, importRepo, dstRegistry)
+	importedImages, err := imageSet.Import(o.InputPath, importRepo, registry)
 	if err != nil {
 		return err
 	}
