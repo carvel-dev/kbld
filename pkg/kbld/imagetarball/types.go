@@ -1,8 +1,34 @@
 package tarball
 
 import (
+	"io"
+
+	regv1 "github.com/google/go-containerregistry/pkg/v1"
 	regv1types "github.com/google/go-containerregistry/pkg/v1/types"
 )
+
+type ImageOrIndex struct {
+	Image *ImageWithRef
+	Index *ImageIndexWithRef
+}
+
+type ImageWithRef interface {
+	regv1.Image
+	Ref() string
+}
+
+type ImageIndexWithRef interface {
+	regv1.ImageIndex
+	Ref() string
+}
+
+type LayerProvider interface {
+	FindLayer(ImageLayerDescriptor) (LayerContents, error)
+}
+
+type LayerContents interface {
+	Open() (io.ReadCloser, error)
+}
 
 type ImageOrImageIndexDescriptor struct {
 	ImageIndex *ImageIndexDescriptor

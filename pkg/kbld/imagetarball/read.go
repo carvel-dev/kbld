@@ -1,36 +1,12 @@
 package tarball
 
 import (
-	"io"
 	"io/ioutil"
 
 	regv1 "github.com/google/go-containerregistry/pkg/v1"
 )
 
-type ImageWithRef interface {
-	regv1.Image
-	Ref() string
-}
-
-type ImageIndexWithRef interface {
-	regv1.ImageIndex
-	Ref() string
-}
-
-type LayerContents interface {
-	Open() (io.ReadCloser, error)
-}
-
-type LayerProvider interface {
-	FindLayer(ImageLayerDescriptor) (LayerContents, error)
-}
-
-type TarImageOrIndex struct {
-	Image *ImageWithRef
-	Index *ImageIndexWithRef
-}
-
-func (t TarImageOrIndex) Digest() (regv1.Hash, error) {
+func (t ImageOrIndex) Digest() (regv1.Hash, error) {
 	switch {
 	case t.Image != nil:
 		return (*t.Image).Digest()
@@ -41,7 +17,7 @@ func (t TarImageOrIndex) Digest() (regv1.Hash, error) {
 	}
 }
 
-func (t TarImageOrIndex) Ref() string {
+func (t ImageOrIndex) Ref() string {
 	switch {
 	case t.Image != nil:
 		return (*t.Image).Ref()
@@ -52,7 +28,7 @@ func (t TarImageOrIndex) Ref() string {
 	}
 }
 
-func MultiRefReadFromFile(path string) ([]TarImageOrIndex, error) {
+func MultiRefReadFromFile(path string) ([]ImageOrIndex, error) {
 	file := tarFile{path}
 
 	manifestFile, err := file.Chunk("manifest.json").Open()
@@ -73,18 +49,18 @@ func MultiRefReadFromFile(path string) ([]TarImageOrIndex, error) {
 	return ReadFromTds(ids, file), nil
 }
 
-func ReadFromTds(ids *ImageRefDescriptors, layerProvider LayerProvider) []TarImageOrIndex {
-	var result []TarImageOrIndex
+func ReadFromTds(ids *ImageRefDescriptors, layerProvider LayerProvider) []ImageOrIndex {
+	var result []ImageOrIndex
 
 	for _, td := range ids.descs {
 		switch {
 		case td.Image != nil:
 			var img ImageWithRef = tarImage{*td.Image, layerProvider}
-			result = append(result, TarImageOrIndex{Image: &img})
+			result = append(result, ImageOrIndex{Image: &img})
 
 		case td.ImageIndex != nil:
 			idx := buildIndex(*td.ImageIndex, layerProvider)
-			result = append(result, TarImageOrIndex{Index: &idx})
+			result = append(result, ImageOrIndex{Index: &idx})
 
 		default:
 			panic("Unknown item")

@@ -88,7 +88,7 @@ func (o ImageSet) exportAsTar(ids *regtarball.ImageRefDescriptors, outputPath st
 	return regtarball.NewTarWriter(ids, outputFileOpener, opts, o.logger).Write()
 }
 
-func (o *ImageSet) Import(imgOrIndexes []regtarball.TarImageOrIndex,
+func (o *ImageSet) Import(imgOrIndexes []regtarball.ImageOrIndex,
 	importRepo regname.Repository, registry ctlreg.Registry) (*ProcessedImages, error) {
 
 	importedImages := NewProcessedImages()
@@ -133,7 +133,7 @@ func (o *ImageSet) Import(imgOrIndexes []regtarball.TarImageOrIndex,
 	return importedImages, nil
 }
 
-func (o *ImageSet) importImage(item regtarball.TarImageOrIndex,
+func (o *ImageSet) importImage(item regtarball.ImageOrIndex,
 	existingRef regname.Digest, importRepo regname.Repository,
 	registry ctlreg.Registry) (regname.Digest, error) {
 
