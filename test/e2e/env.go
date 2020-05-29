@@ -9,12 +9,14 @@ import (
 type Env struct {
 	Namespace            string
 	DockerHubUsername    string
+	DockerHubHostname    string
 	SkipCFImagesDownload bool
 }
 
 func BuildEnv(t *testing.T) Env {
 	env := Env{
 		DockerHubUsername:    os.Getenv("KBLD_E2E_DOCKERHUB_USERNAME"),
+		DockerHubHostname:    os.Getenv("KBLD_E2E_DOCKERHUB_HOSTNAME"),
 		SkipCFImagesDownload: os.Getenv("KBLD_E2E_SKIP_CF_IMAGES_DOWNLOAD") == "true",
 	}
 	env.Validate(t)
@@ -34,8 +36,12 @@ func (e Env) Validate(t *testing.T) {
 }
 
 func (e Env) WithRegistries(input string) string {
-	for _, prefix := range []string{"index.docker.io/", "docker.io/"} {
-		input = strings.Replace(input, prefix+"*username*/", prefix+e.DockerHubUsername+"/", -1)
+	for _, hostname := range []string{"index.docker.io/", "docker.io/"} {
+		newHostname := hostname
+		if len(e.DockerHubHostname) > 0 {
+			newHostname = e.DockerHubHostname + "/"
+		}
+		input = strings.Replace(input, hostname+"*username*/", newHostname+e.DockerHubUsername+"/", -1)
 	}
 	return input
 }
