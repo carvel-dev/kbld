@@ -8,7 +8,7 @@ import (
 
 func TestDockerBuildSuccessful(t *testing.T) {
 	env := BuildEnv(t)
-	kbld := Kbld{t, env.Namespace, Logger{}}
+	kbld := Kbld{t, env.Namespace, env.KbldBinaryPath, Logger{}}
 
 	input := env.WithRegistries(`
 kind: Object
@@ -48,8 +48,9 @@ overrides:
 		StdinReader: strings.NewReader(input),
 	})
 
+	// kbld:192-168-99-100-30777-minikube-tests-kbld-e2e-tests-SHA256-REPLACED
 	out = regexp.MustCompile("sha256\\-[a-z0-9]{64}").ReplaceAllString(out, "SHA256-REPLACED")
-	out = regexp.MustCompile("docker-io-(.+)-kbld-e2e-tests-build-SHA256-REPLACED").ReplaceAllString(out, "img-title-SHA256-REPLACED")
+	out = regexp.MustCompile("kbld:(.+)-kbld-e2e(\\-.*)-SHA256-REPLACED").ReplaceAllString(out, "kbld:img-title-SHA256-REPLACED")
 
 	expectedOut := `---
 kind: Object
@@ -67,7 +68,7 @@ spec:
 
 func TestDockerBuildAndPushSuccessful(t *testing.T) {
 	env := BuildEnv(t)
-	kbld := Kbld{t, env.Namespace, Logger{}}
+	kbld := Kbld{t, env.Namespace, env.KbldBinaryPath, Logger{}}
 
 	input := env.WithRegistries(`
 kind: Object
@@ -127,7 +128,7 @@ spec:
 // to avoid having tags that are too long.
 func TestDockerBuildSuccessfulWithImageRepo(t *testing.T) {
 	env := BuildEnv(t)
-	kbld := Kbld{t, env.Namespace, Logger{}}
+	kbld := Kbld{t, env.Namespace, env.KbldBinaryPath, Logger{}}
 
 	input := env.WithRegistries(`
 kind: Object

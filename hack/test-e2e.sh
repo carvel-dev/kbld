@@ -9,6 +9,8 @@ fi
 
 go clean -testcache
 
+export KBLD_BINARY_PATH="${KBLD_BINARY_PATH:-$PWD/kbld}"
+
 go test ./test/e2e/ -timeout 60m -test.v $@
 
 echo E2E SUCCESS
