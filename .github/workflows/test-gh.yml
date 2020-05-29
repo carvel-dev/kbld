@@ -18,16 +18,22 @@ jobs:
         set -e -x
         export GOPATH=$(echo `pwd`/../../../../)
 
-        # install ytt for build
-        mkdir -p tmp-k14s/bin/
-        wget -O- https://k14s.io/install.sh | K14SIO_INSTALL_BIN_DIR=tmp-k14s/bin bash
-        rm -f tmp-k14s/bin/kbld
-        export PATH=`pwd`/tmp-k14s/bin:$PATH
+        # Install ytt, kapp for build and tests
+        mkdir -p /tmp/bin
+        export PATH=/tmp/bin:$PATH
+
+        wget -O- https://k14s.io/install.sh | K14SIO_INSTALL_BIN_DIR=/tmp/bin bash
+
+        wget -O- https://github.com/kubernetes/minikube/releases/download/v1.10.0/minikube-linux-amd64 > /tmp/bin/minikube
+        chmod +x /tmp/bin/minikube
+        minikube start --driver=docker
+        eval $(minikube docker-env --shell=bash)
+
+        # Ensure that there is no existing kbld installed
+        rm -f /tmp/bin/kbld
 
         git config --global user.email "dummy@k14s.io"
         git config --global user.name "Dummy dummy"
 
-        ./hack/build.sh
-        ./hack/test.sh
+        ./hack/test-all-minikube-local-registry.sh
         ./hack/build-binaries.sh
-        # TODO no e2e since there is no docker creds env
