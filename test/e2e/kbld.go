@@ -13,6 +13,7 @@ import (
 type Kbld struct {
 	t         *testing.T
 	namespace string
+	kbldPath  string
 	l         Logger
 }
 
@@ -35,8 +36,7 @@ func (k Kbld) RunWithOpts(args []string, opts RunOpts) (string, error) {
 
 	k.l.Debugf("Running '%s'...\n", k.cmdDesc(args, opts))
 
-	cmdName := "kbld"
-	cmd := exec.Command(cmdName, args...)
+	cmd := exec.Command(k.kbldPath, args...)
 	cmd.Stdin = opts.StdinReader
 
 	var stderr, stdout bytes.Buffer

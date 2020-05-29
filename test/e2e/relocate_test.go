@@ -7,7 +7,7 @@ import (
 
 func TestRelocateSuccessful(t *testing.T) {
 	env := BuildEnv(t)
-	kbld := Kbld{t, env.Namespace, Logger{}}
+	kbld := Kbld{t, env.Namespace, env.KbldBinaryPath, Logger{}}
 
 	// redis:5.0.4
 	input := `

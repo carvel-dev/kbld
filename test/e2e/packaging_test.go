@@ -14,7 +14,7 @@ import (
 
 func TestPkgUnpkgSuccessful(t *testing.T) {
 	env := BuildEnv(t)
-	kbld := Kbld{t, env.Namespace, Logger{}}
+	kbld := Kbld{t, env.Namespace, env.KbldBinaryPath, Logger{}}
 
 	// redis:5.0.4
 	input := `
@@ -57,7 +57,7 @@ spec:
 
 func TestPkgUnpkgLockSuccessful(t *testing.T) {
 	env := BuildEnv(t)
-	kbld := Kbld{t, env.Namespace, Logger{}}
+	kbld := Kbld{t, env.Namespace, env.KbldBinaryPath, Logger{}}
 
 	input := `
 apiVersion: kbld.k14s.io/v1alpha1
@@ -117,7 +117,7 @@ overrides:
 
 func TestPkgUnpkgSuccessfulWithForeignLayers(t *testing.T) {
 	env := BuildEnv(t)
-	kbld := Kbld{t, env.Namespace, Logger{}}
+	kbld := Kbld{t, env.Namespace, env.KbldBinaryPath, Logger{}}
 
 	input := `
 kind: Object
@@ -161,7 +161,7 @@ func TestPkgUnpkgSuccessfulCfManyImages(t *testing.T) {
 		return
 	}
 
-	kbld := Kbld{t, env.Namespace, Logger{}}
+	kbld := Kbld{t, env.Namespace, env.KbldBinaryPath, Logger{}}
 
 	input := `
 apiVersion: kbld.k14s.io/v1alpha1

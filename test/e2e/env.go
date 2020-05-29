@@ -11,13 +11,20 @@ type Env struct {
 	DockerHubUsername    string
 	DockerHubHostname    string
 	SkipCFImagesDownload bool
+	KbldBinaryPath       string
 }
 
 func BuildEnv(t *testing.T) Env {
+	kbldPath := os.Getenv("KBLD_BINARY_PATH")
+	if kbldPath == "" {
+		kbldPath = "kbld"
+	}
+
 	env := Env{
 		DockerHubUsername:    os.Getenv("KBLD_E2E_DOCKERHUB_USERNAME"),
 		DockerHubHostname:    os.Getenv("KBLD_E2E_DOCKERHUB_HOSTNAME"),
 		SkipCFImagesDownload: os.Getenv("KBLD_E2E_SKIP_CF_IMAGES_DOWNLOAD") == "true",
+		KbldBinaryPath:       kbldPath,
 	}
 	env.Validate(t)
 	return env
