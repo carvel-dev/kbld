@@ -35,5 +35,8 @@ jobs:
         git config --global user.email "dummy@k14s.io"
         git config --global user.name "Dummy dummy"
 
+        wget -O- https://github.com/buildpacks/pack/releases/download/v0.8.1/pack-v0.8.1-linux.tgz > /tmp/pack-cli.tgz
+        tar xzvf /tmp/pack-cli.tgz -C /tmp/bin
+
         ./hack/test-all-minikube-local-registry.sh
         ./hack/build-binaries.sh
