@@ -26,7 +26,7 @@ jobs:
 
         wget -O- https://github.com/kubernetes/minikube/releases/download/v1.10.0/minikube-linux-amd64 > /tmp/bin/minikube
         chmod +x /tmp/bin/minikube
-        minikube start --driver=docker
+        minikube start --driver=docker --insecure-registry=172.17.0.0/16
         eval $(minikube docker-env --shell=bash)
 
         # Ensure that there is no existing kbld installed
