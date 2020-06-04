@@ -61,7 +61,11 @@ func (o *ResolveOptions) Run() error {
 		return err
 	}
 
-	registry := ctlreg.NewRegistry(o.RegistryFlags.AsRegistryOpts())
+	registry, err := ctlreg.NewRegistry(o.RegistryFlags.AsRegistryOpts())
+	if err != nil {
+		return err
+	}
+
 	imgFactory := ctlimg.NewFactory(conf, registry, logger)
 
 	resolvedImages, err := o.resolveImages(nonConfigRs, conf, imgFactory)

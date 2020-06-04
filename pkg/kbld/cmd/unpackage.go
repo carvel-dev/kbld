@@ -68,7 +68,10 @@ func (o *UnpackageOptions) Run() error {
 		return fmt.Errorf("Building import repository ref: %s", err)
 	}
 
-	registry := ctlreg.NewRegistry(o.RegistryFlags.AsRegistryOpts())
+	registry, err := ctlreg.NewRegistry(o.RegistryFlags.AsRegistryOpts())
+	if err != nil {
+		return err
+	}
 
 	imageSet := TarImageSet{ImageSet{o.Concurrency, prefixedLogger}, o.Concurrency, prefixedLogger}
 

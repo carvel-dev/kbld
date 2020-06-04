@@ -62,7 +62,11 @@ func (o *PackageOptions) Run() error {
 		return err
 	}
 
-	registry := ctlreg.NewRegistry(o.RegistryFlags.AsRegistryOpts())
+	registry, err := ctlreg.NewRegistry(o.RegistryFlags.AsRegistryOpts())
+	if err != nil {
+		return err
+	}
+
 	imageSet := TarImageSet{ImageSet{o.Concurrency, prefixedLogger}, o.Concurrency, prefixedLogger}
 
 	return imageSet.Export(foundImages, o.OutputPath, registry)

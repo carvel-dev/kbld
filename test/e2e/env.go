@@ -7,11 +7,11 @@ import (
 )
 
 type Env struct {
-	Namespace            string
-	DockerHubUsername    string
-	DockerHubHostname    string
-	SkipCFImagesDownload bool
-	KbldBinaryPath       string
+	Namespace         string
+	DockerHubUsername string
+	DockerHubHostname string
+	SkipStressTests   bool
+	KbldBinaryPath    string
 }
 
 func BuildEnv(t *testing.T) Env {
@@ -21,10 +21,10 @@ func BuildEnv(t *testing.T) Env {
 	}
 
 	env := Env{
-		DockerHubUsername:    os.Getenv("KBLD_E2E_DOCKERHUB_USERNAME"),
-		DockerHubHostname:    os.Getenv("KBLD_E2E_DOCKERHUB_HOSTNAME"),
-		SkipCFImagesDownload: os.Getenv("KBLD_E2E_SKIP_CF_IMAGES_DOWNLOAD") == "true",
-		KbldBinaryPath:       kbldPath,
+		DockerHubUsername: os.Getenv("KBLD_E2E_DOCKERHUB_USERNAME"),
+		DockerHubHostname: os.Getenv("KBLD_E2E_DOCKERHUB_HOSTNAME"),
+		SkipStressTests:   os.Getenv("KBLD_E2E_SKIP_STRESS_TESTS") == "true",
+		KbldBinaryPath:    kbldPath,
 	}
 	env.Validate(t)
 	return env

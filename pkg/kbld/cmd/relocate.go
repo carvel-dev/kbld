@@ -72,7 +72,10 @@ func (o *RelocateOptions) Run() error {
 		return fmt.Errorf("Building import repository ref: %s", err)
 	}
 
-	dstRegistry := ctlreg.NewRegistry(o.RegistryFlags.AsRegistryOpts())
+	dstRegistry, err := ctlreg.NewRegistry(o.RegistryFlags.AsRegistryOpts())
+	if err != nil {
+		return err
+	}
 
 	imageSet := ImageSet{o.Concurrency, prefixedLogger}
 
