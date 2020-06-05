@@ -223,6 +223,10 @@ func (o *ResolveOptions) emitLockOutput(conf ctlconf.Conf, resolvedImages *Proce
 			},
 			NewImage:    urlImagePair.Image.URL,
 			Preresolved: true,
+			Metadata: ctlconf.Metadata{
+				URL:        urlImagePair.Image.URL,
+				SourceURLs: urlImagePair.Image.Metadata(),
+			},
 		})
 	}
 

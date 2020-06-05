@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 	"io/ioutil"
+	"reflect"
 
 	"github.com/ghodss/yaml"
 	semver "github.com/hashicorp/go-version"
@@ -48,6 +49,12 @@ type ImageOverride struct {
 	ImageRef
 	NewImage    string `json:"newImage"`
 	Preresolved bool   `json:"preresolved,omitempty"`
+	Metadata    `json:"metadata"`
+}
+
+type Metadata struct {
+	URL        string        `json:"url"`
+	SourceURLs []interface{} `json:"source_urls"`
 }
 
 type ImageDestination struct {
@@ -270,7 +277,7 @@ func UniqueImageOverrides(overrides []ImageOverride) []ImageOverride {
 	for _, override := range overrides {
 		var found bool
 		for _, addedOverride := range result {
-			if addedOverride == override {
+			if reflect.DeepEqual(addedOverride, override) {
 				found = true
 				break
 			}

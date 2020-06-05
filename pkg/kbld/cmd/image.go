@@ -34,6 +34,15 @@ func (i Image) Description() string {
 	return strings.TrimSpace(string(yamlBytes))
 }
 
+func (i Image) Metadata() []interface{} {
+	var result []interface{}
+	for _, meta := range i.Metas {
+		result = append(result, meta)
+	}
+
+	return result
+}
+
 type imageStruct struct {
 	URL   string
 	Metas []interface{}

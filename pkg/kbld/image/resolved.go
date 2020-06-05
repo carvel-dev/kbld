@@ -14,9 +14,9 @@ type ResolvedImage struct {
 }
 
 type ResolvedImageSourceURL struct {
-	Type string // always set to 'resolved'
-	URL  string
-	Tag  string
+	Type string `json:"type"` // always set to 'resolved'
+	URL  string `json:"url"`
+	Tag  string `json:"tag"`
 }
 
 func (ResolvedImageSourceURL) meta() {}

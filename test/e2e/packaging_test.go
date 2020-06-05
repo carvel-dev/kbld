@@ -103,9 +103,21 @@ kind: Config
 minimumRequiredVersion: __ver__
 overrides:
 - image: redis
+  metadata:
+    source_urls:
+    - tag: ""
+      type: resolved
+      url: redis
+    url: index.docker.io/*username*/kbld-test-pkg-unpkg@sha256:000339fb57e0ddf2d48d72f3341e47a8ca3b1beae9bdcb25a96323095b72a79b
   newImage: index.docker.io/*username*/kbld-test-pkg-unpkg@sha256:000339fb57e0ddf2d48d72f3341e47a8ca3b1beae9bdcb25a96323095b72a79b
   preresolved: true
 - image: index.docker.io/library/redis@sha256:000339fb57e0ddf2d48d72f3341e47a8ca3b1beae9bdcb25a96323095b72a79b
+  metadata:
+    source_urls:
+    - tag: ""
+      type: resolved
+      url: kbld-test-pkg-unpkg
+    url: index.docker.io/*username*/kbld-test-pkg-unpkg@sha256:000339fb57e0ddf2d48d72f3341e47a8ca3b1beae9bdcb25a96323095b72a79b
   newImage: index.docker.io/*username*/kbld-test-pkg-unpkg@sha256:000339fb57e0ddf2d48d72f3341e47a8ca3b1beae9bdcb25a96323095b72a79b
   preresolved: true
 `), "__ver__", version.Version)
