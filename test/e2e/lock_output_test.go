@@ -62,7 +62,7 @@ minimumRequiredVersion: __ver__
 overrides:
 - image: nginx:1.14.2
   metadata:
-    source_urls:
+  - metas:
     - tag: 1.14.2
       type: resolved
       url: nginx:1.14.2
@@ -71,7 +71,7 @@ overrides:
   preresolved: true
 - image: sample-app
   metadata:
-    source_urls:
+  - metas:
     - tag: 1.15.1
       type: resolved
       url: nginx:1.15.1

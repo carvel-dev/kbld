@@ -44,8 +44,8 @@ func (i Image) Metadata() []interface{} {
 }
 
 type imageStruct struct {
-	URL   string
-	Metas []interface{}
+	URL   string        `json:"url"`
+	Metas []interface{} `json:"metas"`
 }
 
 func newImageStructs(images []Image) []imageStruct {

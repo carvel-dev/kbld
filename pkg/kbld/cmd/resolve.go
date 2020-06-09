@@ -83,7 +83,7 @@ func (o *ResolveOptions) Run() error {
 		return err
 	}
 
-	resBss, err := o.updateRefsInResources(nonConfigRs, conf, resolvedImages, imgFactory)
+	resBss, err := o.updateRefsInResources(nonConfigRs, conf, resolvedImages)
 	if err != nil {
 		return fmt.Errorf("Updating resource references: %s", err)
 	}
@@ -122,8 +122,7 @@ func (o *ResolveOptions) resolveImages(nonConfigRs []ctlres.Resource,
 }
 
 func (o *ResolveOptions) updateRefsInResources(nonConfigRs []ctlres.Resource,
-	conf ctlconf.Conf, resolvedImages *ProcessedImages,
-	imgFactory ctlimg.Factory) ([][]byte, error) {
+	conf ctlconf.Conf, resolvedImages *ProcessedImages) ([][]byte, error) {
 
 	var errs []error
 	var resBss [][]byte
@@ -223,9 +222,11 @@ func (o *ResolveOptions) emitLockOutput(conf ctlconf.Conf, resolvedImages *Proce
 			},
 			NewImage:    urlImagePair.Image.URL,
 			Preresolved: true,
-			Metadata: ctlconf.Metadata{
-				URL:        urlImagePair.Image.URL,
-				SourceURLs: urlImagePair.Image.Metadata(),
+			Metadata: []ctlconf.Metadata{
+				{
+					URL:   urlImagePair.Image.URL,
+					Metas: urlImagePair.Image.Metadata(),
+				},
 			},
 		})
 	}

@@ -61,16 +61,16 @@ kind: Object
 metadata:
   annotations:
     kbld.k14s.io/images: |
-      - Metas:
-        - Tag: 1.14.2
-          Type: resolved
-          URL: nginx:1.14.2
-        URL: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
-      - Metas:
-        - Tag: 1.14.2
-          Type: resolved
-          URL: library/nginx:1.14.2
-        URL: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
+      - metas:
+        - tag: 1.14.2
+          type: resolved
+          url: nginx:1.14.2
+        url: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
+      - metas:
+        - tag: 1.14.2
+          type: resolved
+          url: library/nginx:1.14.2
+        url: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
 spec:
 - image: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
 - image: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d

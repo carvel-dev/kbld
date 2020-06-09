@@ -47,14 +47,14 @@ type Source struct {
 
 type ImageOverride struct {
 	ImageRef
-	NewImage    string `json:"newImage"`
-	Preresolved bool   `json:"preresolved,omitempty"`
-	Metadata    `json:"metadata"`
+	NewImage    string     `json:"newImage"`
+	Preresolved bool       `json:"preresolved,omitempty"`
+	Metadata    []Metadata `json:"metadata"`
 }
 
 type Metadata struct {
-	URL        string        `json:"url"`
-	SourceURLs []interface{} `json:"source_urls"`
+	URL   string        `json:"url"`
+	Metas []interface{} `json:"metas"`
 }
 
 type ImageDestination struct {
@@ -277,7 +277,7 @@ func UniqueImageOverrides(overrides []ImageOverride) []ImageOverride {
 	for _, override := range overrides {
 		var found bool
 		for _, addedOverride := range result {
-			if reflect.DeepEqual(addedOverride, override) {
+			if isEqual(addedOverride, override) {
 				found = true
 				break
 			}
@@ -287,6 +287,15 @@ func UniqueImageOverrides(overrides []ImageOverride) []ImageOverride {
 		}
 	}
 	return result
+}
+
+func isEqual(a, b ImageOverride) bool {
+	if a.ImageRef == b.ImageRef &&
+		a.Preresolved == b.Preresolved &&
+		a.NewImage == b.NewImage {
+		return true
+	}
+	return false
 }
 
 func (r SearchRule) UpdateStrategyWithDefaults() SearchRuleUpdateStrategy {
