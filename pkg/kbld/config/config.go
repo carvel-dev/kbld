@@ -3,7 +3,6 @@ package config
 import (
 	"fmt"
 	"io/ioutil"
-	"reflect"
 
 	"github.com/ghodss/yaml"
 	semver "github.com/hashicorp/go-version"
