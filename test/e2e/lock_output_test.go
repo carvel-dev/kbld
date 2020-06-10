@@ -11,7 +11,7 @@ import (
 
 func TestLockOutputSuccessful(t *testing.T) {
 	env := BuildEnv(t)
-	kbld := Kbld{t, env.Namespace, Logger{}}
+	kbld := Kbld{t, env.Namespace, env.KbldBinaryPath, Logger{}}
 
 	input := `
 images:

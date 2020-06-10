@@ -16,49 +16,54 @@ import (
 	"github.com/spf13/cobra"
 )
 
-type UnpackageOptions struct {
+type RelocateOptions struct {
 	ui ui.UI
 
 	FileFlags     FileFlags
 	RegistryFlags RegistryFlags
-	InputPath     string
 	Repository    string
 	LockOutput    string
 	Concurrency   int
 }
 
-func NewUnpackageOptions(ui ui.UI) *UnpackageOptions {
-	return &UnpackageOptions{ui: ui}
+func NewRelocateOptions(ui ui.UI) *RelocateOptions {
+	return &RelocateOptions{ui: ui}
 }
 
-func NewUnpackageCmd(o *UnpackageOptions) *cobra.Command {
+func NewRelocateCmd(o *RelocateOptions) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "unpackage",
-		Aliases: []string{"unpkg"},
-		Short:   "Unpackage configuration and images from tarball",
-		RunE:    func(_ *cobra.Command, _ []string) error { return o.Run() },
+		Use:   "relocate",
+		Short: "Relocate images between two registries",
+		RunE:  func(_ *cobra.Command, _ []string) error { return o.Run() },
 	}
 	o.FileFlags.Set(cmd)
 	o.RegistryFlags.Set(cmd)
-	cmd.Flags().StringVarP(&o.InputPath, "input", "i", "", "Input tarball path")
 	cmd.Flags().StringVarP(&o.Repository, "repository", "r", "", "Import images into given image repository (e.g. docker.io/dkalinin/my-project)")
 	cmd.Flags().StringVar(&o.LockOutput, "lock-output", "", "File path to emit configuration with resolved image references")
 	cmd.Flags().IntVar(&o.Concurrency, "concurrency", 5, "Set maximum number of concurrent imports")
 	return cmd
 }
 
-func (o *UnpackageOptions) Run() error {
-	if len(o.InputPath) == 0 {
-		return fmt.Errorf("Expected 'input' flag to be non-empty")
-	}
+func (o *RelocateOptions) Run() error {
+	// basic checks
 	if len(o.Repository) == 0 {
-		return fmt.Errorf("Expected 'repository' flag to be non-empty")
+		return fmt.Errorf("Expected repository flag to be non-empty")
+	}
+
+	if len(o.FileFlags.Files) == 0 {
+		return fmt.Errorf("Expected at least one input file")
 	}
 
 	logger := ctlimg.NewLogger(os.Stderr)
-	prefixedLogger := logger.NewPrefixedWriter("unpackage | ")
+	prefixedLogger := logger.NewPrefixedWriter("relocate | ")
 
-	nonConfigRs, conf, err := o.FileFlags.ResourcesAndConfig()
+	// get resources from files
+	rs, conf, err := o.FileFlags.ResourcesAndConfig()
+	if err != nil {
+		return err
+	}
+
+	foundImages, err := FindImages(rs, conf)
 	if err != nil {
 		return err
 	}
@@ -68,15 +73,14 @@ func (o *UnpackageOptions) Run() error {
 		return fmt.Errorf("Building import repository ref: %s", err)
 	}
 
-	registry, err := ctlreg.NewRegistry(o.RegistryFlags.AsRegistryOpts())
+	dstRegistry, err := ctlreg.NewRegistry(o.RegistryFlags.AsRegistryOpts())
 	if err != nil {
 		return err
 	}
 
-	imageSet := TarImageSet{ImageSet{o.Concurrency, prefixedLogger}, o.Concurrency, prefixedLogger}
+	imageSet := ImageSet{o.Concurrency, prefixedLogger}
 
-	// Import images used in the manifests
-	importedImages, err := imageSet.Import(o.InputPath, importRepo, registry)
+	importedImages, err := imageSet.Relocate(foundImages, importRepo, dstRegistry)
 	if err != nil {
 		return err
 	}
@@ -87,7 +91,7 @@ func (o *UnpackageOptions) Run() error {
 	}
 
 	// Update previous image references with new references
-	resBss, err := o.updateRefsInResources(nonConfigRs, conf, importedImages)
+	resBss, err := o.updateRefsInResources(rs, conf, importedImages)
 	if err != nil {
 		return err
 	}
@@ -101,7 +105,7 @@ func (o *UnpackageOptions) Run() error {
 	return nil
 }
 
-func (o *UnpackageOptions) updateRefsInResources(
+func (o *RelocateOptions) updateRefsInResources(
 	nonConfigRs []ctlres.Resource, conf ctlconf.Conf,
 	resolvedImages *ProcessedImages) ([][]byte, error) {
 
@@ -137,7 +141,7 @@ func (o *UnpackageOptions) updateRefsInResources(
 	return resBss, nil
 }
 
-func (o *UnpackageOptions) emitLockOutput(conf ctlconf.Conf, resolvedImages *ProcessedImages) error {
+func (o *RelocateOptions) emitLockOutput(conf ctlconf.Conf, resolvedImages *ProcessedImages) error {
 	if len(o.LockOutput) == 0 {
 		return nil
 	}

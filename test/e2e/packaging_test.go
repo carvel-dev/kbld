@@ -14,7 +14,7 @@ import (
 
 func TestPkgUnpkgSuccessful(t *testing.T) {
 	env := BuildEnv(t)
-	kbld := Kbld{t, env.Namespace, Logger{}}
+	kbld := Kbld{t, env.Namespace, env.KbldBinaryPath, Logger{}}
 
 	// redis:5.0.4
 	input := `
@@ -57,7 +57,7 @@ spec:
 
 func TestPkgUnpkgLockSuccessful(t *testing.T) {
 	env := BuildEnv(t)
-	kbld := Kbld{t, env.Namespace, Logger{}}
+	kbld := Kbld{t, env.Namespace, env.KbldBinaryPath, Logger{}}
 
 	input := `
 apiVersion: kbld.k14s.io/v1alpha1
@@ -117,8 +117,9 @@ overrides:
 
 func TestPkgUnpkgSuccessfulWithForeignLayers(t *testing.T) {
 	env := BuildEnv(t)
-	kbld := Kbld{t, env.Namespace, Logger{}}
+	kbld := Kbld{t, env.Namespace, env.KbldBinaryPath, Logger{}}
 
+	// Mongo has 2 foreign layers
 	input := `
 kind: Object
 spec:
@@ -153,15 +154,15 @@ spec:
 	}
 }
 
-func TestPkgUnpkgSuccessfulCfManyImages(t *testing.T) {
+func TestPkgUnpkgSuccessfulWithManyImages(t *testing.T) {
 	env := BuildEnv(t)
 
-	if env.SkipCFImagesDownload {
-		fmt.Printf("Skipping CF images download")
+	if env.SkipStressTests {
+		fmt.Printf("This is a stress test; skipping.")
 		return
 	}
 
-	kbld := Kbld{t, env.Namespace, Logger{}}
+	kbld := Kbld{t, env.Namespace, env.KbldBinaryPath, Logger{}}
 
 	input := `
 apiVersion: kbld.k14s.io/v1alpha1
@@ -250,7 +251,7 @@ overrides:
 
 	expectedPackagedSHA := "ebb27484fe5955870f5e8d56b25afb026e90e88b"
 
-	path := "/tmp/kbld-test-pkg-unpkg-cf-many-images"
+	path := "/tmp/kbld-test-pkg-unpkg-successful-with-many-images"
 	defer os.RemoveAll(path)
 
 	kbld.RunWithOpts([]string{"package", "-f", "-", "--output", path, "--concurrency=1"}, RunOpts{
@@ -259,6 +260,7 @@ overrides:
 
 	actualSHA := sha1File(t, path)
 
+	// Assert that concurrently writing to tar doesn't affect sha
 	if actualSHA != expectedPackagedSHA {
 		t.Fatalf("Expected package sha to be same >>>%s<<< to match >>>%s<<<", actualSHA, expectedPackagedSHA)
 	}
@@ -275,7 +277,7 @@ overrides:
 
 	kbld.RunWithOpts([]string{
 		"unpackage", "-f", "-", "--input", path,
-		"--repository", env.WithRegistries("docker.io/*username*/kbld-test-pkg-unpkg-cf-many-images"),
+		"--repository", env.WithRegistries("docker.io/*username*/kbld-test-pkg-unpkg-successful-with-many-images"),
 	}, RunOpts{StdinReader: strings.NewReader(input)})
 }
 

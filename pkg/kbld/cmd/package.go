@@ -2,14 +2,13 @@ package cmd
 
 import (
 	"fmt"
-	"io"
 	"os"
 
 	"github.com/cppforlife/go-cli-ui/ui"
 	regname "github.com/google/go-containerregistry/pkg/name"
 	ctlconf "github.com/k14s/kbld/pkg/kbld/config"
 	ctlimg "github.com/k14s/kbld/pkg/kbld/image"
-	regtarball "github.com/k14s/kbld/pkg/kbld/imagetarball"
+	"github.com/k14s/kbld/pkg/kbld/imagedesc"
 	ctlreg "github.com/k14s/kbld/pkg/kbld/registry"
 	ctlres "github.com/k14s/kbld/pkg/kbld/resources"
 	ctlser "github.com/k14s/kbld/pkg/kbld/search"
@@ -25,7 +24,7 @@ type PackageOptions struct {
 	Concurrency   int
 }
 
-var _ regtarball.TarDescriptorsMetadata = ctlreg.Registry{}
+var _ imagedesc.Registry = ctlreg.Registry{}
 
 func NewPackageOptions(ui ui.UI) *PackageOptions {
 	return &PackageOptions{ui: ui}
@@ -58,16 +57,22 @@ func (o *PackageOptions) Run() error {
 		return err
 	}
 
-	foundImages, err := o.findImages(rs, conf, logger)
+	foundImages, err := FindImages(rs, conf)
 	if err != nil {
 		return err
 	}
 
-	return o.exportImages(foundImages, prefixedLogger)
+	registry, err := ctlreg.NewRegistry(o.RegistryFlags.AsRegistryOpts())
+	if err != nil {
+		return err
+	}
+
+	imageSet := TarImageSet{ImageSet{o.Concurrency, prefixedLogger}, o.Concurrency, prefixedLogger}
+
+	return imageSet.Export(foundImages, o.OutputPath, registry)
 }
 
-func (o *PackageOptions) findImages(allRs []ctlres.Resource,
-	conf ctlconf.Conf, logger ctlimg.Logger) (*UnprocessedImageURLs, error) {
+func FindImages(allRs []ctlres.Resource, conf ctlconf.Conf) (*UnprocessedImageURLs, error) {
 
 	foundImages := NewUnprocessedImageURLs()
 
@@ -96,49 +101,4 @@ func (o *PackageOptions) findImages(allRs []ctlres.Resource,
 	}
 
 	return foundImages, nil
-}
-
-func (o *PackageOptions) exportImages(foundImages *UnprocessedImageURLs,
-	logger *ctlimg.LoggerPrefixWriter) error {
-
-	logger.WriteStr("exporting %d images...\n", len(foundImages.All()))
-	defer func() { logger.WriteStr("exported %d images\n", len(foundImages.All())) }()
-
-	var refs []regname.Reference
-
-	for _, img := range foundImages.All() {
-		// Validate strictly as these refs were already resolved
-		ref, err := regname.NewDigest(img.URL, regname.StrictValidation)
-		if err != nil {
-			return err
-		}
-
-		logger.Write([]byte(fmt.Sprintf("will export %s\n", img.URL)))
-		refs = append(refs, ref)
-	}
-
-	outputFile, err := os.Create(o.OutputPath)
-	if err != nil {
-		return fmt.Errorf("Creating file '%s': %s", o.OutputPath, err)
-	}
-
-	err = outputFile.Close()
-	if err != nil {
-		return err
-	}
-
-	outputFileOpener := func() (io.WriteCloser, error) {
-		return os.OpenFile(o.OutputPath, os.O_RDWR, 0755)
-	}
-
-	tds, err := regtarball.NewTarDescriptors(refs, ctlreg.NewRegistry(o.RegistryFlags.AsRegistryOpts()))
-	if err != nil {
-		return fmt.Errorf("Collecting packaging metadata: %s", err)
-	}
-
-	logger.WriteStr("writing layers...\n")
-
-	opts := regtarball.TarWriterOpts{Concurrency: o.Concurrency}
-
-	return regtarball.NewTarWriter(tds, outputFileOpener, opts, logger).Write()
 }

@@ -1,0 +1,81 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: registry-sa
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: registry
+spec:
+  type: NodePort
+  selector:
+    registry: ""
+  ports:
+  - name: registry
+    port: 5000
+    nodePort: 30777
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: registry
+  labels:
+    registry: ""
+  annotations:
+    kapp.k14s.io/update-strategy: fallback-on-replace
+    kbld.k14s.io/images: |
+      - Metas:
+        - Tag: "2"
+          Type: resolved
+          URL: registry:2
+        URL: index.docker.io/library/registry@sha256:7d081088e4bfd632a88e3f3bcd9e007ef44a796fddfe3261407a3f9f04abe1e7
+spec:
+  serviceAccountName: registry-sa
+  containers:
+  - name: registry
+    image: index.docker.io/library/registry@sha256:7d081088e4bfd632a88e3f3bcd9e007ef44a796fddfe3261407a3f9f04abe1e7
+    ports:
+    - containerPort: 5000
+    volumeMounts:
+    - mountPath: /etc/docker/registry
+      name: config
+  volumes:
+  - name: config
+    configMap:
+      name: registry-config
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: registry-config
+  annotations:
+    kapp.k14s.io/versioned: ""
+data:
+  config.yml: |
+    # Taken from /etc/docker/registry/config.yml
+    version: 0.1
+    log:
+      fields:
+        service: registry
+    storage:
+      cache:
+        blobdescriptor: inmemory
+      filesystem:
+        rootdirectory: /var/lib/registry
+    http:
+      addr: :5000
+      headers:
+        X-Content-Type-Options: [nosniff]
+    health:
+      storagedriver:
+        enabled: true
+        interval: 10s
+        threshold: 3
+
+    # Custom: allows for foreign layers to be allowed in
+    validation:
+      manifests:
+        urls:
+          allow:
+            - ^https?://

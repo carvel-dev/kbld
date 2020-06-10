@@ -46,6 +46,7 @@ func NewKbldCmd(o *KbldOptions) *cobra.Command {
 	cmd.AddCommand(NewUnpackageCmd(NewUnpackageOptions(o.ui)))
 	cmd.AddCommand(NewWebsiteCmd(NewWebsiteOptions()))
 	cmd.AddCommand(NewVersionCmd(NewVersionOptions(o.ui)))
+	cmd.AddCommand(NewRelocateCmd(NewRelocateOptions(o.ui)))
 
 	// Last one runs first
 	cobrautil.VisitCommands(cmd, cobrautil.ReconfigureCmdWithSubcmd)

@@ -8,7 +8,7 @@ import (
 
 func TestPackBuildAndPushSuccessful(t *testing.T) {
 	env := BuildEnv(t)
-	kbld := Kbld{t, env.Namespace, Logger{}}
+	kbld := Kbld{t, env.Namespace, env.KbldBinaryPath, Logger{}}
 
 	input := env.WithRegistries(`
 kind: Object
