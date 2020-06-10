@@ -12,6 +12,7 @@ import (
 	ctlreg "github.com/k14s/kbld/pkg/kbld/registry"
 	ctlres "github.com/k14s/kbld/pkg/kbld/resources"
 	ctlser "github.com/k14s/kbld/pkg/kbld/search"
+	"github.com/k14s/kbld/pkg/kbld/version"
 	"github.com/spf13/cobra"
 )
 
@@ -84,6 +85,11 @@ func (o *RelocateOptions) Run() error {
 		return err
 	}
 
+	err = o.emitLockOutput(conf, importedImages)
+	if err != nil {
+		return err
+	}
+
 	// Update previous image references with new references
 	resBss, err := o.updateRefsInResources(rs, conf, importedImages)
 	if err != nil {
@@ -133,4 +139,44 @@ func (o *RelocateOptions) updateRefsInResources(
 	}
 
 	return resBss, nil
+}
+
+func (o *RelocateOptions) emitLockOutput(conf ctlconf.Conf, resolvedImages *ProcessedImages) error {
+	if len(o.LockOutput) == 0 {
+		return nil
+	}
+
+	c := ctlconf.NewConfig()
+	c.MinimumRequiredVersion = version.Version
+	c.SearchRules = conf.SearchRulesWithoutDefaults()
+
+	for _, override := range conf.ImageOverrides() {
+		if override.Preresolved {
+			img, found := resolvedImages.FindByURL(UnprocessedImageURL{override.NewImage})
+			if !found {
+				return fmt.Errorf("Expected to find imported image for '%s'", override.NewImage)
+			}
+
+			c.Overrides = append(c.Overrides, ctlconf.ImageOverride{
+				ImageRef:    override.ImageRef,
+				NewImage:    img.URL,
+				Preresolved: true,
+			})
+		}
+	}
+
+	// TODO should we dedup overrides?
+	for _, urlImagePair := range resolvedImages.All() {
+		c.Overrides = append(c.Overrides, ctlconf.ImageOverride{
+			ImageRef: ctlconf.ImageRef{
+				Image: urlImagePair.UnprocessedImageURL.URL,
+			},
+			NewImage:    urlImagePair.Image.URL,
+			Preresolved: true,
+		})
+	}
+
+	c.Overrides = ctlconf.UniqueImageOverrides(c.Overrides)
+
+	return c.WriteToFile(o.LockOutput)
 }

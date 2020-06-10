@@ -2,8 +2,12 @@ package e2e
 
 import (
 	"fmt"
+	"io/ioutil"
+	"os"
 	"strings"
 	"testing"
+
+	"github.com/k14s/kbld/pkg/kbld/version"
 )
 
 func TestRelocateSuccessful(t *testing.T) {
@@ -113,5 +117,59 @@ spec:
 `)
 	if out != expectedOut {
 		t.Fatalf("Expected >>>%s<<< to match >>>%s<<<", out, expectedOut)
+	}
+}
+
+func TestRelocateLockSuccessful(t *testing.T) {
+	env := BuildEnv(t)
+	kbld := Kbld{t, env.Namespace, env.KbldBinaryPath, Logger{}}
+
+	input := `
+apiVersion: kbld.k14s.io/v1alpha1
+kind: Config
+overrides:
+# ignored because it's not preresolved
+- image: gcs-fetcher
+  newImage: gcr.io/cloud-builders/gcs-fetcher@sha256:055519529bf1ba12bf916fa42d6d3f68bdc581413621c269425bb0fee2467a93
+- image: redis
+  newImage: index.docker.io/library/redis@sha256:000339fb57e0ddf2d48d72f3341e47a8ca3b1beae9bdcb25a96323095b72a79b
+  preresolved: true
+`
+
+	path := "/tmp/kbld-test-pkg-unpkg-with-lock-successful"
+	defer os.RemoveAll(path)
+
+	relocatedLockPath := path + "-relocated"
+	defer os.RemoveAll(relocatedLockPath)
+
+	out, _ := kbld.RunWithOpts([]string{"relocate", "-f", "-", "--repository", env.WithRegistries("docker.io/*username*/kbld-test-relocate-lock"), "--lock-output", relocatedLockPath}, RunOpts{
+		StdinReader: strings.NewReader(input),
+	})
+
+	expectedOut := ""
+
+	if out != expectedOut {
+		t.Fatalf("Expected package output >>>%s<<< to match >>>%s<<<", out, expectedOut)
+	}
+
+	lockOutBs, err := ioutil.ReadFile(relocatedLockPath)
+	if err != nil {
+		t.Fatalf("Expected to find relocated lock file")
+	}
+
+	expectedLockOut := strings.ReplaceAll(env.WithRegistries(`apiVersion: kbld.k14s.io/v1alpha1
+kind: Config
+minimumRequiredVersion: __ver__
+overrides:
+- image: redis
+  newImage: index.docker.io/*username*/kbld-test-relocate-lock@sha256:000339fb57e0ddf2d48d72f3341e47a8ca3b1beae9bdcb25a96323095b72a79b
+  preresolved: true
+- image: index.docker.io/library/redis@sha256:000339fb57e0ddf2d48d72f3341e47a8ca3b1beae9bdcb25a96323095b72a79b
+  newImage: index.docker.io/*username*/kbld-test-relocate-lock@sha256:000339fb57e0ddf2d48d72f3341e47a8ca3b1beae9bdcb25a96323095b72a79b
+  preresolved: true
+`), "__ver__", version.Version)
+
+	if string(lockOutBs) != expectedLockOut {
+		t.Fatalf("Expected unpackage lock output >>>%s<<< to match >>>%s<<<", lockOutBs, expectedLockOut)
 	}
 }
