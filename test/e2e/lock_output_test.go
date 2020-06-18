@@ -105,3 +105,71 @@ searchRules:
 		t.Fatalf("Expected >>>%s<<< to match >>>%s<<<", out, expectedOut)
 	}
 }
+
+func TestLockOutputPreservesMetadata(t *testing.T) {
+	env := BuildEnv(t)
+	kbld := Kbld{t, env.Namespace, env.KbldBinaryPath, Logger{}}
+
+	lockFileInput := `
+---
+apiVersion: kbld.k14s.io/v1alpha1
+kind: Config
+minimumRequiredVersion: 0.22.0
+overrides:
+- image: nginx
+  metadata:
+  - metas:
+    - Path: /Users/name/workspace/nginx
+      Type: local
+    - Dirty: true
+      RemoteURL: git@github.com:nginx/nginx.git
+      SHA: 0284d4f11c7a2a55e03e05784e2d59ee4f02dab0
+      Type: git
+    url: index.docker.io/library/nginx@sha256:21f32f6c08406306d822a0e6e8b7dc81f53f336570e852e25fbe1e3e3d0d0133
+  newImage: index.docker.io/library/nginx@sha256:21f32f6c08406306d822a0e6e8b7dc81f53f336570e852e25fbe1e3e3d0d0133
+  preresolved: true
+`
+	path := "/tmp/kbld-test-lock-output-successful"
+	defer os.RemoveAll(path)
+
+	kbld.RunWithOpts([]string{"relocate", "-f", "-", "--repository", env.WithRegistries("docker.io/*username*/kbld-test-relocate"), "--lock-output=" + path}, RunOpts{
+		StdinReader: strings.NewReader(lockFileInput),
+	})
+
+	expectedFileContents := env.WithRegistries(`
+---
+apiVersion: kbld.k14s.io/v1alpha1
+kind: Config
+minimumRequiredVersion: 0.22.0
+overrides:
+- image: nginx
+  metadata:
+  - metas:
+    - Path: /Users/user/workspace/nginx
+      Type: local
+    - Dirty: true
+      RemoteURL: git@github.com:nginx/nginx.git
+      SHA: 0284d4f11c7a2a55e03e05784e2d59ee4f02dab0
+      Type: git
+    url: index.docker.io/library/nginx@sha256:21f32f6c08406306d822a0e6e8b7dc81f53f336570e852e25fbe1e3e3d0d0133
+  - metas:
+    - type: ???
+  newImage: index.docker.io/*username*/kbld-test-relocate@sha256:21f32f6c08406306d822a0e6e8b7dc81f53f336570e852e25fbe1e3e3d0d0133
+  preresolved: true
+- image: index.docker.io/library/nginx@sha256:21f32f6c08406306d822a0e6e8b7dc81f53f336570e852e25fbe1e3e3d0d0133
+  metadata: 
+  - metas:
+    - type: ???
+  newImage: index.docker.io/*username*/kbld-test-relocate@sha256:21f32f6c08406306d822a0e6e8b7dc81f53f336570e852e25fbe1e3e3d0d0133
+	preresolved: true
+`)
+
+	bs, err := ioutil.ReadFile(path)
+	if err != nil {
+		t.Fatalf("Failed while reading " + path)
+	}
+
+	if string(bs) != expectedFileContents {
+		t.Fatalf("Expected >>>%s<<< to match >>>%s<<<", bs, expectedFileContents)
+	}
+}

@@ -158,7 +158,12 @@ func (o *RelocateOptions) emitLockOutput(conf ctlconf.Conf, resolvedImages *Proc
 			}
 
 			c.Overrides = append(c.Overrides, ctlconf.ImageOverride{
-				ImageRef:    override.ImageRef,
+				ImageRef: override.ImageRef,
+				Metadata: []ctlconf.Metadata{
+					{
+						//TODO add metadata here
+					},
+				},
 				NewImage:    img.URL,
 				Preresolved: true,
 			})
