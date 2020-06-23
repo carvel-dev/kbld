@@ -80,18 +80,18 @@ func (o *RelocateOptions) Run() error {
 
 	imageSet := ImageSet{o.Concurrency, prefixedLogger}
 
-	importedImages, err := imageSet.Relocate(foundImages, importRepo, dstRegistry)
+	relocatedImages, err := imageSet.Relocate(foundImages, importRepo, dstRegistry)
 	if err != nil {
 		return err
 	}
 
-	err = o.emitLockOutput(conf, importedImages)
+	err = o.emitLockOutput(conf, relocatedImages)
 	if err != nil {
 		return err
 	}
 
 	// Update previous image references with new references
-	resBss, err := o.updateRefsInResources(rs, conf, importedImages)
+	resBss, err := o.updateRefsInResources(rs, conf, relocatedImages)
 	if err != nil {
 		return err
 	}
@@ -141,7 +141,7 @@ func (o *RelocateOptions) updateRefsInResources(
 	return resBss, nil
 }
 
-func (o *RelocateOptions) emitLockOutput(conf ctlconf.Conf, resolvedImages *ProcessedImages) error {
+func (o *RelocateOptions) emitLockOutput(conf ctlconf.Conf, relocatedImages *ProcessedImages) error {
 	if len(o.LockOutput) == 0 {
 		return nil
 	}
@@ -152,30 +152,26 @@ func (o *RelocateOptions) emitLockOutput(conf ctlconf.Conf, resolvedImages *Proc
 
 	for _, override := range conf.ImageOverrides() {
 		if override.Preresolved {
-			img, found := resolvedImages.FindByURL(UnprocessedImageURL{override.NewImage})
+			img, found := relocatedImages.FindByURL(UnprocessedImageURL{override.NewImage})
 			if !found {
 				return fmt.Errorf("Expected to find imported image for '%s'", override.NewImage)
 			}
 
 			c.Overrides = append(c.Overrides, ctlconf.ImageOverride{
-				ImageRef: override.ImageRef,
-				Metadata: []ctlconf.Metadata{
-					{
-						//TODO add metadata here
-					},
-				},
+				ImageRef:    override.ImageRef,
+				Metadata:    override.Metadata,
 				NewImage:    img.URL,
 				Preresolved: true,
 			})
 		}
 	}
 
-	// TODO should we dedup overrides?
-	for _, urlImagePair := range resolvedImages.All() {
+	for _, urlImagePair := range relocatedImages.All() {
 		c.Overrides = append(c.Overrides, ctlconf.ImageOverride{
 			ImageRef: ctlconf.ImageRef{
 				Image: urlImagePair.UnprocessedImageURL.URL,
 			},
+			Metadata:    []ctlconf.Metadata{},
 			NewImage:    urlImagePair.Image.URL,
 			Preresolved: true,
 		})

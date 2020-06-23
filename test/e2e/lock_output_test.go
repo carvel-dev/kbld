@@ -110,7 +110,7 @@ func TestLockOutputPreservesMetadata(t *testing.T) {
 	env := BuildEnv(t)
 	kbld := Kbld{t, env.Namespace, env.KbldBinaryPath, Logger{}}
 
-	lockFileInput := `
+	lockFileWithMetas := `
 ---
 apiVersion: kbld.k14s.io/v1alpha1
 kind: Config
@@ -133,43 +133,38 @@ overrides:
 	defer os.RemoveAll(path)
 
 	kbld.RunWithOpts([]string{"relocate", "-f", "-", "--repository", env.WithRegistries("docker.io/*username*/kbld-test-relocate"), "--lock-output=" + path}, RunOpts{
-		StdinReader: strings.NewReader(lockFileInput),
+		StdinReader: strings.NewReader(lockFileWithMetas),
 	})
 
-	expectedFileContents := env.WithRegistries(`
----
-apiVersion: kbld.k14s.io/v1alpha1
+	// TODO: either a) drop the second override; b) copy metadata to the second override; c) extract metadata and refer to it from within overrides; d) ???
+	lockFileWithAppendedMetas := env.WithRegistries(`apiVersion: kbld.k14s.io/v1alpha1
 kind: Config
 minimumRequiredVersion: 0.22.0
 overrides:
 - image: nginx
   metadata:
   - metas:
-    - Path: /Users/user/workspace/nginx
+    - Path: /Users/name/workspace/nginx
       Type: local
     - Dirty: true
       RemoteURL: git@github.com:nginx/nginx.git
       SHA: 0284d4f11c7a2a55e03e05784e2d59ee4f02dab0
       Type: git
     url: index.docker.io/library/nginx@sha256:21f32f6c08406306d822a0e6e8b7dc81f53f336570e852e25fbe1e3e3d0d0133
-  - metas:
-    - type: ???
   newImage: index.docker.io/*username*/kbld-test-relocate@sha256:21f32f6c08406306d822a0e6e8b7dc81f53f336570e852e25fbe1e3e3d0d0133
   preresolved: true
 - image: index.docker.io/library/nginx@sha256:21f32f6c08406306d822a0e6e8b7dc81f53f336570e852e25fbe1e3e3d0d0133
-  metadata: 
-  - metas:
-    - type: ???
+  metadata: []
   newImage: index.docker.io/*username*/kbld-test-relocate@sha256:21f32f6c08406306d822a0e6e8b7dc81f53f336570e852e25fbe1e3e3d0d0133
-	preresolved: true
+  preresolved: true
 `)
 
 	bs, err := ioutil.ReadFile(path)
 	if err != nil {
-		t.Fatalf("Failed while reading " + path)
+		t.Fatalf("Failed while reading %s; err=%s", path, err)
 	}
 
-	if string(bs) != expectedFileContents {
-		t.Fatalf("Expected >>>%s<<< to match >>>%s<<<", bs, expectedFileContents)
+	if string(bs) != lockFileWithAppendedMetas {
+		t.Fatalf("Expected >>>%s<<< to match >>>%s<<<", bs, lockFileWithAppendedMetas)
 	}
 }
