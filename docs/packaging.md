@@ -1,12 +1,17 @@
-## Packaging images
+## Packaging/relocating images
 
-kbld can be used to package all referenced container images into a single tarball so that they can be easily imported into a same or different registry. Use cases:
+kbld provides a way to relocate (i.e. copy) images between multiple registries. Two approaches are available:
+
+- `kbld relocate` (available v0.23.0+) allows to efficiently copy images between registries as long as running `relocate` command has connectivity to both registries.
+- `kbld package` and `kbld unpackage` allows to export images into a single tarball, and later import them from given tarball into a different (or same) registry. This approach does _not_ require connectivity to source registry during the `pkg unpackage` time.
+
+Use cases:
 
 - packaging applications for fully offline environments with a private registry
-- moving images from one registry to another
+- copying images from one registry to another
 - backing up images
 
-There are two approaches to do this (both use same commands):
+There are two approaches to do this:
 
 - With lock file (recommended)
 - Directly against configuration
@@ -67,6 +72,13 @@ To import packaged images from a tarball:
     ```
 
     Images will be imported under a single new repository `docker.io/dkalinin/app1`. **You are guaranteed that images are exactly same as they are referenced by the same digests in produced YAML configuration (though under a different repository name)**.
+
+1. **Alternatively**, using `relocate` command against a lock file:
+
+    ```bash
+    $ kbld relocate -f /tmp/manifest.lock --repository docker.io/dkalinin/app1 --lock-output /tmp/manifest.lock.copied
+    relocate | ...
+    ```
 
 1. Use newely generated lock file with configuration to get updated results
 
@@ -131,6 +143,16 @@ To import packaged images from a tarball:
     ```
 
     Images will be imported under a single new repository `docker.io/dkalinin/app1`. **You are guaranteed that images are exactly same as they are referenced by the same digests in produced YAML configuration (though under a different repository name)**.
+
+1. **Alternatively**, using `relocate` command:
+
+    ```bash
+    $ kbld relocate -f /tmp/resolved-manifest --repository docker.io/dkalinin/app1
+    relocate | ...
+    images:
+    - image: docker.io/dkalinin/app1@sha256:e71b1bf4281f25533cf15e6e5f9be4dac74d2328152edf7ecde23abc54e16c1c
+    - image: docker.io/dkalinin/app1@sha256:6dae9c8674e2e5f418c3dd040041a05f6b490597315139c0bcacadf65a46cfd5
+    ```
 
 ---
 ### Authentication
