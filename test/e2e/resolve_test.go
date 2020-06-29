@@ -81,6 +81,63 @@ spec:
 	}
 }
 
+func TestSortAnnotations(t *testing.T) {
+	env := BuildEnv(t)
+	kbld := Kbld{t, env.Namespace, env.KbldBinaryPath, Logger{}}
+
+	input := `
+kind: Object
+spec:
+- image: foo/img1:bbb
+- image: foo/img1:aaa
+- image: foo/img1:ccc
+---
+apiVersion: kbld.k14s.io/v1alpha1
+kind: ImageOverrides
+overrides:
+- image: foo/img1:bbb
+  newImage: bbb
+  preresolved: true
+- image: foo/img1:aaa
+  newImage: aaa
+  preresolved: true
+- image: foo/img1:ccc
+  newImage: ccc
+  preresolved: true
+`
+
+	out, _ := kbld.RunWithOpts([]string{"-f", "-"}, RunOpts{
+		StdinReader: strings.NewReader(input),
+	})
+
+	expectedOut := `---
+kind: Object
+metadata:
+  annotations:
+    kbld.k14s.io/images: |
+      - Metas:
+        - Type: preresolved
+          URL: aaa
+        URL: aaa
+      - Metas:
+        - Type: preresolved
+          URL: bbb
+        URL: bbb
+      - Metas:
+        - Type: preresolved
+          URL: ccc
+        URL: ccc
+spec:
+- image: bbb
+- image: aaa
+- image: ccc
+`
+
+	if out != expectedOut {
+		t.Fatalf("Expected >>>%s<<< to match >>>%s<<<", out, expectedOut)
+	}
+}
+
 func TestResolveInvalidDigest(t *testing.T) {
 	env := BuildEnv(t)
 	kbld := Kbld{t, env.Namespace, env.KbldBinaryPath, Logger{}}
