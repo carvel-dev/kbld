@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"sort"
+
 	"github.com/ghodss/yaml"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 )
@@ -15,6 +17,10 @@ type ResourceWithImages struct {
 }
 
 func NewResourceWithImages(contents map[string]interface{}, images []Image) ResourceWithImages {
+	// sort images lexicographically (by URL) to avoid unnecessary annotation changes
+	sort.Slice(images, func(i, j int) bool {
+		return images[i].URL < images[j].URL
+	})
 	return ResourceWithImages{contents, images}
 }
 
