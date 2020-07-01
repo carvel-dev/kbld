@@ -28,7 +28,7 @@ func (r GitRepo) RemoteURL() (string, error) {
 		if r.IsValid() && strings.Contains(stderr, "No remote configured to list refs from") {
 			return GitRepoRemoteURLUnknown, nil
 		}
-		return "", fmt.Errorf("Determining remote: %s (stderr '%s')", err, stderr)
+		return "", r.error("Determining remote: %s (stderr '%s')", err, stderr)
 	}
 
 	return strings.TrimSpace(stdout), nil
@@ -41,7 +41,7 @@ func (r GitRepo) HeadSHA() (string, error) {
 		if listErr == nil && len(strings.TrimSpace(listStdout)) == 0 {
 			return GitRepoHeadSHANoCommits, nil
 		}
-		return "", fmt.Errorf("Checking HEAD commit: %s (stderr '%s')", err, stderr)
+		return "", r.error("Checking HEAD commit: %s (stderr '%s')", err, stderr)
 	}
 
 	return strings.TrimSpace(stdout), nil
@@ -54,7 +54,7 @@ func (r GitRepo) HeadTags() ([]string, error) {
 			strings.Contains(stderr, "No names found") {
 			return nil, nil
 		}
-		return nil, fmt.Errorf("Checking HEAD tags: %s (stderr '%s')", err, stderr)
+		return nil, r.error("Checking HEAD tags: %s (stderr '%s')", err, stderr)
 	}
 
 	return strings.Split(strings.TrimSpace(stdout), "\n"), nil
@@ -63,7 +63,7 @@ func (r GitRepo) HeadTags() ([]string, error) {
 func (r GitRepo) IsDirty() (bool, error) {
 	stdout, _, err := r.runCmd([]string{"status", "--short"})
 	if err != nil {
-		return false, fmt.Errorf("Checking status: %s", err)
+		return false, r.error("Checking status: %s", err)
 	}
 
 	// Strip newline which is added if there are any changes
@@ -74,6 +74,10 @@ func (r GitRepo) IsValid() bool {
 	// Prints .git directory path if it's git repo
 	_, _, err := r.runCmd([]string{"rev-parse", "--git-dir"})
 	return err == nil
+}
+
+func (r GitRepo) error(str string, args ...interface{}) error {
+	return fmt.Errorf("Getting details from git for directory '%s': %s", r.dirPath, fmt.Sprintf(str, args...))
 }
 
 func (r GitRepo) runCmd(args []string) (string, string, error) {
