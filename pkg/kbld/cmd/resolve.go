@@ -141,7 +141,9 @@ func (o *ResolveOptions) updateRefsInResources(nonConfigRs []ctlres.Resource,
 			}
 
 			if o.ImagesAnnotation {
-				images = append(images, img)
+				if len(img.Metas) > 0 {
+					images = append(images, img)
+				}
 			}
 
 			return img.URL, true
