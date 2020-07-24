@@ -141,8 +141,13 @@ func (o *ResolveOptions) updateRefsInResources(nonConfigRs []ctlres.Resource,
 			}
 
 			if o.ImagesAnnotation {
+				// if Metas is null then the image was already in digest form and we didn't need to resolve
+				// it, so the annotation isn't very useful
 				if len(img.Metas) > 0 {
-					images = append(images, img)
+					// also check for duplicates before adding
+					if !Images(images).Contains(img) {
+						images = append(images, img)
+					}
 				}
 			}
 

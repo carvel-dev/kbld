@@ -44,9 +44,14 @@ func TestResolveSuccessfulWithAnnotations(t *testing.T) {
 	env := BuildEnv(t)
 	kbld := Kbld{t, env.Namespace, env.KbldBinaryPath, Logger{}}
 
+	// The repetition in this input is so it can test for:
+	// 1) resolving
+	// 2) filtering annotations with null metas (which happens with digests, which don't get resolved)
+	// 3) de-duplicating annotations
 	input := `
 kind: Object
 spec:
+- image: nginx:1.14.2
 - image: nginx:1.14.2
 - image: library/nginx:1.14.2
 - image: docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
@@ -56,7 +61,6 @@ spec:
 		StdinReader: strings.NewReader(input),
 	})
 
-	// TODO dedup same url images
 	expectedOut := `---
 kind: Object
 metadata:
@@ -73,6 +77,7 @@ metadata:
           URL: library/nginx:1.14.2
         URL: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
 spec:
+- image: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
 - image: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
 - image: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
 - image: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d

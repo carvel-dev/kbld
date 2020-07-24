@@ -24,6 +24,30 @@ func (imgs Images) ForImage(url string) (Image, bool) {
 	return Image{}, false
 }
 
+func (i Image) Equal(other Image) bool {
+	if i.URL != other.URL {
+		return false
+	}
+	if len(i.Metas) != len(other.Metas) {
+		return false
+	}
+	for i, meta := range i.Metas {
+		if meta != other.Metas[i] {
+			return false
+		}
+	}
+	return true
+}
+
+func (imgs Images) Contains(img Image) bool {
+	for _, other := range imgs {
+		if img.Equal(other) {
+			return true
+		}
+	}
+	return false
+}
+
 // TODO only works after deserialization
 func (i Image) Description() string {
 	yamlBytes, err := yaml.Marshal(i.metasRaw)
