@@ -243,6 +243,7 @@ func (bt *bearerTransport) refreshBasic() ([]byte, error) {
 		"service": []string{bt.service},
 	}.Encode()
 
+	fmt.Printf("URL: %s\n", u.String())
 	resp, err := client.Get(u.String())
 	if err != nil {
 		return nil, err

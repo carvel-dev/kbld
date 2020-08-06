@@ -16,6 +16,7 @@ package authn
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 
 	"github.com/docker/cli/cli/config"
@@ -87,11 +88,14 @@ func (dk *defaultKeychain) Resolve(target Resource) (Authenticator, error) {
 	if cfg == empty {
 		return Anonymous, nil
 	}
-	return FromConfig(AuthConfig{
+	c := FromConfig(AuthConfig{
 		Username:      cfg.Username,
 		Password:      cfg.Password,
 		Auth:          cfg.Auth,
 		IdentityToken: cfg.IdentityToken,
 		RegistryToken: cfg.RegistryToken,
-	}), nil
+	})
+	fmt.Printf("\n\nCONFIG: %#v\n\n", c)
+	return c, nil
+
 }
