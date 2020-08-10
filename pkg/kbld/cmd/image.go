@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"reflect"
 	"strings"
 
 	"github.com/ghodss/yaml"
@@ -24,30 +25,6 @@ func (imgs Images) ForImage(url string) (Image, bool) {
 	return Image{}, false
 }
 
-func (i Image) Equal(other Image) bool {
-	if i.URL != other.URL {
-		return false
-	}
-	if len(i.Metas) != len(other.Metas) {
-		return false
-	}
-	for i, meta := range i.Metas {
-		if meta != other.Metas[i] {
-			return false
-		}
-	}
-	return true
-}
-
-func (imgs Images) Contains(img Image) bool {
-	for _, other := range imgs {
-		if img.Equal(other) {
-			return true
-		}
-	}
-	return false
-}
-
 // TODO only works after deserialization
 func (i Image) Description() string {
 	yamlBytes, err := yaml.Marshal(i.metasRaw)
@@ -63,10 +40,31 @@ type imageStruct struct {
 	Metas []interface{}
 }
 
+func (st imageStruct) equal(other imageStruct) bool {
+	return st.URL == other.URL && reflect.DeepEqual(st.Metas, other.Metas)
+}
+
+func contains(structs []imageStruct, st imageStruct) bool {
+	for _, other := range structs {
+		if st.equal(other) {
+			return true
+		}
+	}
+	return false
+}
+
 func newImageStructs(images []Image) []imageStruct {
 	var result []imageStruct
 	for _, img := range images {
-		result = append(result, newImageStruct(img))
+		st := newImageStruct(img)
+		// if Metas is empty then the image was already in digest form and we didn't need to resolve
+		// it, so the annotation isn't very useful
+		if len(st.Metas) > 0 {
+			// also check for duplicates before adding
+			if !contains(result, st) {
+				result = append(result, st)
+			}
+		}
 	}
 	return result
 }
