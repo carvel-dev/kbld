@@ -1,6 +1,6 @@
 /* Variables */
 :root {
-  --base-color: #00C1D5;  /* "Ocean" */
+  --base-color: #00C1D5;  /* "Aqua" */
 }
 
 /* Reset */
@@ -127,7 +127,6 @@ a, a:visited, a:hover {
   text-decoration: underline;
 }
 
-
 #nav h1 {
   float: left;
 }
@@ -175,12 +174,11 @@ a, a:visited, a:hover {
   margin: 40px 0px 40px 0px;
   border: 1px solid #e8e8e8;
   display: flex;
-  height: 120px;
 }
 #features .icon {
   background: var(--base-color);
   text-align: center;
-  width: 15%;
+  width: 12%;
   display: flex;
   align-items: center;
 }
@@ -188,7 +186,7 @@ a, a:visited, a:hover {
   fill: #ffffff;
   transform: scale(0.6, 0.6);
   margin: auto;
-  width: 100%;
+  width: 100%;   /* without this, (at least) Chrome assigns 0px */
 }
 #features .card {
   margin: 40px;
