@@ -1,6 +1,10 @@
+// Copyright 2020 VMware, Inc.
+// SPDX-License-Identifier: Apache-2.0
+
 package cmd
 
 import (
+	"reflect"
 	"strings"
 
 	"github.com/ghodss/yaml"
@@ -39,10 +43,31 @@ type imageStruct struct {
 	Metas []interface{}
 }
 
+func (st imageStruct) equal(other imageStruct) bool {
+	return st.URL == other.URL && reflect.DeepEqual(st.Metas, other.Metas)
+}
+
+func contains(structs []imageStruct, st imageStruct) bool {
+	for _, other := range structs {
+		if st.equal(other) {
+			return true
+		}
+	}
+	return false
+}
+
 func newImageStructs(images []Image) []imageStruct {
 	var result []imageStruct
 	for _, img := range images {
-		result = append(result, newImageStruct(img))
+		st := newImageStruct(img)
+		// if Metas is empty then the image was already in digest form and we didn't need to resolve
+		// it, so the annotation isn't very useful
+		if len(st.Metas) > 0 {
+			// also check for duplicates before adding
+			if !contains(result, st) {
+				result = append(result, st)
+			}
+		}
 	}
 	return result
 }
