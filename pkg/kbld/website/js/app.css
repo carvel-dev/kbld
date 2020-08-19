@@ -389,39 +389,7 @@ li code, p code {
 
 /* Before-after */
 #before-after { margin-bottom: 50px; }
-#before-after table {
-  max-width: 100%;
-}
 #before-after p { margin-top: 15px; }
-#before-after table,
-#before-after tr,
-#before-after td {
-  border-collapse: collapse;
-  padding: 0;
-  margin: 0;
-  border-width: 0;
-  vertical-align: text-top;
-}
-#before-after th { font-weight: bold; }
-#before-after .before,
-#before-after .after {
-  background: #000;
-  color: #aaa;
-  border: 1px solid #eee;
-  padding: 10px 15px;
-}
-#before-after .before {
-  width: 35%;
-  max-width: 35%;
-}
-#before-after .after {
-  width: 50%;
-  max-width: 50%;
-}
-#before-after td pre { margin: 0; }
-#before-after .before,
-#before-after .after { border-width: 0; }
-#before-after .after { border-left: 4px solid #333; }
 #before-after .green { color: #AFCE5E; }
 #before-after .red { color: #ef4f4f; }
 #before-after .gray { color: #555; }

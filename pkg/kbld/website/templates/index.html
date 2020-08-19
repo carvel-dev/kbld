@@ -115,18 +115,12 @@ $ ytt -f ./some-app | <span class="green">kbld -f -</span> | kapp -y deploy -a s
 
       <div id="before-after">
         <h2 id="examples">Examples</h2>
-        <table>
-          <tbody>
-            <tr>
-              <td colspan="2"><p>Resolves name-tag pair reference (<code>nginx:1.17</code>) into digest reference (<code>index.docker.io/library/nginx@sha256:2539d4344...</code>)</p></td>
-            </tr>
-            <tr>
-              <th>Input file</th>
-              <th>stdout</th>
-            </tr>
-            <tr>
-              <td class="before">
-                <pre>
+
+        <p>Resolves name-tag pair reference (<code>nginx:1.17</code>) into digest reference (<code>index.docker.io/library/nginx@sha256:2539d4344...</code>)</p>
+
+        <p>Input:</p>
+
+        <pre class="terminal">
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -148,9 +142,10 @@ spec:
         <span class="green">image: nginx:1.17</span>
         ports:
         - containerPort: 80</pre>
-              </td>
-              <td class="after">
-                <pre>
+
+        <p>Output:</p>
+
+        <pre class="terminal">
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -179,18 +174,12 @@ spec:
         <span class="green">image: index.docker.io/library/nginx@sha256:2539d4344...</span>
         ports:
         - containerPort: 80</pre>
-              </td>
-            </tr>
-            <tr>
-              <td colspan="2"><p>Builds app from local directory (configured via <code>Sources</code>), pushes image as <code>docker.io/hk/simple-app</code> (configured via <code>ImageDestinations</code>), and finally resolves it to a digest reference <code>index.docker.io/hk/simple-app@sha256:e932e46fd...</code>.</p></td>
-            </tr>
-            <tr>
-              <th>Input file</th>
-              <th>stdout</th>
-            </tr>
-            <tr>
-              <td class="before">
-                <pre>
+
+        <p>Builds app from local directory (configured via <code>Sources</code>), pushes image as <code>docker.io/hk/simple-app</code> (configured via <code>ImageDestinations</code>), and finally resolves it to a digest reference <code>index.docker.io/hk/simple-app@sha256:e932e46fd...</code>.</p>
+
+        <p>Input:</p>
+
+        <pre class="terminal">
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -230,9 +219,10 @@ destinations:
   newImage: docker.io/hk/simple-app
 </span>
 </pre>
-              </td>
-              <td class="after">
-                <pre>
+
+        <p>Output:</p>
+        
+        <pre class="terminal">
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -264,10 +254,6 @@ spec:
         <span class="green">image: index.docker.io/hk/simple-app@sha256:e932e46fd...</span>
         ports:
         - containerPort: 80</pre>
-              </td>
-            </tr>
-          </tbody>
-        </table>
       </div>
 
       <div id="authors">
