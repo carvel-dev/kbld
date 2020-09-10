@@ -16,7 +16,6 @@ jobs:
     - name: Run Tests
       run: |
         set -e -x
-        export GOPATH=$(echo `pwd`/../../../../)
 
         # Install ytt, kapp for build and tests
         mkdir -p /tmp/bin
@@ -38,6 +37,7 @@ jobs:
         wget -O- https://github.com/buildpacks/pack/releases/download/v0.8.1/pack-v0.8.1-linux.tgz > /tmp/pack-cli.tgz
         tar xzvf /tmp/pack-cli.tgz -C /tmp/bin
 
+        export GOPATH=$(echo `pwd`)
         cd src/github.com/k14s/kbld
 
         ./hack/test-all-minikube-local-registry.sh
