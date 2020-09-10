@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strings"
 
 	regv1 "github.com/google/go-containerregistry/pkg/v1"
 	"github.com/k14s/kbld/pkg/kbld/imagedesc"
@@ -27,6 +28,7 @@ type tarFileChunk struct {
 var _ imagedesc.LayerContents = tarFileChunk{}
 
 type tarFileChunkReadCloser struct {
+	DebugId string
 	io.Reader
 	io.Closer
 }
@@ -62,8 +64,32 @@ func (f tarFile) openChunk(path string) (io.ReadCloser, error) {
 			return nil, err
 		}
 		if hdr.Name == path {
-			return tarFileChunkReadCloser{Reader: tf, Closer: file}, nil
+			return tarFileChunkReadCloser{
+				DebugId: fmt.Sprintf("%s/%p", path, tf),
+				Reader:  tf, Closer: file}, nil
 		}
 	}
 	return nil, fmt.Errorf("file %s not found in tar", path)
+}
+
+func (f tarFileChunkReadCloser) Close() error {
+	// It seems that there is a race between go-containerregistry library
+	// and net/http's transport to close the request body. Specifically
+	// between net/http.(*transferWriter).writeBody(...) and
+	// gcrr.pkg/v1/remote.(*writer).streamBlob(...).
+	// Example trace: https://gist.github.com/cppforlife/aeeb989c83aebd061561d12524c6476b
+	// Following lines are used to identify locations where Close()
+	// method is being called during runtime.
+	//   fmt.Printf("%s: close\n>>>%s<<<\n\n", f.DebugId, debug.Stack())
+
+	err := f.Closer.Close()
+	if err != nil {
+		// Ignore dup close error since closing file twice does
+		// not have any side-effects (except just being conceptually wrong)
+		if strings.Contains(err.Error(), "file already closed") {
+			// fmt.Printf("%s: dup close\n\n", f.DebugId)
+			return nil
+		}
+	}
+	return err
 }
