@@ -1,7 +1,7 @@
 # kbld
 
 - Website: https://get-kbld.io
-- Slack: [#k14s in Kubernetes slack](https://slack.kubernetes.io)
+- Slack: [#carvel in Kubernetes slack](https://slack.kubernetes.io)
 - [Docs](docs/README.md) with topics about building, packaging images, blog posts, etc.
 - Install: Grab prebuilt binaries from the [Releases page](https://github.com/k14s/kbld/releases) or [Homebrew k14s tap](https://github.com/k14s/homebrew-tap)
 
