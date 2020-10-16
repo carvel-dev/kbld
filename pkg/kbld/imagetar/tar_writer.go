@@ -163,7 +163,7 @@ func (w *TarWriter) writeLayers() error {
 		}
 
 		if isInflattable {
-			stream = io.LimitReader(zeroReader{}, imgLayer.Size)
+			stream = nil
 		} else {
 			foundLayer, err := w.ids.FindLayer(imgLayer)
 			if err != nil {
@@ -274,6 +274,13 @@ func (w *TarWriter) fillInLayer(wl writtenLayer) error {
 }
 
 func (w *TarWriter) writeTarEntry(tw *tar.Writer, path string, r io.Reader, size int64) error {
+	var zerosFill bool
+
+	if r == nil {
+		zerosFill = true
+		r = io.LimitReader(zeroReader{}, size)
+	}
+
 	hdr := &tar.Header{
 		Mode:     0644,
 		Typeflag: tar.TypeReg,
@@ -293,7 +300,9 @@ func (w *TarWriter) writeTarEntry(tw *tar.Writer, path string, r io.Reader, size
 		return fmt.Errorf("Copying data: %s", err)
 	}
 
-	w.logger.WriteStr("done: file '%s' (%s)\n", path, time.Now().Sub(t1))
+	if !zerosFill {
+		w.logger.WriteStr("done: file '%s' (%s)\n", path, time.Now().Sub(t1))
+	}
 
 	return nil
 }
