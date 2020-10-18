@@ -14,13 +14,12 @@ type BuiltImage struct {
 	buildSource ctlconf.Source
 	docker      Docker
 	pack        Pack
-	tags        []string
 }
 
 func NewBuiltImage(url string, buildSource ctlconf.Source,
 	docker Docker, pack Pack) BuiltImage {
 
-	return BuiltImage{url, buildSource, docker, pack, buildSource.Tags}
+	return BuiltImage{url, buildSource, docker, pack}
 }
 
 func (i BuiltImage) URL() (string, []ImageMeta, error) {
