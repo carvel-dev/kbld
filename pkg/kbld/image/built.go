@@ -14,12 +14,17 @@ type BuiltImage struct {
 	buildSource ctlconf.Source
 	docker      Docker
 	pack        Pack
+	tags        []string
 }
 
 func NewBuiltImage(url string, buildSource ctlconf.Source,
 	docker Docker, pack Pack) BuiltImage {
 
-	return BuiltImage{url, buildSource, docker, pack}
+	return BuiltImage{url, buildSource, docker, pack, buildSource.Tags}
+}
+
+func (i BuiltImage) ImageTags() []string {
+	return i.tags
 }
 
 func (i BuiltImage) URL() (string, []ImageMeta, error) {
@@ -59,6 +64,7 @@ func (i BuiltImage) URL() (string, []ImageMeta, error) {
 			NoCache:    i.buildSource.Docker.Build.NoCache,
 			File:       i.buildSource.Docker.Build.File,
 			RawOptions: i.buildSource.Docker.Build.RawOptions,
+			Tags:       i.buildSource.Tags,
 		}
 
 		digest, err := i.docker.Build(urlRepo, i.buildSource.Path, opts)

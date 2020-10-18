@@ -69,6 +69,43 @@ spec:
 	}
 }
 
+func TestDockerBuildWithAdditionalImageTagsSuccessful(t *testing.T) {
+	env := BuildEnv(t)
+	kbld := Kbld{t, env.Namespace, env.KbldBinaryPath, Logger{}}
+
+	input := env.WithRegistries(`
+kind: Object
+spec:
+- image: simple-app
+---
+apiVersion: kbld.k14s.io/v1alpha1
+kind: Sources
+sources:
+- image: simple-app
+  tags:
+  - staging
+  path: assets/simple-app
+`)
+
+	out, _ := kbld.RunWithOpts([]string{"-f", "-", "--images-annotation=false"}, RunOpts{
+		StdinReader: strings.NewReader(input),
+	})
+
+	// kbld:192-168-99-100-30777-minikube-tests-kbld-e2e-tests-SHA256-REPLACED
+	out = regexp.MustCompile("sha256\\-[a-z0-9]{64}").ReplaceAllString(out, "SHA256-REPLACED")
+	out = regexp.MustCompile("kbld:(.+)-kbld-e2e(\\-.*)-SHA256-REPLACED").ReplaceAllString(out, "kbld:img-title-SHA256-REPLACED")
+
+	expectedOut := `---
+kind: Object
+spec:
+- image: kbld:simple-app-SHA256-REPLACED
+`
+
+	if out != expectedOut {
+		t.Fatalf("Expected >>>%s<<< to match >>>%s<<<", out, expectedOut)
+	}
+}
+
 func TestDockerBuildAndPushSuccessful(t *testing.T) {
 	env := BuildEnv(t)
 	kbld := Kbld{t, env.Namespace, env.KbldBinaryPath, Logger{}}

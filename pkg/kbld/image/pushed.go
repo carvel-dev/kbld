@@ -9,12 +9,12 @@ import (
 
 // PushedImage respresents an image that will be pushed when its URL is requested
 type PushedImage struct {
-	image  Image
+	image  BuiltImage
 	imgDst ctlconf.ImageDestination
 	docker Docker
 }
 
-func NewPushedImage(image Image, imgDst ctlconf.ImageDestination, docker Docker) PushedImage {
+func NewPushedImage(image BuiltImage, imgDst ctlconf.ImageDestination, docker Docker) PushedImage {
 	return PushedImage{image, imgDst, docker}
 }
 
@@ -24,7 +24,7 @@ func (i PushedImage) URL() (string, []ImageMeta, error) {
 		return "", nil, err
 	}
 
-	digest, err := i.docker.Push(DockerTmpRef{url}, i.imgDst.NewImage)
+	digest, err := i.docker.Push(DockerTmpRef{url}, i.imgDst.NewImage, i.image.ImageTags())
 	if err != nil {
 		return "", nil, err
 	}
