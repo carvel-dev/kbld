@@ -23,10 +23,6 @@ func NewBuiltImage(url string, buildSource ctlconf.Source,
 	return BuiltImage{url, buildSource, docker, pack, buildSource.Tags}
 }
 
-func (i BuiltImage) ImageTags() []string {
-	return i.tags
-}
-
 func (i BuiltImage) URL() (string, []ImageMeta, error) {
 	sources, err := i.sources()
 	if err != nil {
