@@ -60,7 +60,6 @@ func (i BuiltImage) URL() (string, []ImageMeta, error) {
 			NoCache:    i.buildSource.Docker.Build.NoCache,
 			File:       i.buildSource.Docker.Build.File,
 			RawOptions: i.buildSource.Docker.Build.RawOptions,
-			Tags:       i.buildSource.Tags,
 		}
 
 		digest, err := i.docker.Build(urlRepo, i.buildSource.Path, opts)

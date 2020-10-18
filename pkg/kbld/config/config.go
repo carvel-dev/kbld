@@ -56,7 +56,8 @@ type ImageOverride struct {
 
 type ImageDestination struct {
 	ImageRef
-	NewImage string `json:"newImage"`
+	NewImage string   `json:"newImage"`
+	Tags     []string `json:"tags"`
 }
 
 type SearchRule struct {

@@ -33,7 +33,6 @@ type DockerBuildOpts struct {
 	NoCache    *bool
 	File       *string
 	RawOptions *[]string
-	Tags       []string
 }
 
 type DockerTmpRef struct {
@@ -91,11 +90,6 @@ func (d Docker) Build(image, directory string, opts DockerBuildOpts) (DockerTmpR
 		}
 		if opts.RawOptions != nil {
 			cmdArgs = append(cmdArgs, *opts.RawOptions...)
-		}
-		for _, imageTag := range opts.Tags {
-			cmdArgs = append(cmdArgs, "--tag", fmt.Sprintf(
-				"kbld:%s", imageTag),
-			)
 		}
 
 		cmdArgs = append(cmdArgs, "--tag", tmpRef.AsString(), ".")
