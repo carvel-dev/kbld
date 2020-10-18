@@ -9,12 +9,12 @@ import (
 
 // PushedImage respresents an image that will be pushed when its URL is requested
 type PushedImage struct {
-	image  BuiltImage
+	image  Image
 	imgDst ctlconf.ImageDestination
 	docker Docker
 }
 
-func NewPushedImage(image BuiltImage, imgDst ctlconf.ImageDestination, docker Docker) PushedImage {
+func NewPushedImage(image Image, imgDst ctlconf.ImageDestination, docker Docker) PushedImage {
 	return PushedImage{image, imgDst, docker}
 }
 
