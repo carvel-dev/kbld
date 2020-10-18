@@ -42,7 +42,6 @@ type Config struct {
 type Source struct {
 	ImageRef
 	Path string
-	Tags []string
 
 	Docker *SourceDockerOpts
 	Pack   *SourcePackOpts
