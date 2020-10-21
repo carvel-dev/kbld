@@ -115,6 +115,32 @@ func (i Registry) WriteIndex(ref regname.Reference, idx regv1.ImageIndex) error 
 	return nil
 }
 
+func (i Registry) WriteTag(dstRef regname.Tag, srcRef regname.Digest) error {
+	dstRef, err := regname.NewTag(dstRef.String(), i.refOpts...)
+	if err != nil {
+		return err
+	}
+
+	srcRef, err = regname.NewDigest(srcRef.String(), i.refOpts...)
+	if err != nil {
+		return err
+	}
+
+	err = i.retry(func() error {
+		desc, err := regremote.Get(srcRef, i.opts...)
+		if err != nil {
+			return err
+		}
+
+		return regremote.Tag(dstRef, desc, i.opts...)
+	})
+	if err != nil {
+		return fmt.Errorf("Writing image tag: %s", err)
+	}
+
+	return nil
+}
+
 func newHTTPTransport(opts RegistryOpts) (*http.Transport, error) {
 	pool, err := x509.SystemCertPool()
 	if err != nil {

@@ -24,7 +24,7 @@ func (i PushedImage) URL() (string, []ImageMeta, error) {
 		return "", nil, err
 	}
 
-	digest, err := i.docker.Push(DockerTmpRef{url}, i.imgDst.NewImage, i.imgDst.Tags)
+	digest, err := i.docker.Push(DockerTmpRef{url}, i.imgDst.NewImage)
 	if err != nil {
 		return "", nil, err
 	}

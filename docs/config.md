@@ -76,6 +76,20 @@ destinations:
   newImage: docker.io/dkalinin/microservices-demo-adservice
 ```
 
+As of v0.26.0+, additional tags could be specified to be associated with pushed image (applied via registry API):
+
+```yaml
+---
+apiVersion: kbld.k14s.io/v1alpha1
+kind: ImageDestinations
+destinations:
+- image: adservice
+  newImage: docker.io/dkalinin/microservices-demo-adservice
+  tags:
+  - v0.10.3
+  - latest-staging
+```
+
 ### ImageOverrides
 
 ImageOverrides resource configures kbld to rewrite image location before trying to build it or resolve it.

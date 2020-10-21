@@ -41,7 +41,8 @@ func (f Factory) New(url string) Image {
 		buildImg := NewBuiltImage(url, srcConf, docker, pack)
 
 		if imgDstConf, found := f.shouldPush(url); found {
-			return NewPushedImage(buildImg, imgDstConf, docker)
+			pushedImg := NewPushedImage(buildImg, imgDstConf, docker)
+			return NewTaggedImage(pushedImg, imgDstConf, f.registry)
 		}
 		return buildImg
 	}

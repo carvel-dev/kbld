@@ -160,7 +160,7 @@ func (d Docker) RetagStable(tmpRef DockerTmpRef, image, imageID string,
 	return stableTmpRef, nil
 }
 
-func (d Docker) Push(tmpRef DockerTmpRef, imageDst string, additionalImageTags []string) (DockerImageDigest, error) {
+func (d Docker) Push(tmpRef DockerTmpRef, imageDst string) (DockerImageDigest, error) {
 	prefixedLogger := d.logger.NewPrefixedWriter(imageDst + " | ")
 
 	// Generate random tag for pushed image.
@@ -181,19 +181,9 @@ func (d Docker) Push(tmpRef DockerTmpRef, imageDst string, additionalImageTags [
 		}
 	}
 
-	for i, imageDstTag := range additionalImageTags {
-		imageDstTag, err := regname.NewTag(imageDst+":"+imageDstTag, regname.WeakValidation)
-		if err != nil {
-			return DockerImageDigest{}, fmt.Errorf("Generating image dst tag '%s': %s", imageDstTag, err)
-		}
-		additionalImageTags[i] = imageDstTag.Name()
-	}
+	imageDst = imageDstTagged.Name()
 
-	fullImageDst := imageDstTagged.Name()
-
-	additionalImageTags = append(additionalImageTags, fullImageDst)
-
-	prefixedLogger.Write([]byte(fmt.Sprintf("starting push (using Docker): %s -> %s\n", tmpRef.AsString(), fullImageDst)))
+	prefixedLogger.Write([]byte(fmt.Sprintf("starting push (using Docker): %s -> %s\n", tmpRef.AsString(), imageDst)))
 	defer prefixedLogger.Write([]byte("finished push (using Docker)\n"))
 
 	prevInspectData, err := d.inspect(tmpRef.AsString())
@@ -205,36 +195,32 @@ func (d Docker) Push(tmpRef DockerTmpRef, imageDst string, additionalImageTags [
 	{
 		var stdoutBuf, stderrBuf bytes.Buffer
 
-		for _, imageDstTag := range additionalImageTags {
-			cmd := exec.Command("docker", "tag", tmpRef.AsString(), imageDstTag)
-			cmd.Stdout = io.MultiWriter(&stdoutBuf, prefixedLogger)
-			cmd.Stderr = io.MultiWriter(&stderrBuf, prefixedLogger)
+		cmd := exec.Command("docker", "tag", tmpRef.AsString(), imageDst)
+		cmd.Stdout = io.MultiWriter(&stdoutBuf, prefixedLogger)
+		cmd.Stderr = io.MultiWriter(&stderrBuf, prefixedLogger)
 
-			err := cmd.Run()
-			if err != nil {
-				prefixedLogger.Write([]byte(fmt.Sprintf("tag error: %s\n", err)))
-				return DockerImageDigest{}, err
-			}
+		err := cmd.Run()
+		if err != nil {
+			prefixedLogger.Write([]byte(fmt.Sprintf("tag error: %s\n", err)))
+			return DockerImageDigest{}, err
 		}
 	}
 
 	{
 		var stdoutBuf, stderrBuf bytes.Buffer
 
-		for _, imageTag := range additionalImageTags {
-			cmd := exec.Command("docker", "push", imageTag)
-			cmd.Stdout = io.MultiWriter(&stdoutBuf, prefixedLogger)
-			cmd.Stderr = io.MultiWriter(&stderrBuf, prefixedLogger)
+		cmd := exec.Command("docker", "push", imageDst)
+		cmd.Stdout = io.MultiWriter(&stdoutBuf, prefixedLogger)
+		cmd.Stderr = io.MultiWriter(&stderrBuf, prefixedLogger)
 
-			err := cmd.Run()
-			if err != nil {
-				prefixedLogger.Write([]byte(fmt.Sprintf("push error: %s\n", err)))
-				return DockerImageDigest{}, err
-			}
+		err := cmd.Run()
+		if err != nil {
+			prefixedLogger.Write([]byte(fmt.Sprintf("push error: %s\n", err)))
+			return DockerImageDigest{}, err
 		}
 	}
 
-	currInspectData, err := d.inspect(fullImageDst)
+	currInspectData, err := d.inspect(imageDst)
 	if err != nil {
 		prefixedLogger.Write([]byte(fmt.Sprintf("inspect error: %s\n", err)))
 		return DockerImageDigest{}, err

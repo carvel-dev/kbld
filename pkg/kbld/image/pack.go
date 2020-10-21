@@ -89,6 +89,6 @@ func (d Pack) Build(image, directory string, opts PackBuildOpts) (DockerTmpRef, 
 	return d.docker.RetagStable(DockerTmpRef{imageID}, image, imageID, prefixedLogger)
 }
 
-func (d Pack) Push(tmpRef DockerTmpRef, imageDst string, additionalImageTags []string) (DockerImageDigest, error) {
-	return d.docker.Push(tmpRef, imageDst, additionalImageTags)
+func (d Pack) Push(tmpRef DockerTmpRef, imageDst string) (DockerImageDigest, error) {
+	return d.docker.Push(tmpRef, imageDst)
 }
