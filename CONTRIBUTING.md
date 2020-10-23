@@ -32,7 +32,7 @@ Note: if you would like to submit an "_obvious fix_" for something like a typo, 
 
 - [minikube](https://minikube.sigs.k8s.io/docs/)
 - [ytt](https://github.com/k14s/ytt)
-- [pack](https://github.com/buildpacks/pack)
+- [pack 0.8.1](https://github.com/buildpacks/pack)
 
 ## Run Unit tests
 ```bash
