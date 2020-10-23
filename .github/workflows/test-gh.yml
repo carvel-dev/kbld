@@ -1,5 +1,16 @@
 name: test-gh
-on: [push, pull_request]
+on:
+  push:
+    paths-ignore:
+      - 'docs/**'
+      - '*.md'
+      - 'examples/**'
+  pull_request:
+    paths-ignore:
+      - 'docs/**'
+      - '*.md'
+      - 'examples/**'
+
 jobs:
   test-all:
     name: Test GH
