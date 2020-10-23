@@ -44,7 +44,7 @@ Note: if you would like to submit an "_obvious fix_" for something like a typo, 
 
 ## Run E2E tests against minikube registry
 ```bash
-# Bootstrao k8s cluster and enable docker registry
+# Bootstrap k8s cluster and enable docker registry
 # X.X.X.X must be replaced with your subnetmask of "minikube ip"
 minikube start --driver=docker --insecure-registry=X.X.X.X/16
 # Build kbld binary for testing
@@ -59,7 +59,7 @@ eval $(minikube docker-env)
 
 ## Run E2E tests against private docker registry
 ```bash
-# Bootstrao k8s cluster
+# Bootstrap k8s cluster
 minikube start
 # Build kbld binary for testing
 ./hack/build.sh
