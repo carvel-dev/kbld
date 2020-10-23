@@ -42,7 +42,7 @@ Note: if you would like to submit an "_obvious fix_" for something like a typo, 
 ./hack/test.sh -run TestLogger
 ```
 
-## Run E2E tests
+## Run E2E tests against minikube registry
 ```bash
 # Bootstrao k8s cluster and enable docker registry
 # X.X.X.X must be replaced with your subnetmask of "minikube ip"
@@ -55,6 +55,20 @@ eval $(minikube docker-env)
 ./hack/test-all-minikube-local-registry.sh
 # or run single test
 ./hack/test-all-minikube-local-registry.sh -run TestDockerBuildSuccessful
+```
+
+## Run E2E tests against private docker registry
+```bash
+# Bootstrao k8s cluster
+minikube start
+# Build kbld binary for testing
+./hack/build.sh
+# Make your env aware of the docker registry
+eval $(minikube docker-env)
+docker login ...
+export KBLD_E2E_DOCKERHUB_USERNAME=...
+# Run all tests
+./hack/test-all.sh
 ```
 
 ## Website build
