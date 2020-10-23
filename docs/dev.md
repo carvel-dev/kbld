@@ -50,5 +50,5 @@ For those interested in extending and improving kbld, below is a quick reference
 - [pkg/kbld/image](https://github.com/k14s/kbld/tree/develop/pkg/kbld/image) contains set of classes that know how to "transform" image URLs (build it, resolve it to digest, tag it)
 - [pkg/kbld/registry](https://github.com/k14s/kbld/tree/develop/pkg/kbld/registry) provides a simplified registry API client
 - [pkg/kbld/search](https://github.com/k14s/kbld/tree/develop/pkg/kbld/search) implements YAML node searcher that finds image URLs
-- [test/e2e](https://github.com/k14s/kbld/tree/develop/test/e2e) includes e2e tests that can run against any k8s cluster.
+- [test/e2e](https://github.com/k14s/kbld/tree/develop/test/e2e) includes e2e tests that can run against Docker registry.
 - [pkg/kbld/website](https://github.com/k14s/kbld/tree/develop/pkg/kbld/website) has HTML and JS assets used by `kbld website` command and ultimately https://get-kbld.io.
