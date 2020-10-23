@@ -21,19 +21,6 @@ Features:
 
 See [building and deploying simple Go application to Kubernetes example](https://github.com/k14s/k8s-simple-app-example#step-3-building-container-images-locally) that uses kbld.
 
-## Development
+# Development
 
-```bash
-./hack/build.sh
-
-eval $(minikube docker-env)
-docker login ...
-export KBLD_E2E_DOCKERHUB_USERNAME=...
-./hack/test-all.sh
-
-# include goog analytics in 'kbld website' command for https://get-kbld.io
-# (goog analytics is _not_ included in release binaries)
-BUILD_VALUES=./hack/build-values-get-kbld-io.yml ./hack/build.sh
-```
-
-`build.sh` depends on [ytt](https://github.com/k14s/ytt).
+See [CONTRIBUTING.md](CONTRIBUTING.md#development)
