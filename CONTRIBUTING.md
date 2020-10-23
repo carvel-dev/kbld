@@ -28,38 +28,4 @@ Note: if you would like to submit an "_obvious fix_" for something like a typo, 
 
 # Development
 
-## Prerequisites
-
-- [minikube](https://minikube.sigs.k8s.io/docs/)
-- [ytt](https://github.com/k14s/ytt)
-- [pack 0.8.1](https://github.com/buildpacks/pack)
-
-## Run Unit tests
-```bash
-# Run all tests
-./hack/test.sh
-# or run single test
-./hack/test.sh -run TestLogger
-```
-
-## Run E2E tests against minikube registry
-```bash
-# Bootstrap k8s cluster and enable docker registry
-# X.X.X.X must be replaced with your subnetmask of "minikube ip"
-minikube start --driver=docker --insecure-registry=X.X.X.X/16
-# Build kbld binary for testing
-./hack/build.sh
-# Make your env aware of the docker registry
-eval $(minikube docker-env)
-# Run all tests
-./hack/test-all-minikube-local-registry.sh
-# or run single test
-./hack/test-all-minikube-local-registry.sh -run TestDockerBuildSuccessful
-```
-
-## Website build
-```bash
-# include goog analytics in 'kbld website' command for https://get-kbld.io
-# (goog analytics is _not_ included in release binaries)
-BUILD_VALUES=./hack/build-values-get-kbld-io.yml ./hack/build.sh
-```
+See [docs/dev.md](docs/dev.md).

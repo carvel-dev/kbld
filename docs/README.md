@@ -8,3 +8,7 @@
 - [CNAB image relocation mapping](cnab-image-relocation.md)
 - Blog posts
   - [Introducing k14s (Kubernetes Tools): Simple and Composable Tools for Application Deployment](https://content.pivotal.io/blog/introducing-k14s-kubernetes-tools-simple-and-composable-tools-for-application-deployment)
+
+### Misc
+
+- [Development details](dev.md)

@@ -23,4 +23,4 @@ See [building and deploying simple Go application to Kubernetes example](https:/
 
 # Development
 
-See [CONTRIBUTING.md](CONTRIBUTING.md#development)
+Consult [docs/dev.md](docs/dev.md) for build instructions, code structure details.
