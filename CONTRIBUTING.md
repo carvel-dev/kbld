@@ -57,20 +57,6 @@ eval $(minikube docker-env)
 ./hack/test-all-minikube-local-registry.sh -run TestDockerBuildSuccessful
 ```
 
-## Run E2E tests against private docker registry
-```bash
-# Bootstrap k8s cluster
-minikube start
-# Build kbld binary for testing
-./hack/build.sh
-# Make your env aware of the docker registry
-eval $(minikube docker-env)
-docker login ...
-export KBLD_E2E_DOCKERHUB_USERNAME=...
-# Run all tests
-./hack/test-all.sh
-```
-
 ## Website build
 ```bash
 # include goog analytics in 'kbld website' command for https://get-kbld.io
