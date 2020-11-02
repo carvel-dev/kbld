@@ -29,6 +29,7 @@ type ResolveOptions struct {
 	ImagesAnnotation bool
 	ImageMapFile     string
 	LockOutput       string
+	ImgpkgLockOutput string
 }
 
 func NewResolveOptions(ui ui.UI) *ResolveOptions {
@@ -47,10 +48,14 @@ func NewResolveCmd(o *ResolveOptions) *cobra.Command {
 	cmd.Flags().BoolVar(&o.ImagesAnnotation, "images-annotation", true, "Annotate resources with images annotation")
 	cmd.Flags().StringVar(&o.ImageMapFile, "image-map-file", "", "Set image map file (/cnab/app/relocation-mapping.json in CNAB)")
 	cmd.Flags().StringVar(&o.LockOutput, "lock-output", "", "File path to emit configuration with resolved image references")
+	cmd.Flags().StringVar(&o.ImgpkgLockOutput, "imgpkg-lock-output", "", "File path to emit images lockfile with resolved image references")
 	return cmd
 }
 
 func (o *ResolveOptions) Run() error {
+	if o.ImgpkgLockOutput != "" && o.LockOutput != "" {
+		return fmt.Errorf("Can only output one lockfile type, please provide only one of '--lock-output' or '--imgpkg-lock-output'")
+	}
 	logger := ctlimg.NewLogger(os.Stderr)
 	prefixedLogger := logger.NewPrefixedWriter("resolve | ")
 
@@ -211,25 +216,35 @@ func (o *ResolveOptions) withImageMapConf(conf ctlconf.Conf) (ctlconf.Conf, erro
 }
 
 func (o *ResolveOptions) emitLockOutput(conf ctlconf.Conf, resolvedImages *ProcessedImages) error {
-	if len(o.LockOutput) == 0 {
+	switch {
+	case o.LockOutput != "":
+		c := ctlconf.NewConfig()
+		c.MinimumRequiredVersion = version.Version
+		c.SearchRules = conf.SearchRulesWithoutDefaults()
+
+		for _, urlImagePair := range resolvedImages.All() {
+			c.Overrides = append(c.Overrides, ctlconf.ImageOverride{
+				ImageRef: ctlconf.ImageRef{
+					Image: urlImagePair.UnprocessedImageURL.URL,
+				},
+				NewImage:    urlImagePair.Image.URL,
+				Preresolved: true,
+			})
+		}
+
+		c.Overrides = ctlconf.UniqueImageOverrides(c.Overrides)
+
+		return c.WriteToFile(o.LockOutput)
+	case o.ImgpkgLockOutput != "":
+		iLock := ctlconf.ImagesLock{APIVersion: ctlconf.ImagesLockAPIVersion, Kind: ctlconf.ImagesLockKind}
+		for _, urlImagePair := range resolvedImages.All() {
+			iLock.Spec.Images = append(iLock.Spec.Images, ctlconf.ImagesLockEntry{
+				Image:       urlImagePair.Image.URL,
+				Annotations: map[string]string{"kbld.carvel.dev/id": urlImagePair.UnprocessedImageURL.URL},
+			})
+		}
+		return iLock.WriteToFile(o.ImgpkgLockOutput)
+	default:
 		return nil
 	}
-
-	c := ctlconf.NewConfig()
-	c.MinimumRequiredVersion = version.Version
-	c.SearchRules = conf.SearchRulesWithoutDefaults()
-
-	for _, urlImagePair := range resolvedImages.All() {
-		c.Overrides = append(c.Overrides, ctlconf.ImageOverride{
-			ImageRef: ctlconf.ImageRef{
-				Image: urlImagePair.UnprocessedImageURL.URL,
-			},
-			NewImage:    urlImagePair.Image.URL,
-			Preresolved: true,
-		})
-	}
-
-	c.Overrides = ctlconf.UniqueImageOverrides(c.Overrides)
-
-	return c.WriteToFile(o.LockOutput)
 }
