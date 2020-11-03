@@ -18,7 +18,7 @@ func NewConfFromResources(resources []ctlres.Resource) ([]ctlres.Resource, Conf,
 	var configs []Config
 
 	for _, res := range resources {
-		if res.APIVersion() == configAPIVersion && matchesConfigKind(res) {
+		if matchesConfigKind(res) {
 			config, err := NewConfigFromResource(res)
 			if err != nil {
 				return nil, Conf{}, err
@@ -40,8 +40,8 @@ func (c Conf) WithAdditionalConfig(config Config) Conf {
 }
 
 func matchesConfigKind(res ctlres.Resource) bool {
-	for _, kind := range configKinds {
-		if res.Kind() == kind {
+	for _, configKind := range configKinds {
+		if res.APIVersion() == configKind.APIVersion && res.Kind() == configKind.Kind {
 			return true
 		}
 	}
@@ -60,6 +60,9 @@ func (c Conf) ImageOverrides() []ImageOverride {
 	var result []ImageOverride
 	for _, config := range c.configs {
 		result = append(result, config.Overrides...)
+		if config.Spec != nil {
+			result = append(result, config.Spec.AsOverrides()...)
+		}
 	}
 	return result
 }

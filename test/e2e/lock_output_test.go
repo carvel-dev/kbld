@@ -168,8 +168,7 @@ images:
 	}
 }
 
-func TestLockFileNotInOutput(t *testing.T) {
-	t.Skip()
+func TestImgpkgLockFileNotInOutput(t *testing.T) {
 	env := BuildEnv(t)
 	kbld := Kbld{t, env.Namespace, env.KbldBinaryPath, Logger{}}
 
@@ -182,4 +181,30 @@ func TestLockFileNotInOutput(t *testing.T) {
 	if out != expectedOut {
 		t.Fatalf("Expected:\n >>>%s<<<\n\nActual:\n >>>%s<<<", expectedOut, out)
 	}
+}
+
+func TestImgpkgLockFileInputSuccessful(t *testing.T) {
+	env := BuildEnv(t)
+	kbld := Kbld{t, env.Namespace, env.KbldBinaryPath, Logger{}}
+
+	input := `
+images:
+- image: nginx:1.14.2
+- image: sample-app
+---
+` + imgLock
+
+	out, _ := kbld.RunWithOpts([]string{"-f", "-", "--images-annotation=false"}, RunOpts{
+		StdinReader: strings.NewReader(input),
+	})
+
+	expectedOut := `---
+images:
+- image: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
+- image: index.docker.io/library/nginx@sha256:4a5573037f358b6cdfa2f3e8a9c33a5cf11bcd1675ca72ca76fbe5bd77d0d682
+`
+	if out != expectedOut {
+		t.Fatalf("Expected >>>%s<<< to match >>>%s<<<", out, expectedOut)
+	}
+
 }

@@ -22,8 +22,20 @@ const (
 	imageKeysKind         = "ImageKeys"
 )
 
+type ConfigKind struct {
+	APIVersion, Kind string
+}
+
 var (
-	configKinds = []string{configKind, sourcesKind, imageOverridesKind, imageDestinationsKind, imageKeysKind}
+	configKinds = []ConfigKind{
+		{configAPIVersion, configKind},
+		{configAPIVersion, configKind},
+		{configAPIVersion, sourcesKind},
+		{configAPIVersion, imageOverridesKind},
+		{configAPIVersion, imageDestinationsKind},
+		{configAPIVersion, imageKeysKind},
+		{ImagesLockAPIVersion, ImagesLockKind},
+	}
 )
 
 type Config struct {
@@ -37,6 +49,7 @@ type Config struct {
 	Destinations []ImageDestination `json:"destinations,omitempty"`
 	Keys         []string           `json:"keys,omitempty"`
 	SearchRules  []SearchRule       `json:"searchRules,omitempty"`
+	Spec         *ImagesLockSpec    `json:"spec,omitempty"`
 }
 
 type Source struct {

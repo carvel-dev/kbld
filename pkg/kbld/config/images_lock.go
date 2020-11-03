@@ -12,14 +12,17 @@ import (
 const (
 	ImagesLockAPIVersion = "imgpkg.carvel.dev/v1alpha1"
 	ImagesLockKind       = "ImagesLock"
+	ImagesLockKbldID     = "kbld.carvel.dev/id"
 )
 
 type ImagesLock struct {
 	APIVersion string `yaml:"apiVersion"`
 	Kind       string
-	Spec       struct {
-		Images []ImagesLockEntry
-	}
+	Spec       ImagesLockSpec
+}
+
+type ImagesLockSpec struct {
+	Images []ImagesLockEntry `json:"images,omitempty"`
 }
 
 type ImagesLockEntry struct {
@@ -39,4 +42,21 @@ func (i ImagesLock) WriteToFile(path string) error {
 	}
 
 	return nil
+}
+
+func (i ImagesLockSpec) AsOverrides() []ImageOverride {
+	var overrides []ImageOverride
+
+	for _, image := range i.Images {
+		iOverride := ImageOverride{
+			ImageRef: ImageRef{
+				Image: image.Annotations[ImagesLockKbldID],
+			},
+			NewImage:    image.Image,
+			Preresolved: true,
+		}
+		overrides = append(overrides, iOverride)
+	}
+
+	return overrides
 }

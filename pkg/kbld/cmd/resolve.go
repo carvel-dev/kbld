@@ -240,7 +240,7 @@ func (o *ResolveOptions) emitLockOutput(conf ctlconf.Conf, resolvedImages *Proce
 		for _, urlImagePair := range resolvedImages.All() {
 			iLock.Spec.Images = append(iLock.Spec.Images, ctlconf.ImagesLockEntry{
 				Image:       urlImagePair.Image.URL,
-				Annotations: map[string]string{"kbld.carvel.dev/id": urlImagePair.UnprocessedImageURL.URL},
+				Annotations: map[string]string{ctlconf.ImagesLockKbldID: urlImagePair.UnprocessedImageURL.URL},
 			})
 		}
 		return iLock.WriteToFile(o.ImgpkgLockOutput)
