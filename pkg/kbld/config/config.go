@@ -34,7 +34,6 @@ var (
 		{configAPIVersion, imageOverridesKind},
 		{configAPIVersion, imageDestinationsKind},
 		{configAPIVersion, imageKeysKind},
-		{ImagesLockAPIVersion, ImagesLockKind},
 	}
 )
 
@@ -49,7 +48,6 @@ type Config struct {
 	Destinations []ImageDestination `json:"destinations,omitempty"`
 	Keys         []string           `json:"keys,omitempty"`
 	SearchRules  []SearchRule       `json:"searchRules,omitempty"`
-	Spec         *ImagesLockSpec    `json:"spec,omitempty"`
 }
 
 type Source struct {
@@ -148,6 +146,40 @@ func NewConfigFromResource(res ctlres.Resource) (Config, error) {
 	}
 
 	return config, nil
+}
+
+func NewConfigFromImagesLock(res ctlres.Resource) (Config, error) {
+	iLockBytes, err := res.AsYAMLBytes()
+	if err != nil {
+		return Config{}, err
+	}
+
+	var imagesLock ImagesLock
+
+	err = yaml.Unmarshal(iLockBytes, &imagesLock)
+	if err != nil {
+		return Config{}, fmt.Errorf("Unmarshaling %s: %s", res.Description(), err)
+	}
+
+	overridesConfig := NewConfig()
+
+	for _, image := range imagesLock.Spec.Images {
+		iOverride := ImageOverride{
+			ImageRef: ImageRef{
+				Image: image.Annotations[ImagesLockKbldID],
+			},
+			NewImage:    image.Image,
+			Preresolved: true,
+		}
+		overridesConfig.Overrides = append(overridesConfig.Overrides, iOverride)
+	}
+
+	err = overridesConfig.Validate()
+	if err != nil {
+		return Config{}, fmt.Errorf("Validating %s: %s", res.Description(), err)
+	}
+
+	return overridesConfig, nil
 }
 
 func (d Config) Validate() error {

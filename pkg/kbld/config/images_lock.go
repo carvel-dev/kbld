@@ -22,7 +22,7 @@ type ImagesLock struct {
 }
 
 type ImagesLockSpec struct {
-	Images []ImagesLockEntry `json:"images,omitempty"`
+	Images []ImagesLockEntry
 }
 
 type ImagesLockEntry struct {
@@ -42,21 +42,4 @@ func (i ImagesLock) WriteToFile(path string) error {
 	}
 
 	return nil
-}
-
-func (i ImagesLockSpec) AsOverrides() []ImageOverride {
-	var overrides []ImageOverride
-
-	for _, image := range i.Images {
-		iOverride := ImageOverride{
-			ImageRef: ImageRef{
-				Image: image.Annotations[ImagesLockKbldID],
-			},
-			NewImage:    image.Image,
-			Preresolved: true,
-		}
-		overrides = append(overrides, iOverride)
-	}
-
-	return overrides
 }

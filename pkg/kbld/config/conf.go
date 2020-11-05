@@ -18,17 +18,23 @@ func NewConfFromResources(resources []ctlres.Resource) ([]ctlres.Resource, Conf,
 	var configs []Config
 
 	for _, res := range resources {
-		if matchesConfigKind(res) {
+		switch {
+		case matchesConfigKind(res):
 			config, err := NewConfigFromResource(res)
 			if err != nil {
 				return nil, Conf{}, err
 			}
 			configs = append(configs, config)
-		} else {
+		case res.APIVersion() == ImagesLockAPIVersion && res.Kind() == ImagesLockKind:
+			config, err := NewConfigFromImagesLock(res)
+			if err != nil {
+				return nil, Conf{}, err
+			}
+			configs = append(configs, config)
+		default:
 			rsWithoutConfigs = append(rsWithoutConfigs, res)
 		}
 	}
-
 	return rsWithoutConfigs, Conf{configs}, nil
 }
 
@@ -60,9 +66,6 @@ func (c Conf) ImageOverrides() []ImageOverride {
 	var result []ImageOverride
 	for _, config := range c.configs {
 		result = append(result, config.Overrides...)
-		if config.Spec != nil {
-			result = append(result, config.Spec.AsOverrides()...)
-		}
 	}
 	return result
 }
