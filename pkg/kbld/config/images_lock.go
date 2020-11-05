@@ -5,7 +5,7 @@ package config
 
 import (
 	"fmt"
-	"gopkg.in/yaml.v2"
+	"github.com/ghodss/yaml"
 	"io/ioutil"
 )
 
@@ -16,18 +16,18 @@ const (
 )
 
 type ImagesLock struct {
-	APIVersion string `yaml:"apiVersion"`
-	Kind       string
-	Spec       ImagesLockSpec
+	APIVersion string         `json:"apiVersion"`
+	Kind       string         `json:"kind"`
+	Spec       ImagesLockSpec `json:"spec"`
 }
 
 type ImagesLockSpec struct {
-	Images []ImagesLockEntry
+	Images []ImagesLockEntry `json:"images"`
 }
 
 type ImagesLockEntry struct {
-	Image       string
-	Annotations map[string]string
+	Image       string            `json:"image"`
+	Annotations map[string]string `json:"annotations"`
 }
 
 func (i ImagesLock) WriteToFile(path string) error {
