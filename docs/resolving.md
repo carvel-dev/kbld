@@ -98,7 +98,7 @@ spec:
   images:
   - image: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
     annoations:
-      kbld.carvel.dev/ID: nginx:1.14.2
+      kbld.carvel.dev/id: nginx:1.14.2
 ```
 
 An ImagesLock can be included with configuration via `-f` to produce same resolved configuration, for example, `kbld -f input.yml -f /tmp/imgpkg.lock.yml` produces:
