@@ -12,12 +12,12 @@ require (
 	github.com/google/gofuzz v1.1.0 // indirect
 	github.com/hashicorp/go-version v1.2.0
 	github.com/json-iterator/go v1.1.9 // indirect
-	github.com/kisielk/errcheck v1.4.0 // indirect
 	github.com/onsi/ginkgo v1.12.0 // indirect
 	github.com/onsi/gomega v1.9.0 // indirect
 	github.com/spf13/cobra v0.0.5
 	github.com/stretchr/testify v1.5.1 // indirect
+	golang.org/x/net v0.0.0-20201021035429-f5854403a974 // indirect
 	golang.org/x/sync v0.0.0-20201020160332-67f06af15bc9
-	golang.org/x/tools v0.0.0-20201112185108-eeaa07dd7696 // indirect
+	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 	k8s.io/apimachinery v0.17.4
 )
