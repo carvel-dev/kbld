@@ -4,6 +4,7 @@
 package e2e
 
 import (
+	"fmt"
 	"regexp"
 	"strings"
 	"testing"
@@ -54,6 +55,12 @@ spec:
 
 func TestKubectlBuildkitBuildAndPushSuccessful(t *testing.T) {
 	env := BuildEnv(t)
+
+	if env.SkipWhenHTTPRegistry {
+		fmt.Printf("This is a test that cannot run against HTTP registry; skipping.")
+		return
+	}
+
 	kbld := Kbld{t, env.Namespace, env.KbldBinaryPath, Logger{}}
 
 	input := env.WithRegistries(`
