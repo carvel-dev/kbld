@@ -12,7 +12,7 @@ require (
 	github.com/google/gofuzz v1.1.0 // indirect
 	github.com/hashicorp/go-version v1.2.0
 	github.com/json-iterator/go v1.1.9 // indirect
-	github.com/kisielk/errcheck v1.4.0 // indirect
+	github.com/kisielk/errcheck v1.4.0
 	github.com/onsi/ginkgo v1.12.0 // indirect
 	github.com/onsi/gomega v1.9.0 // indirect
 	github.com/spf13/cobra v0.0.5
