@@ -56,8 +56,9 @@ type Source struct {
 	ImageRef
 	Path string
 
-	Docker *SourceDockerOpts
-	Pack   *SourcePackOpts
+	Docker          *SourceDockerOpts
+	Pack            *SourcePackOpts
+	KubectlBuildkit *SourceKubectlBuildkitOpts
 }
 
 type ImageOverride struct {

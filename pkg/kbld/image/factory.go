@@ -35,16 +35,20 @@ func (f Factory) New(url string) Image {
 	}
 
 	if srcConf, found := f.shouldBuild(url); found {
+		imgDstConf := f.optionalPushConf(url)
+
 		docker := Docker{f.logger}
 		pack := Pack{docker, f.logger}
+		kubectlBuildkit := KubectlBuildkit{f.logger}
 
-		buildImg := NewBuiltImage(url, srcConf, docker, pack)
+		builtImg := NewBuiltImage(url, srcConf, imgDstConf,
+			docker, pack, kubectlBuildkit)
 
-		if imgDstConf, found := f.shouldPush(url); found {
-			pushedImg := NewPushedImage(buildImg, imgDstConf, docker)
-			return NewTaggedImage(pushedImg, imgDstConf, f.registry)
+		if imgDstConf != nil {
+			return NewTaggedImage(builtImg, *imgDstConf, f.registry)
 		}
-		return buildImg
+
+		return builtImg
 	}
 
 	digestedImage := MaybeNewDigestedImage(url)
@@ -75,12 +79,12 @@ func (f Factory) shouldBuild(url string) (ctlconf.Source, bool) {
 	return ctlconf.Source{}, false
 }
 
-func (f Factory) shouldPush(url string) (ctlconf.ImageDestination, bool) {
+func (f Factory) optionalPushConf(url string) *ctlconf.ImageDestination {
 	urlMatcher := Matcher{url}
 	for _, dst := range f.conf.ImageDestinations() {
 		if urlMatcher.Matches(dst.ImageRef) {
-			return dst, true
+			return &dst
 		}
 	}
-	return ctlconf.ImageDestination{}, false
+	return nil
 }
