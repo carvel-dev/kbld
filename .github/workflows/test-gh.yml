@@ -17,13 +17,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Set up Go 1.x
-      uses: actions/setup-go@v1
+      uses: actions/setup-go@v2
       with:
         go-version: "1.13"
     - name: Check out code into the Go module directory
       uses: actions/checkout@v2
       with:
-        path: src/github.com/k14s/kbld
+        path: src/github.com/${{ github.repository }}
     - name: Run Tests
       run: |
         set -e -x
@@ -54,8 +54,7 @@ jobs:
         wget -O- https://github.com/buildpacks/pack/releases/download/v0.8.1/pack-v0.8.1-linux.tgz > /tmp/pack-cli.tgz
         tar xzvf /tmp/pack-cli.tgz -C /tmp/bin
 
-        export GOPATH=$(echo `pwd`)
-        cd src/github.com/k14s/kbld
+        cd "src/github.com/${{ github.repository }}"
 
         export KBLD_E2E_SKIP_WHEN_HTTP_REGISTRY=true
         ./hack/test-all-minikube-local-registry.sh
