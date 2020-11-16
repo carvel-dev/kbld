@@ -12,25 +12,26 @@ import (
 type BuiltImage struct {
 	url         string
 	buildSource ctlconf.Source
-	docker      Docker
-	pack        Pack
+	imgDst      *ctlconf.ImageDestination
+
+	docker          Docker
+	pack            Pack
+	kubectlBuildkit KubectlBuildkit
 }
 
-func NewBuiltImage(url string, buildSource ctlconf.Source,
-	docker Docker, pack Pack) BuiltImage {
+func NewBuiltImage(url string, buildSource ctlconf.Source, imgDst *ctlconf.ImageDestination,
+	docker Docker, pack Pack, kubectlBuildkit KubectlBuildkit) BuiltImage {
 
-	return BuiltImage{url, buildSource, docker, pack}
+	return BuiltImage{url, buildSource, imgDst, docker, pack, kubectlBuildkit}
 }
 
 func (i BuiltImage) URL() (string, []ImageMeta, error) {
-	sources, err := i.sources()
+	metas, err := i.sources()
 	if err != nil {
 		return "", nil, err
 	}
 
 	urlRepo, _ := URLRepo(i.url)
-
-	var digestStr string
 
 	switch {
 	case i.buildSource.Pack != nil:
@@ -41,12 +42,17 @@ func (i BuiltImage) URL() (string, []ImageMeta, error) {
 			RawOptions: i.buildSource.Pack.Build.RawOptions,
 		}
 
-		digest, err := i.pack.Build(urlRepo, i.buildSource.Path, opts)
+		dockerTmpRef, err := i.pack.Build(urlRepo, i.buildSource.Path, opts)
 		if err != nil {
 			return "", nil, err
 		}
 
-		digestStr = digest.AsString()
+		return i.optionalPushWithDocker(dockerTmpRef, metas)
+
+	case i.buildSource.KubectlBuildkit != nil:
+		url, err := i.kubectlBuildkit.BuildAndPush(
+			urlRepo, i.buildSource.Path, i.imgDst, *i.buildSource.KubectlBuildkit)
+		return url, metas, err
 
 	default:
 		if i.buildSource.Docker == nil {
@@ -61,15 +67,31 @@ func (i BuiltImage) URL() (string, []ImageMeta, error) {
 			RawOptions: i.buildSource.Docker.Build.RawOptions,
 		}
 
-		digest, err := i.docker.Build(urlRepo, i.buildSource.Path, opts)
+		dockerTmpRef, err := i.docker.Build(urlRepo, i.buildSource.Path, opts)
 		if err != nil {
 			return "", nil, err
 		}
 
-		digestStr = digest.AsString()
+		return i.optionalPushWithDocker(dockerTmpRef, metas)
+	}
+}
+
+func (i BuiltImage) optionalPushWithDocker(dockerTmpRef DockerTmpRef, metas []ImageMeta) (string, []ImageMeta, error) {
+	if i.imgDst != nil {
+		digest, err := i.docker.Push(dockerTmpRef, i.imgDst.NewImage)
+		if err != nil {
+			return "", nil, err
+		}
+
+		url, metas2, err := NewDigestedImageFromParts(i.imgDst.NewImage, digest.AsString()).URL()
+		if err != nil {
+			return "", nil, err
+		}
+
+		return url, append(metas, metas2...), nil
 	}
 
-	return digestStr, sources, nil
+	return dockerTmpRef.AsString(), metas, nil
 }
 
 type BuiltImageSourceGit struct {

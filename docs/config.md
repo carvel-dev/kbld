@@ -6,7 +6,11 @@ You can configure kbld by adding configuration resources (they follow Kubernetes
 
 Sources resource configures kbld to execute image building operation based on specified path.
 
-Two builders are currently supported: [Docker](https://docs.docker.com/engine/reference/commandline/cli/) (default) and [pack](https://github.com/buildpack/pack).
+Builders currently supported:
+
+- [Docker](https://docs.docker.com/engine/reference/commandline/cli/) (default)
+- [pack](https://github.com/buildpack/pack)
+- [buildkit-cli-for-kubectl](https://github.com/vmware-tanzu/buildkit-cli-for-kubectl)
 
 ```yaml
 ---
@@ -60,6 +64,39 @@ sources:
 - `pack.build.buildpacks` ([]string): Set list of buildpacks to be used (no default)
 - `pack.build.clearCache` (bool): Clear cache before building image (default is false)
 - `pack.build.rawOptions` ([]string): Refer to `pack build -h` for all available flags
+
+#### BuildKit CLI for kubectl
+
+```yaml
+---
+apiVersion: kbld.k14s.io/v1alpha1
+kind: Sources
+sources:
+- image: image1
+  path: src/
+  kubectlBuildkit:
+    # all options shown; none are required
+    build:
+      target: "some-target"
+      pull: true
+      noCache: true
+      file: "hack/Dockefile.dev"
+      rawOptions: ["--platform=..."]
+```
+
+- `kubectlBuildkit.build.target` (string): Set the target build stage to build (no default)
+- `kubectlBuildkit.build.pull` (bool): Always attempt to pull a newer version of the image (default is false)
+- `kubectlBuildkit.build.noCache` (bool): Do not use cache when building the image (default is false)
+- `kubectlBuildkit.build.file` (string): Name of the Dockerfile (default is Dockerfile)
+- `kubectlBuildkit.build.rawOptions` ([]string): Refer to `kubectl buildkit build -h` for all available options
+
+To provide registry credentials to the builder, create a Kubernetes docker secret:
+
+```
+kubectl create secret docker-registry buildkit --docker-server=https://index.docker.io/v1/ --docker-username=my-user --docker-password=my-password
+```
+
+See project site for details: [buildkit-cli-for-kubectl](https://github.com/vmware-tanzu/buildkit-cli-for-kubectl).
 
 ### ImageDestinations
 

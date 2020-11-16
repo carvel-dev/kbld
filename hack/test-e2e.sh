@@ -7,6 +7,11 @@ if [ "$(pack version)" != "v0.8.1 (git sha: e776ebf0096363bbac60771a456af9418273
   exit 1
 fi
 
+if [ "$(kubectl-buildkit version)" != "refs/tags/v0.1.0" ]; then
+  echo "Please install 'kubectl-buildkit' from https://github.com/vmware-tanzu/buildkit-cli-for-kubectl/releases/tag/v0.1.0"
+  exit 1
+fi
+
 go clean -testcache
 
 export KBLD_BINARY_PATH="${KBLD_BINARY_PATH:-$PWD/kbld}"
