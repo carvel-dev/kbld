@@ -6,8 +6,13 @@ package image
 import (
 	"crypto/rand"
 	"fmt"
+	"regexp"
 	"strings"
 	"time"
+)
+
+var (
+	tagBuilderTagCleanRegexp = regexp.MustCompile("[^a-zA-Z0-9\\-]+")
 )
 
 type TagBuilder struct{}
@@ -34,6 +39,10 @@ func (d TagBuilder) TrimStr(str string, num int) string {
 		}
 	}
 	return str
+}
+
+func (d TagBuilder) CleanStr(str string) string {
+	return tagBuilderTagCleanRegexp.ReplaceAllString(str, "-")
 }
 
 func (d TagBuilder) RandomStr50() (string, error) {

@@ -5,21 +5,14 @@ package image
 
 import (
 	"bytes"
-	"crypto/rand"
 	"encoding/json"
 	"fmt"
 	"io"
 	"os"
 	"os/exec"
-	"regexp"
 	"strings"
-	"time"
 
 	regname "github.com/google/go-containerregistry/pkg/name"
-)
-
-var (
-	tmpRefHint = regexp.MustCompile("[^a-zA-Z0-9\\-]+")
 )
 
 type Docker struct {
@@ -53,15 +46,17 @@ func (d Docker) Build(image, directory string, opts DockerBuildOpts) (DockerTmpR
 		return DockerTmpRef{}, err
 	}
 
-	randPrefix50, err := d.randomStr50()
+	tb := TagBuilder{}
+
+	randPrefix50, err := tb.RandomStr50()
 	if err != nil {
 		return DockerTmpRef{}, fmt.Errorf("Generating tmp image suffix: %s", err)
 	}
 
-	tmpRef := DockerTmpRef{d.checkTagLen128(fmt.Sprintf(
-		"kbld:%s-%s",
+	tmpRef := DockerTmpRef{"kbld:" + tb.CheckTagLen128(fmt.Sprintf(
+		"%s-%s",
 		randPrefix50,
-		d.trimStr(tmpRefHint.ReplaceAllString(image, "-"), 50),
+		tb.TrimStr(tb.CleanStr(image), 50),
 	))}
 
 	prefixedLogger := d.logger.NewPrefixedWriter(image + " | ")
@@ -118,13 +113,15 @@ func (d Docker) Build(image, directory string, opts DockerBuildOpts) (DockerTmpR
 func (d Docker) RetagStable(tmpRef DockerTmpRef, image, imageID string,
 	prefixedLogger *LoggerPrefixWriter) (DockerTmpRef, error) {
 
+	tb := TagBuilder{}
+
 	// Retag image with its sha256 to produce exact image ref if nothing has changed.
 	// Seems that Docker doesn't like `kbld@sha256:...` format for local images.
 	// Image hint at the beginning for easier sorting.
-	stableTmpRef := DockerTmpRef{d.checkTagLen128(fmt.Sprintf(
-		"kbld:%s-%s",
-		d.trimStr(tmpRefHint.ReplaceAllString(image, "-"), 50),
-		d.checkLen(tmpRefHint.ReplaceAllString(imageID, "-"), 72),
+	stableTmpRef := DockerTmpRef{"kbld:" + tb.CheckTagLen128(fmt.Sprintf(
+		"%s-%s",
+		tb.TrimStr(tb.CleanStr(image), 50),
+		tb.CheckLen(tb.CleanStr(imageID), 72),
 	))}
 
 	{
@@ -163,12 +160,14 @@ func (d Docker) RetagStable(tmpRef DockerTmpRef, image, imageID string,
 func (d Docker) Push(tmpRef DockerTmpRef, imageDst string) (DockerImageDigest, error) {
 	prefixedLogger := d.logger.NewPrefixedWriter(imageDst + " | ")
 
+	tb := TagBuilder{}
+
 	// Generate random tag for pushed image.
 	// TODO we are technically polluting registry with new tags.
 	// Unfortunately we do not know digest upfront so cannot use kbld-sha256-... format.
 	imageDstTagged, err := regname.NewTag(imageDst, regname.WeakValidation)
 	if err == nil {
-		randSuffix, err := d.randomStr50()
+		randSuffix, err := tb.RandomStr50()
 		if err != nil {
 			return DockerImageDigest{}, fmt.Errorf("Generating image dst suffix: %s", err)
 		}
@@ -309,50 +308,4 @@ func (d Docker) inspect(ref string) (dockerInspectData, error) {
 	}
 
 	return data[0], nil
-}
-
-func (d Docker) checkTagLen128(tag string) string {
-	// "A tag ... may contain a maximum of 128 characters."
-	// (https://docs.docker.com/engine/reference/commandline/tag/)
-	return d.checkLen(tag, 128)
-}
-
-func (d Docker) checkLen(str string, num int) string {
-	if len(str) > num {
-		panic(fmt.Sprintf("Expected string '%s' len to be less than %d", str, num))
-	}
-	return str
-}
-
-func (d Docker) trimStr(str string, num int) string {
-	if len(str) > num {
-		str = str[:num]
-		// Do not end strings on dash
-		if strings.HasSuffix(str, "-") {
-			str = str[:len(str)-1] + "e"
-		}
-	}
-	return str
-}
-
-func (d Docker) randomStr50() (string, error) {
-	bs, err := d.randomBytes(5)
-	if err != nil {
-		return "", err
-	}
-	result := ""
-	for _, b := range bs {
-		result += fmt.Sprintf("%d", b)
-	}
-	// Timestamp at the beginning for easier sorting
-	return d.checkLen(fmt.Sprintf("rand-%d-%s", time.Now().UTC().UnixNano(), result), 50), nil
-}
-
-func (d Docker) randomBytes(n int) ([]byte, error) {
-	bs := make([]byte, n)
-	_, err := rand.Read(bs)
-	if err != nil {
-		return nil, err
-	}
-	return bs, nil
 }
