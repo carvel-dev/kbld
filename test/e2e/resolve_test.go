@@ -456,3 +456,57 @@ spec:
 		t.Fatalf("Expected >>>%s<<< to match >>>%s<<<", out, expectedOut)
 	}
 }
+
+func TestResolveSuccessfulWithTagSelection(t *testing.T) {
+	env := BuildEnv(t)
+	kbld := Kbld{t, env.Namespace, env.KbldBinaryPath, Logger{}}
+
+	input := `
+kind: Object
+spec:
+- image: nginx1
+- image: nginx2
+---
+apiVersion: kbld.k14s.io/v1alpha1
+kind: ImageOverrides
+overrides:
+- image: nginx1
+  newImage: index.docker.io/library/nginx
+  tagSelection:
+    semver:
+      constraints: "<=1.14.2"
+- image: nginx2
+  newImage: index.docker.io/library/nginx
+  tagSelection:
+    semver:
+      constraints: "<1.14.2"
+`
+
+	out, _ := kbld.RunWithOpts([]string{"-f", "-"}, RunOpts{
+		StdinReader: strings.NewReader(input),
+	})
+
+	expectedOut := `---
+kind: Object
+metadata:
+  annotations:
+    kbld.k14s.io/images: |
+      - Metas:
+        - Tag: 1.14.1
+          Type: resolved
+          URL: index.docker.io/library/nginx:1.14.1
+        URL: index.docker.io/library/nginx@sha256:32fdf92b4e986e109e4db0865758020cb0c3b70d6ba80d02fe87bad5cc3dc228
+      - Metas:
+        - Tag: 1.14.2
+          Type: resolved
+          URL: index.docker.io/library/nginx:1.14.2
+        URL: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
+spec:
+- image: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
+- image: index.docker.io/library/nginx@sha256:32fdf92b4e986e109e4db0865758020cb0c3b70d6ba80d02fe87bad5cc3dc228
+`
+
+	if out != expectedOut {
+		t.Fatalf("Expected >>>%s<<< to match >>>%s<<<", out, expectedOut)
+	}
+}

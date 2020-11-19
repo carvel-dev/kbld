@@ -35,6 +35,8 @@ func (f Factory) New(url string) Image {
 		url = overrideConf.NewImage
 		if overrideConf.Preresolved {
 			return NewPreresolvedImage(url)
+		} else if overrideConf.TagSelection != nil {
+			return NewTagSelectedImage(url, overrideConf.TagSelection, f.registry)
 		}
 	}
 

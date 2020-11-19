@@ -129,33 +129,6 @@ destinations:
   - latest-staging
 ```
 
-### ImageOverrides
-
-ImageOverrides resource configures kbld to rewrite image location before trying to build it or resolve it.
-
-```yaml
----
-apiVersion: kbld.k14s.io/v1alpha1
-kind: ImageOverrides
-overrides:
-- image: unknown
-  newImage: docker.io/library/nginx:1.14.2
-```
-
-It can also hold `preresolved` new image, so no building or resolution happens:
-
-```yaml
----
-apiVersion: kbld.k14s.io/v1alpha1
-kind: ImageOverrides
-overrides:
-- image: unknown
-  newImage: docker.io/library/nginx:1.14.2
-  preresolved: true
-```
-
-For preresolved images, kbld will not connect to registry to obtain any metadata.
-
 ### ImageKeys
 
 (Deprecated as of v0.18.0+, use `searchRules` within `Config` kind to specify custom image reference matching rules.)
@@ -172,17 +145,24 @@ keys:
 
 ### Config
 
+Multiple `Config` kind resources can be specified.
+
 ```yaml
 ---
 apiVersion: kbld.k14s.io/v1alpha1
 kind: Config
 minimumRequiredVersion: 0.15.0
+
 searchRules:
 - keyMatcher:
     name: sidecarImage
 - valueMatcher:
     image: exact-image
     imageRepo: gcr.io/some/repo
+
+overrides:
+- image: unknown
+  newImage: docker.io/library/nginx:1.14.2
 ```
 
 - `searchRules` (optional) allows to specify one or more matchers for finding image references. Key and value matchers could be specified together or separately. If key and value matchers are specified together, both matchers must succeed. This functionality supersedes `ImageKeys` kind. 
@@ -199,6 +179,54 @@ searchRules:
       - `searchRules` ... (recursive)
     - `yaml` (optional) parses YAML and identifies image refs by specified search rules
       - `searchRules` ... (recursive)
+- `overrides` (optional; array) configures kbld to rewrite image location before trying to build image or resolve it to a digest.
+  - `image` (optional) image matcher
+  - `newImage` (optional) could be image repository, image tag ref, or image digest ref
+  - `preresolved` (optional; bool) specifies if `newImage` should be used as is
+  - `tagSelection` (optional; VersionSelection) specifies how to resolve tag for `newImage`. `newImage` in this case is expected to specify just repository (e.g. `gcr.io/my-corp/app`) without a tag. [See `VersionSelection` type details](https://github.com/vmware-tanzu/carvel-vendir/blob/develop/docs/versions.md#versionselection-type).
+
+#### Overrides
+
+Overrides configure kbld to rewrite image location before trying to build it or resolve it to a digest.
+
+```yaml
+---
+apiVersion: kbld.k14s.io/v1alpha1
+kind: Config
+overrides:
+- image: unknown
+  newImage: docker.io/library/nginx:1.14.2
+```
+
+It can also hold `preresolved` new image, so no building or resolution happens (for preresolved images, kbld will not connect to registry to obtain any metadata):
+
+```yaml
+---
+apiVersion: kbld.k14s.io/v1alpha1
+kind: Config
+overrides:
+- image: unknown
+  newImage: docker.io/library/nginx:1.14.2
+  preresolved: true
+```
+
+`tagSelection` can be used for dynamic selection of a tag based on various strategies. Currently only `semver` strategy is available.
+
+```yaml
+---
+apiVersion: kbld.k14s.io/v1alpha1
+kind: Config
+overrides:
+- image: unknown
+  newImage: docker.io/library/nginx
+  tagSelection:
+    semver:
+      constraints: "<1.15.0"
+```
+
+### ImageOverrides
+
+We recommend using `Config` kind with overrides key instead of `ImageOverrides` kind. `overrides` key has same functionality under kind `Config` and `ImageOverrides`.
 
 #### Example for `updateStrategy` that parses YAML
 
