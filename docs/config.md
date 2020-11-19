@@ -129,20 +129,6 @@ destinations:
   - latest-staging
 ```
 
-### ImageKeys
-
-(Deprecated as of v0.18.0+, use `searchRules` within `Config` kind to specify custom image reference matching rules.)
-
-ImageKeys resource configures kbld to look for additional keys that reference images (in addition to using default `image` key).
-
-```yaml
----
-apiVersion: kbld.k14s.io/v1alpha1
-kind: ImageKeys
-keys:
-- sidecarImage
-```
-
 ### Config
 
 Multiple `Config` kind resources can be specified.
