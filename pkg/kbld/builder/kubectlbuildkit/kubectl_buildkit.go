@@ -11,7 +11,9 @@ import (
 	"regexp"
 
 	regname "github.com/google/go-containerregistry/pkg/name"
+	ctlb "github.com/k14s/kbld/pkg/kbld/builder"
 	ctlconf "github.com/k14s/kbld/pkg/kbld/config"
+	ctllog "github.com/k14s/kbld/pkg/kbld/logger"
 )
 
 var (
@@ -29,7 +31,11 @@ var (
 )
 
 type KubectlBuildkit struct {
-	logger Logger
+	logger ctllog.Logger
+}
+
+func NewKubectlBuildkit(logger ctllog.Logger) KubectlBuildkit {
+	return KubectlBuildkit{logger}
 }
 
 func (d KubectlBuildkit) BuildAndPush(image, directory string,
@@ -113,7 +119,7 @@ func (d KubectlBuildkit) BuildAndPush(image, directory string,
 }
 
 func (d KubectlBuildkit) tagRef(image string, imgDst *ctlconf.ImageDestination) (string, error) {
-	tb := TagBuilder{}
+	tb := ctlb.TagBuilder{}
 
 	randPrefix50, err := tb.RandomStr50()
 	if err != nil {

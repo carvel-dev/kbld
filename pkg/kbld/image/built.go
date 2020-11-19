@@ -6,6 +6,9 @@ package image
 import (
 	"path/filepath"
 
+	ctlbdk "github.com/k14s/kbld/pkg/kbld/builder/docker"
+	ctlbkb "github.com/k14s/kbld/pkg/kbld/builder/kubectlbuildkit"
+	ctlbpk "github.com/k14s/kbld/pkg/kbld/builder/pack"
 	ctlconf "github.com/k14s/kbld/pkg/kbld/config"
 )
 
@@ -14,13 +17,13 @@ type BuiltImage struct {
 	buildSource ctlconf.Source
 	imgDst      *ctlconf.ImageDestination
 
-	docker          Docker
-	pack            Pack
-	kubectlBuildkit KubectlBuildkit
+	docker          ctlbdk.Docker
+	pack            ctlbpk.Pack
+	kubectlBuildkit ctlbkb.KubectlBuildkit
 }
 
 func NewBuiltImage(url string, buildSource ctlconf.Source, imgDst *ctlconf.ImageDestination,
-	docker Docker, pack Pack, kubectlBuildkit KubectlBuildkit) BuiltImage {
+	docker ctlbdk.Docker, pack ctlbpk.Pack, kubectlBuildkit ctlbkb.KubectlBuildkit) BuiltImage {
 
 	return BuiltImage{url, buildSource, imgDst, docker, pack, kubectlBuildkit}
 }
@@ -35,7 +38,7 @@ func (i BuiltImage) URL() (string, []ImageMeta, error) {
 
 	switch {
 	case i.buildSource.Pack != nil:
-		opts := PackBuildOpts{
+		opts := ctlbpk.PackBuildOpts{
 			Builder:    i.buildSource.Pack.Build.Builder,
 			Buildpacks: i.buildSource.Pack.Build.Buildpacks,
 			ClearCache: i.buildSource.Pack.Build.ClearCache,
@@ -59,7 +62,7 @@ func (i BuiltImage) URL() (string, []ImageMeta, error) {
 			i.buildSource.Docker = &ctlconf.SourceDockerOpts{}
 		}
 
-		opts := DockerBuildOpts{
+		opts := ctlbdk.DockerBuildOpts{
 			Target:     i.buildSource.Docker.Build.Target,
 			Pull:       i.buildSource.Docker.Build.Pull,
 			NoCache:    i.buildSource.Docker.Build.NoCache,
@@ -76,7 +79,7 @@ func (i BuiltImage) URL() (string, []ImageMeta, error) {
 	}
 }
 
-func (i BuiltImage) optionalPushWithDocker(dockerTmpRef DockerTmpRef, metas []ImageMeta) (string, []ImageMeta, error) {
+func (i BuiltImage) optionalPushWithDocker(dockerTmpRef ctlbdk.DockerTmpRef, metas []ImageMeta) (string, []ImageMeta, error) {
 	if i.imgDst != nil {
 		digest, err := i.docker.Push(dockerTmpRef, i.imgDst.NewImage)
 		if err != nil {

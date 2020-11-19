@@ -11,7 +11,7 @@ import (
 	"github.com/ghodss/yaml"
 	regname "github.com/google/go-containerregistry/pkg/name"
 	ctlconf "github.com/k14s/kbld/pkg/kbld/config"
-	ctlimg "github.com/k14s/kbld/pkg/kbld/image"
+	ctllog "github.com/k14s/kbld/pkg/kbld/logger"
 	ctlreg "github.com/k14s/kbld/pkg/kbld/registry"
 	ctlres "github.com/k14s/kbld/pkg/kbld/resources"
 	ctlser "github.com/k14s/kbld/pkg/kbld/search"
@@ -57,7 +57,7 @@ func (o *RelocateOptions) Run() error {
 		return fmt.Errorf("Expected at least one input file")
 	}
 
-	logger := ctlimg.NewLogger(os.Stderr)
+	logger := ctllog.NewLogger(os.Stderr)
 	prefixedLogger := logger.NewPrefixedWriter("relocate | ")
 
 	// get resources from files

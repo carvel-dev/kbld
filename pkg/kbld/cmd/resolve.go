@@ -13,6 +13,7 @@ import (
 	"github.com/cppforlife/go-cli-ui/ui"
 	ctlconf "github.com/k14s/kbld/pkg/kbld/config"
 	ctlimg "github.com/k14s/kbld/pkg/kbld/image"
+	ctllog "github.com/k14s/kbld/pkg/kbld/logger"
 	ctlreg "github.com/k14s/kbld/pkg/kbld/registry"
 	ctlres "github.com/k14s/kbld/pkg/kbld/resources"
 	ctlser "github.com/k14s/kbld/pkg/kbld/search"
@@ -56,7 +57,7 @@ func (o *ResolveOptions) Run() error {
 	if o.ImgpkgLockOutput != "" && o.LockOutput != "" {
 		return fmt.Errorf("Can only output one lockfile type, please provide only one of '--lock-output' or '--imgpkg-lock-output'")
 	}
-	logger := ctlimg.NewLogger(os.Stderr)
+	logger := ctllog.NewLogger(os.Stderr)
 	prefixedLogger := logger.NewPrefixedWriter("resolve | ")
 
 	nonConfigRs, conf, err := o.FileFlags.ResourcesAndConfig()

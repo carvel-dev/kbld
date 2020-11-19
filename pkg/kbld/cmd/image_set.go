@@ -9,13 +9,14 @@ import (
 	regname "github.com/google/go-containerregistry/pkg/name"
 	ctlimg "github.com/k14s/kbld/pkg/kbld/image"
 	"github.com/k14s/kbld/pkg/kbld/imagedesc"
+	ctllog "github.com/k14s/kbld/pkg/kbld/logger"
 	ctlreg "github.com/k14s/kbld/pkg/kbld/registry"
 	"github.com/k14s/kbld/pkg/kbld/util"
 )
 
 type ImageSet struct {
 	concurrency int
-	logger      *ctlimg.LoggerPrefixWriter
+	logger      *ctllog.LoggerPrefixWriter
 }
 
 func (o ImageSet) Relocate(foundImages *UnprocessedImageURLs,

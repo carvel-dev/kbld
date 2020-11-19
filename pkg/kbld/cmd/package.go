@@ -10,8 +10,8 @@ import (
 	"github.com/cppforlife/go-cli-ui/ui"
 	regname "github.com/google/go-containerregistry/pkg/name"
 	ctlconf "github.com/k14s/kbld/pkg/kbld/config"
-	ctlimg "github.com/k14s/kbld/pkg/kbld/image"
 	"github.com/k14s/kbld/pkg/kbld/imagedesc"
+	ctllog "github.com/k14s/kbld/pkg/kbld/logger"
 	ctlreg "github.com/k14s/kbld/pkg/kbld/registry"
 	ctlres "github.com/k14s/kbld/pkg/kbld/resources"
 	ctlser "github.com/k14s/kbld/pkg/kbld/search"
@@ -52,7 +52,7 @@ func (o *PackageOptions) Run() error {
 		return fmt.Errorf("Expected 'output' flag to be non-empty")
 	}
 
-	logger := ctlimg.NewLogger(os.Stderr)
+	logger := ctllog.NewLogger(os.Stderr)
 	prefixedLogger := logger.NewPrefixedWriter("package | ")
 
 	rs, conf, err := o.FileFlags.ResourcesAndConfig()

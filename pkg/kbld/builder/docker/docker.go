@@ -13,10 +13,12 @@ import (
 	"strings"
 
 	regname "github.com/google/go-containerregistry/pkg/name"
+	ctlb "github.com/k14s/kbld/pkg/kbld/builder"
+	ctllog "github.com/k14s/kbld/pkg/kbld/logger"
 )
 
 type Docker struct {
-	logger Logger
+	logger ctllog.Logger
 }
 
 type DockerBuildOpts struct {
@@ -32,6 +34,10 @@ type DockerTmpRef struct {
 	val string
 }
 
+func NewDockerTmpRef(val string) DockerTmpRef {
+	return DockerTmpRef{val}
+}
+
 func (r DockerTmpRef) AsString() string { return r.val }
 
 type DockerImageDigest struct {
@@ -40,13 +46,17 @@ type DockerImageDigest struct {
 
 func (r DockerImageDigest) AsString() string { return r.val }
 
+func NewDocker(logger ctllog.Logger) Docker {
+	return Docker{logger}
+}
+
 func (d Docker) Build(image, directory string, opts DockerBuildOpts) (DockerTmpRef, error) {
 	err := d.ensureDirectory(directory)
 	if err != nil {
 		return DockerTmpRef{}, err
 	}
 
-	tb := TagBuilder{}
+	tb := ctlb.TagBuilder{}
 
 	randPrefix50, err := tb.RandomStr50()
 	if err != nil {
@@ -111,9 +121,9 @@ func (d Docker) Build(image, directory string, opts DockerBuildOpts) (DockerTmpR
 }
 
 func (d Docker) RetagStable(tmpRef DockerTmpRef, image, imageID string,
-	prefixedLogger *LoggerPrefixWriter) (DockerTmpRef, error) {
+	prefixedLogger *ctllog.LoggerPrefixWriter) (DockerTmpRef, error) {
 
-	tb := TagBuilder{}
+	tb := ctlb.TagBuilder{}
 
 	// Retag image with its sha256 to produce exact image ref if nothing has changed.
 	// Seems that Docker doesn't like `kbld@sha256:...` format for local images.
@@ -160,7 +170,7 @@ func (d Docker) RetagStable(tmpRef DockerTmpRef, image, imageID string,
 func (d Docker) Push(tmpRef DockerTmpRef, imageDst string) (DockerImageDigest, error) {
 	prefixedLogger := d.logger.NewPrefixedWriter(imageDst + " | ")
 
-	tb := TagBuilder{}
+	tb := ctlb.TagBuilder{}
 
 	// Generate random tag for pushed image.
 	// TODO we are technically polluting registry with new tags.
@@ -251,7 +261,9 @@ func (d Docker) ensureDirectory(directory string) error {
 	return nil
 }
 
-func (d Docker) determineRepoDigest(inspectData dockerInspectData, prefixedLogger *LoggerPrefixWriter) (DockerImageDigest, error) {
+func (d Docker) determineRepoDigest(inspectData dockerInspectData,
+	prefixedLogger *ctllog.LoggerPrefixWriter) (DockerImageDigest, error) {
+
 	if len(inspectData.RepoDigests) == 0 {
 		prefixedLogger.Write([]byte("missing repo digest\n"))
 		return DockerImageDigest{}, fmt.Errorf("Expected to find at least one repo digest")

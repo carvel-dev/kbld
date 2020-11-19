@@ -9,15 +9,15 @@ import (
 	"os"
 
 	regname "github.com/google/go-containerregistry/pkg/name"
-	ctlimg "github.com/k14s/kbld/pkg/kbld/image"
 	"github.com/k14s/kbld/pkg/kbld/imagetar"
+	ctllog "github.com/k14s/kbld/pkg/kbld/logger"
 	ctlreg "github.com/k14s/kbld/pkg/kbld/registry"
 )
 
 type TarImageSet struct {
 	imageSet    ImageSet
 	concurrency int
-	logger      *ctlimg.LoggerPrefixWriter
+	logger      *ctllog.LoggerPrefixWriter
 }
 
 func (o TarImageSet) Export(foundImages *UnprocessedImageURLs,

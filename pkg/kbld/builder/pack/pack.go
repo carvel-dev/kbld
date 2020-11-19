@@ -9,6 +9,9 @@ import (
 	"io"
 	"os/exec"
 	"regexp"
+
+	ctlbdk "github.com/k14s/kbld/pkg/kbld/builder/docker"
+	ctllog "github.com/k14s/kbld/pkg/kbld/logger"
 )
 
 var (
@@ -21,8 +24,8 @@ var (
 )
 
 type Pack struct {
-	docker Docker
-	logger Logger
+	docker ctlbdk.Docker
+	logger ctllog.Logger
 }
 
 type PackBuildOpts struct {
@@ -32,11 +35,11 @@ type PackBuildOpts struct {
 	RawOptions *[]string // pack build -h
 }
 
-func NewPack(docker Docker, logger Logger) Pack {
+func NewPack(docker ctlbdk.Docker, logger ctllog.Logger) Pack {
 	return Pack{docker, logger}
 }
 
-func (d Pack) Build(image, directory string, opts PackBuildOpts) (DockerTmpRef, error) {
+func (d Pack) Build(image, directory string, opts PackBuildOpts) (ctlbdk.DockerTmpRef, error) {
 	prefixedLogger := d.logger.NewPrefixedWriter(image + " | ")
 
 	prefixedLogger.Write([]byte(fmt.Sprintf("starting build (using pack): %s\n", directory)))
@@ -51,7 +54,7 @@ func (d Pack) Build(image, directory string, opts PackBuildOpts) (DockerTmpRef, 
 		cmdArgs := []string{"build", "--verbose", image, "--path", "."}
 
 		if opts.Builder == nil {
-			return DockerTmpRef{}, fmt.Errorf("Expected builder to be specified, but was not")
+			return ctlbdk.DockerTmpRef{}, fmt.Errorf("Expected builder to be specified, but was not")
 		}
 		cmdArgs = append(cmdArgs, "--builder", *opts.Builder)
 
@@ -75,20 +78,20 @@ func (d Pack) Build(image, directory string, opts PackBuildOpts) (DockerTmpRef, 
 		err := cmd.Run()
 		if err != nil {
 			prefixedLogger.Write([]byte(fmt.Sprintf("error: %s\n", err)))
-			return DockerTmpRef{}, err
+			return ctlbdk.DockerTmpRef{}, err
 		}
 
 		matches := packImageID.FindStringSubmatch(stdoutBuf.String())
 		if len(matches) != 3 {
-			return DockerTmpRef{}, fmt.Errorf("Expected to find image ID in pack output but did not")
+			return ctlbdk.DockerTmpRef{}, fmt.Errorf("Expected to find image ID in pack output but did not")
 		}
 
 		imageID = "sha256:" + matches[2]
 	}
 
-	return d.docker.RetagStable(DockerTmpRef{imageID}, image, imageID, prefixedLogger)
+	return d.docker.RetagStable(ctlbdk.NewDockerTmpRef(imageID), image, imageID, prefixedLogger)
 }
 
-func (d Pack) Push(tmpRef DockerTmpRef, imageDst string) (DockerImageDigest, error) {
+func (d Pack) Push(tmpRef ctlbdk.DockerTmpRef, imageDst string) (ctlbdk.DockerImageDigest, error) {
 	return d.docker.Push(tmpRef, imageDst)
 }

@@ -4,7 +4,11 @@
 package image
 
 import (
+	ctlbdk "github.com/k14s/kbld/pkg/kbld/builder/docker"
+	ctlbkb "github.com/k14s/kbld/pkg/kbld/builder/kubectlbuildkit"
+	ctlbpk "github.com/k14s/kbld/pkg/kbld/builder/pack"
 	ctlconf "github.com/k14s/kbld/pkg/kbld/config"
+	ctllog "github.com/k14s/kbld/pkg/kbld/logger"
 	ctlreg "github.com/k14s/kbld/pkg/kbld/registry"
 )
 
@@ -19,10 +23,10 @@ type ImageMeta interface {
 type Factory struct {
 	conf     ctlconf.Conf
 	registry ctlreg.Registry
-	logger   Logger
+	logger   ctllog.Logger
 }
 
-func NewFactory(conf ctlconf.Conf, registry ctlreg.Registry, logger Logger) Factory {
+func NewFactory(conf ctlconf.Conf, registry ctlreg.Registry, logger ctllog.Logger) Factory {
 	return Factory{conf, registry, logger}
 }
 
@@ -37,9 +41,9 @@ func (f Factory) New(url string) Image {
 	if srcConf, found := f.shouldBuild(url); found {
 		imgDstConf := f.optionalPushConf(url)
 
-		docker := Docker{f.logger}
-		pack := Pack{docker, f.logger}
-		kubectlBuildkit := KubectlBuildkit{f.logger}
+		docker := ctlbdk.NewDocker(f.logger)
+		pack := ctlbpk.NewPack(docker, f.logger)
+		kubectlBuildkit := ctlbkb.NewKubectlBuildkit(f.logger)
 
 		builtImg := NewBuiltImage(url, srcConf, imgDstConf,
 			docker, pack, kubectlBuildkit)
