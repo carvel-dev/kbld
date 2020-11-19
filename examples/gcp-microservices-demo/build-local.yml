@@ -1,5 +1,5 @@
 apiVersion: kbld.k14s.io/v1alpha1
-kind: Sources
+kind: Config
 sources:
 - image: emailservice
   path: src/emailservice
@@ -23,9 +23,6 @@ sources:
   path: src/loadgenerator
 - image: adservice
   path: src/adservice
----
-apiVersion: kbld.k14s.io/v1alpha1
-kind: ImageDestinations
 destinations:
 - image: emailservice
   newImage: docker.io/dkalinin/microservices-demo-emailservice

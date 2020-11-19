@@ -15,7 +15,7 @@ Builders currently supported:
 ```yaml
 ---
 apiVersion: kbld.k14s.io/v1alpha1
-kind: Sources
+kind: Config
 sources:
 - image: image1
   path: src/
@@ -26,7 +26,7 @@ sources:
 ```yaml
 ---
 apiVersion: kbld.k14s.io/v1alpha1
-kind: Sources
+kind: Config
 sources:
 - image: image1
   path: src/
@@ -51,7 +51,7 @@ sources:
 ```yaml
 ---
 apiVersion: kbld.k14s.io/v1alpha1
-kind: Sources
+kind: Config
 sources:
 - image: image1
   path: src/
@@ -70,7 +70,7 @@ sources:
 ```yaml
 ---
 apiVersion: kbld.k14s.io/v1alpha1
-kind: Sources
+kind: Config
 sources:
 - image: image1
   path: src/
@@ -107,7 +107,7 @@ Currently images are pushed via Docker daemon for both Docker and pack built ima
 ```yaml
 ---
 apiVersion: kbld.k14s.io/v1alpha1
-kind: ImageDestinations
+kind: Config
 destinations:
 - image: adservice
   newImage: docker.io/dkalinin/microservices-demo-adservice
@@ -118,7 +118,7 @@ As of v0.26.0+, additional tags could be specified to be associated with pushed 
 ```yaml
 ---
 apiVersion: kbld.k14s.io/v1alpha1
-kind: ImageDestinations
+kind: Config
 destinations:
 - image: adservice
   newImage: docker.io/dkalinin/microservices-demo-adservice
@@ -134,7 +134,7 @@ ImageOverrides resource configures kbld to rewrite image location before trying 
 ```yaml
 ---
 apiVersion: kbld.k14s.io/v1alpha1
-kind: ImageOverrides
+kind: Config
 overrides:
 - image: unknown
   newImage: docker.io/library/nginx:1.14.2
@@ -145,7 +145,7 @@ It can also hold `preresolved` new image, so no building or resolution happens:
 ```yaml
 ---
 apiVersion: kbld.k14s.io/v1alpha1
-kind: ImageOverrides
+kind: Config
 overrides:
 - image: unknown
   newImage: docker.io/library/nginx:1.14.2
@@ -163,7 +163,7 @@ ImageKeys resource configures kbld to look for additional keys that reference im
 ```yaml
 ---
 apiVersion: kbld.k14s.io/v1alpha1
-kind: ImageKeys
+kind: Config
 keys:
 - sidecarImage
 ```

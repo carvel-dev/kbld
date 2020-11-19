@@ -16,16 +16,13 @@ spec:
         image: simple-app
 ---
 apiVersion: kbld.k14s.io/v1alpha1
-kind: Sources
+kind: Config
 sources:
 - image: simple-app
   path: test/e2e/assets/simple-app
   kubectlBuildkit: {}
 
 ## Uncomment to also push to registry
-# ---
-# apiVersion: kbld.k14s.io/v1alpha1
-# kind: ImageDestinations
 # destinations:
 # - image: simple-app
 #   newImage: docker.io/k14stest/kbld-simple-app2
