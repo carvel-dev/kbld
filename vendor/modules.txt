@@ -4,6 +4,8 @@ github.com/aws/aws-lambda-go/lambda
 github.com/aws/aws-lambda-go/lambda/handlertrace
 github.com/aws/aws-lambda-go/lambda/messages
 github.com/aws/aws-lambda-go/lambdacontext
+# github.com/blang/semver/v4 v4.0.0
+github.com/blang/semver/v4
 # github.com/cppforlife/cobrautil v0.0.0-20180924214100-a39a1714c920
 github.com/cppforlife/cobrautil
 # github.com/cppforlife/go-cli-ui v0.0.0-20200506005011-4268990983cc
@@ -24,6 +26,8 @@ github.com/docker/docker-credential-helpers/credentials
 github.com/fatih/color
 # github.com/ghodss/yaml v1.0.0
 github.com/ghodss/yaml
+# github.com/go-logr/logr v0.2.0
+github.com/go-logr/logr
 # github.com/gogo/protobuf v1.3.1
 github.com/gogo/protobuf/proto
 github.com/gogo/protobuf/sortkeys
@@ -45,6 +49,8 @@ github.com/google/gofuzz
 github.com/hashicorp/go-version
 # github.com/inconshreveable/mousetrap v1.0.0
 github.com/inconshreveable/mousetrap
+# github.com/json-iterator/go v1.1.10
+github.com/json-iterator/go
 # github.com/kisielk/errcheck v1.4.0
 github.com/kisielk/errcheck
 github.com/kisielk/errcheck/internal/errcheck
@@ -52,7 +58,11 @@ github.com/kisielk/errcheck/internal/errcheck
 github.com/mattn/go-colorable
 # github.com/mattn/go-isatty v0.0.4
 github.com/mattn/go-isatty
-# github.com/pkg/errors v0.8.1
+# github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd
+github.com/modern-go/concurrent
+# github.com/modern-go/reflect2 v1.0.1
+github.com/modern-go/reflect2
+# github.com/pkg/errors v0.9.1
 github.com/pkg/errors
 # github.com/spf13/cobra v0.0.5
 github.com/spf13/cobra
@@ -61,6 +71,8 @@ github.com/spf13/pflag
 # github.com/vito/go-interact v0.0.0-20171111012221-fa338ed9e9ec
 github.com/vito/go-interact/interact
 github.com/vito/go-interact/interact/terminal
+# github.com/vmware-tanzu/carvel-vendir v0.14.1-0.20201119204632-393bea7fb738
+github.com/vmware-tanzu/carvel-vendir/pkg/vendir/versions
 # golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9
 golang.org/x/crypto/ssh/terminal
 # golang.org/x/mod v0.2.0
@@ -100,7 +112,7 @@ golang.org/x/xerrors/internal
 gopkg.in/inf.v0
 # gopkg.in/yaml.v2 v2.2.8
 gopkg.in/yaml.v2
-# k8s.io/apimachinery v0.17.4
+# k8s.io/apimachinery v0.19.0
 k8s.io/apimachinery/pkg/api/resource
 k8s.io/apimachinery/pkg/apis/meta/v1
 k8s.io/apimachinery/pkg/apis/meta/v1/unstructured
@@ -124,7 +136,9 @@ k8s.io/apimachinery/pkg/util/validation/field
 k8s.io/apimachinery/pkg/util/yaml
 k8s.io/apimachinery/pkg/watch
 k8s.io/apimachinery/third_party/forked/golang/reflect
-# k8s.io/klog v1.0.0
-k8s.io/klog
-# sigs.k8s.io/yaml v1.1.0
+# k8s.io/klog/v2 v2.2.0
+k8s.io/klog/v2
+# sigs.k8s.io/structured-merge-diff/v4 v4.0.1
+sigs.k8s.io/structured-merge-diff/v4/value
+# sigs.k8s.io/yaml v1.2.0
 sigs.k8s.io/yaml

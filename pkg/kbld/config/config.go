@@ -11,6 +11,7 @@ import (
 	semver "github.com/hashicorp/go-version"
 	ctlres "github.com/k14s/kbld/pkg/kbld/resources"
 	"github.com/k14s/kbld/pkg/kbld/version"
+	"github.com/vmware-tanzu/carvel-vendir/pkg/vendir/versions"
 )
 
 const (
@@ -61,8 +62,9 @@ type Source struct {
 
 type ImageOverride struct {
 	ImageRef
-	NewImage    string `json:"newImage"`
-	Preresolved bool   `json:"preresolved,omitempty"`
+	NewImage     string                     `json:"newImage"`
+	Preresolved  bool                       `json:"preresolved,omitempty"`
+	TagSelection *versions.VersionSelection `json:"tagSelection,omitempty"`
 }
 
 type ImageDestination struct {
