@@ -1,5 +1,5 @@
 apiVersion: kbld.k14s.io/v1alpha1
-kind: ImageOverrides
+kind: Config
 overrides:
 - image: emailservice
   newImage: gcr.io/google-samples/microservices-demo/emailservice:v0.1.0

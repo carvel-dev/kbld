@@ -33,15 +33,12 @@ spec:
         image: simple-app2
 ---
 apiVersion: kbld.k14s.io/v1alpha1
-kind: ImageOverrides
+kind: Config
 overrides:
 - image: simple-app
   newImage: simple-app
 - image: simple-app2
   newImage: simple-app
----
-apiVersion: kbld.k14s.io/v1alpha1
-kind: Sources
 sources:
 - image: simple-app
   path: test/e2e/assets/simple-app

@@ -62,12 +62,14 @@ kbld -f .
 kbld -f file.yml -f config2.yml
 ```
 
-### Generating resolution `imgpkg` lock output (available in 0.28.0+)
+### Generating resolution `imgpkg` lock output
+
+Available in 0.28.0+
 
 Using the `--imgpkg-lock-output` flag, users are able to create an [ImagesLock](https://github.com/k14s/imgpkg/blob/develop/docs/resources.md#imageslock) file that can be used as input for the packaging and distribution tool: [`imgpkg`](https://github.com/k14s/imgpkg)
 
-
 For example, the command `kbld -f input.yml --imgpkg-lock-output /tmp/imgpkg.lock.yml` with `input.yml`:
+
 ```yaml
 ---
 apiVersion: apps/v1

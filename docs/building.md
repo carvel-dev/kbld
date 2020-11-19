@@ -39,7 +39,7 @@ spec:
         image: another-simple-app #! <-- unresolved image ref
 ---
 apiVersion: kbld.k14s.io/v1alpha1
-kind: Sources
+kind: Config
 sources:
 - image: simple-app
   path: src/simple-app
@@ -99,7 +99,7 @@ As long as building tool has proper push access (run `docker login` for Docker),
 ```yaml
 ---
 apiVersion: kbld.k14s.io/v1alpha1
-kind: ImageDestinations
+kind: Config
 destinations:
 - image: simple-app
   newImage: docker.io/dkalinin/simple-app
