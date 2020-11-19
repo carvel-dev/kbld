@@ -67,6 +67,8 @@ sources:
 
 #### BuildKit CLI for kubectl
 
+Available as of v0.28.0+
+
 ```yaml
 ---
 apiVersion: kbld.k14s.io/v1alpha1
