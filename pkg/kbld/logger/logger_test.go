@@ -7,13 +7,13 @@ import (
 	"bytes"
 	"testing"
 
-	ctlimg "github.com/k14s/kbld/pkg/kbld/image"
+	ctllog "github.com/k14s/kbld/pkg/kbld/logger"
 )
 
 func TestLogger(t *testing.T) {
 	var buf bytes.Buffer
 
-	logger := ctlimg.NewLogger(&buf)
+	logger := ctllog.NewLogger(&buf)
 	prefLogger := logger.NewPrefixedWriter("prefix: ")
 
 	prefLogger.Write([]byte("content1"))
