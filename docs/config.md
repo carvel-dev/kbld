@@ -183,7 +183,7 @@ overrides:
   - `image` (optional) image matcher
   - `newImage` (optional) could be image repository, image tag ref, or image digest ref
   - `preresolved` (optional; bool) specifies if `newImage` should be used as is
-  - `tagSelection` (optional; VersionSelection) specifies how to resolve tag for `newImage`. `newImage` in this case is expected to specify just repository (e.g. `gcr.io/my-corp/app`) without a tag. [See `VersionSelection` type details](https://github.com/vmware-tanzu/carvel-vendir/blob/develop/docs/versions.md#versionselection-type).
+  - `tagSelection` (optional; VersionSelection) specifies how to resolve tag for `newImage`. `newImage` in this case is expected to specify just repository (e.g. `gcr.io/my-corp/app`) without a tag. [See `VersionSelection` type details](https://github.com/vmware-tanzu/carvel-vendir/blob/develop/docs/versions.md#versionselection-type). Available as of v0.28.0+
 
 #### Overrides
 
