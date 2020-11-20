@@ -41,7 +41,7 @@ func (i ResolvedImage) URL() (string, []ImageMeta, error) {
 
 	// Resolve image second time because some older registry can
 	// return "random" digests that change for every request.
-	// See https://github.com/k14s/kbld/issues/21 for details.
+	// See https://github.com/vmware-tanzu/carvel-kbld/issues/21 for details.
 	imgDescriptor2, err := i.registry.Generic(tag)
 	if err != nil {
 		return "", nil, err
