@@ -11,4 +11,5 @@ package tools
 import (
 	// exists solely for its side effects, in this case the declaration of the dependency.
 	_ "github.com/kisielk/errcheck"
+	_ "github.com/maxbrunsfeld/counterfeiter/v6"
 )

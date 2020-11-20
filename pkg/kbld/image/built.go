@@ -7,23 +7,39 @@ import (
 	"path/filepath"
 
 	ctlbdk "github.com/k14s/kbld/pkg/kbld/builder/docker"
-	ctlbkb "github.com/k14s/kbld/pkg/kbld/builder/kubectlbuildkit"
 	ctlbpk "github.com/k14s/kbld/pkg/kbld/builder/pack"
 	ctlconf "github.com/k14s/kbld/pkg/kbld/config"
 )
+
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . DockerBuild
+type DockerBuild interface {
+	Build(image, directory string, opts ctlbdk.DockerBuildOpts) (ctlbdk.DockerTmpRef, error)
+	Push(tmpRef ctlbdk.DockerTmpRef, imageDst string) (ctlbdk.DockerImageDigest, error)
+}
+
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . PackBuild
+type PackBuild interface {
+	Build(image, directory string, opts ctlbpk.PackBuildOpts) (ctlbdk.DockerTmpRef, error)
+}
+
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . KBuildKitBuild
+type KBuildKitBuild interface {
+	BuildAndPush(image, directory string,
+		imgDst *ctlconf.ImageDestination, opts ctlconf.SourceKubectlBuildkitOpts) (string, error)
+}
 
 type BuiltImage struct {
 	url         string
 	buildSource ctlconf.Source
 	imgDst      *ctlconf.ImageDestination
 
-	docker          ctlbdk.Docker
-	pack            ctlbpk.Pack
-	kubectlBuildkit ctlbkb.KubectlBuildkit
+	docker          DockerBuild
+	pack            PackBuild
+	kubectlBuildkit KBuildKitBuild
 }
 
 func NewBuiltImage(url string, buildSource ctlconf.Source, imgDst *ctlconf.ImageDestination,
-	docker ctlbdk.Docker, pack ctlbpk.Pack, kubectlBuildkit ctlbkb.KubectlBuildkit) BuiltImage {
+	docker DockerBuild, pack PackBuild, kubectlBuildkit KBuildKitBuild) BuiltImage {
 
 	return BuiltImage{url, buildSource, imgDst, docker, pack, kubectlBuildkit}
 }

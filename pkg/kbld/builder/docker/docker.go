@@ -40,6 +40,10 @@ func NewDockerTmpRef(val string) DockerTmpRef {
 
 func (r DockerTmpRef) AsString() string { return r.val }
 
+func NewDockerImageDigest(val string) DockerImageDigest {
+	return DockerImageDigest{val}
+}
+
 type DockerImageDigest struct {
 	val string
 }
