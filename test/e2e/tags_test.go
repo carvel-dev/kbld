@@ -9,7 +9,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/ghodss/yaml"
+	"sigs.k8s.io/yaml"
 )
 
 func TestAdditionalImageTags(t *testing.T) {

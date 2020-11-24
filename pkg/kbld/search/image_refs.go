@@ -9,9 +9,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/ghodss/yaml"
 	ctlconf "github.com/k14s/kbld/pkg/kbld/config"
 	ctlres "github.com/k14s/kbld/pkg/kbld/resources"
+	"sigs.k8s.io/yaml"
 )
 
 type ImageRefs struct {

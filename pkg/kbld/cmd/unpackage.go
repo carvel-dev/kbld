@@ -8,7 +8,6 @@ import (
 	"os"
 
 	"github.com/cppforlife/go-cli-ui/ui"
-	"github.com/ghodss/yaml"
 	regname "github.com/google/go-containerregistry/pkg/name"
 	ctlconf "github.com/k14s/kbld/pkg/kbld/config"
 	ctllog "github.com/k14s/kbld/pkg/kbld/logger"
@@ -17,6 +16,7 @@ import (
 	ctlser "github.com/k14s/kbld/pkg/kbld/search"
 	"github.com/k14s/kbld/pkg/kbld/version"
 	"github.com/spf13/cobra"
+	"sigs.k8s.io/yaml"
 )
 
 type UnpackageOptions struct {

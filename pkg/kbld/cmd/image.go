@@ -7,8 +7,8 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/ghodss/yaml"
 	ctlimg "github.com/k14s/kbld/pkg/kbld/image"
+	"sigs.k8s.io/yaml"
 )
 
 type Images []Image
