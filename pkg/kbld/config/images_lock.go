@@ -5,8 +5,8 @@ package config
 
 import (
 	"fmt"
-	"github.com/ghodss/yaml"
 	"io/ioutil"
+	"sigs.k8s.io/yaml"
 )
 
 const (

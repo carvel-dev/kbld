@@ -8,9 +8,9 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/ghodss/yaml"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
+	"sigs.k8s.io/yaml"
 )
 
 type Resource interface {

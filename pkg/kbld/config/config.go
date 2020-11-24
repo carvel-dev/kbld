@@ -7,11 +7,11 @@ import (
 	"fmt"
 	"io/ioutil"
 
-	"github.com/ghodss/yaml"
 	semver "github.com/hashicorp/go-version"
 	ctlres "github.com/k14s/kbld/pkg/kbld/resources"
 	"github.com/k14s/kbld/pkg/kbld/version"
 	"github.com/vmware-tanzu/carvel-vendir/pkg/vendir/versions"
+	"sigs.k8s.io/yaml"
 )
 
 const (
