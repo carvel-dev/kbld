@@ -1,4 +1,4 @@
-### Note: While kbld will continue to provide packaging support for the foreseeable future, most new Carvel users would likely favor [`imgpkg's`](https://github.com/k14s/imgpkg) feature set. To get started with imgpkg, check out the [docs](https://github.com/k14s/imgpkg/tree/develop/docs) as well as how to [produce an ImagesLock file using kbld resolve](resolving.md#generating-resolution-imgpkg-lock-output)
+### Note: While kbld will continue to provide packaging support for the foreseeable future, most new Carvel users would likely favor [`imgpkg's`](https://github.com/vmware-tanzu/carvel-imgpkg) feature set. To get started with imgpkg, check out the [docs](https://github.com/vmware-tanzu/carvel-imgpkg/tree/develop/docs) as well as how to [produce an ImagesLock file using kbld resolve](resolving.md#generating-resolution-imgpkg-lock-output)
 
 ---
 ## Packaging/relocating images

@@ -3,7 +3,7 @@
 - Website: https://get-kbld.io
 - Slack: [#carvel in Kubernetes slack](https://slack.kubernetes.io)
 - [Docs](docs/README.md) with topics about building, packaging images, blog posts, etc.
-- Install: Grab prebuilt binaries from the [Releases page](https://github.com/k14s/kbld/releases) or [Homebrew k14s tap](https://github.com/k14s/homebrew-tap)
+- Install: Grab prebuilt binaries from the [Releases page](https://github.com/vmware-tanzu/carvel-kbld/releases) or [Homebrew k14s tap](https://github.com/k14s/homebrew-tap)
 
 `kbld` (pronounced: `kei·bild`) seamlessly incorporates image building and image pushing into your development and deployment workflows.
 
@@ -19,7 +19,7 @@ Features:
 
 ![](docs/kbld-screenshot.png)
 
-See [building and deploying simple Go application to Kubernetes example](https://github.com/k14s/k8s-simple-app-example#step-3-building-container-images-locally) that uses kbld.
+See [building and deploying simple Go application to Kubernetes example](https://github.com/vmware-tanzu/carvel-simple-app-on-kubernetes#step-3-building-container-images-locally) that uses kbld.
 
 # Development
 
