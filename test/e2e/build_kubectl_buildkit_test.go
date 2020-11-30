@@ -5,6 +5,7 @@ package e2e
 
 import (
 	"fmt"
+	"os/exec"
 	"regexp"
 	"strings"
 	"testing"
@@ -13,6 +14,7 @@ import (
 func TestKubectlBuildkitBuildSuccessful(t *testing.T) {
 	env := BuildEnv(t)
 	kbld := Kbld{t, env.Namespace, env.KbldBinaryPath, Logger{}}
+	createBuilder(t)
 
 	input := env.WithRegistries(`
 kind: Object
@@ -61,6 +63,8 @@ func TestKubectlBuildkitBuildAndPushSuccessful(t *testing.T) {
 		return
 	}
 
+	createBuilder(t)
+
 	kbld := Kbld{t, env.Namespace, env.KbldBinaryPath, Logger{}}
 
 	input := env.WithRegistries(`
@@ -102,5 +106,21 @@ spec:
 
 	if out != expectedOut {
 		t.Fatalf("Expected >>>%s<<< to match >>>%s<<<", out, expectedOut)
+	}
+}
+
+// This function was created ensure that a builder was present in the cluster
+// before we try to run these tests.
+// If a builder does not exist the build command will try to create one.
+// The problem is that we run multiple build commands in parallel which cause
+// a race condition described in
+// https://github.com/vmware-tanzu/buildkit-cli-for-kubectl/issues/55
+// When this issue gets solved we should be able to remove this function
+func createBuilder(t *testing.T) {
+	cmd := exec.Command("kubectl", "buildkit", "create")
+
+	err := cmd.Run()
+	if err != nil {
+		t.Fatalf("error: %s\n", err)
 	}
 }
