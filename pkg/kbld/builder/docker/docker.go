@@ -27,6 +27,7 @@ type DockerBuildOpts struct {
 	Pull       *bool
 	NoCache    *bool
 	File       *string
+	Buildkit   *bool
 	RawOptions *[]string
 }
 
@@ -103,6 +104,10 @@ func (d Docker) Build(image, directory string, opts DockerBuildOpts) (DockerTmpR
 		cmd.Dir = directory
 		cmd.Stdout = io.MultiWriter(&stdoutBuf, prefixedLogger)
 		cmd.Stderr = io.MultiWriter(&stderrBuf, prefixedLogger)
+
+		if opts.Buildkit != nil {
+			cmd.Env = append(os.Environ(), "DOCKER_BUILDKIT=1")
+		}
 
 		err := cmd.Run()
 		if err != nil {
