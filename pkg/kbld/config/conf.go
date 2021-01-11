@@ -6,6 +6,7 @@ package config
 import (
 	"reflect"
 
+	"github.com/k14s/imgpkg/pkg/imgpkg/lockconfig"
 	ctlres "github.com/k14s/kbld/pkg/kbld/resources"
 )
 
@@ -25,7 +26,7 @@ func NewConfFromResources(resources []ctlres.Resource) ([]ctlres.Resource, Conf,
 				return nil, Conf{}, err
 			}
 			configs = append(configs, config)
-		case res.APIVersion() == ImagesLockAPIVersion && res.Kind() == ImagesLockKind:
+		case res.APIVersion() == lockconfig.ImagesLockAPIVersion && res.Kind() == lockconfig.ImagesLockKind:
 			config, err := NewConfigFromImagesLock(res)
 			if err != nil {
 				return nil, Conf{}, err

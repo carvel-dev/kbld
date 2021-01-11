@@ -1,6 +1,6 @@
 # github.com/blang/semver/v4 v4.0.0
 github.com/blang/semver/v4
-# github.com/cppforlife/cobrautil v0.0.0-20180924214100-a39a1714c920
+# github.com/cppforlife/cobrautil v0.0.0-20200514214827-bb86e6965d72
 github.com/cppforlife/cobrautil
 # github.com/cppforlife/go-cli-ui v0.0.0-20200506005011-4268990983cc
 github.com/cppforlife/go-cli-ui/errors
@@ -23,7 +23,7 @@ github.com/go-logr/logr
 # github.com/gogo/protobuf v1.3.1
 github.com/gogo/protobuf/proto
 github.com/gogo/protobuf/sortkeys
-# github.com/google/go-containerregistry v0.0.0-20200331213917-3d03ed9b1ca2
+# github.com/google/go-containerregistry v0.1.4
 github.com/google/go-containerregistry/pkg/authn
 github.com/google/go-containerregistry/pkg/internal/retry
 github.com/google/go-containerregistry/pkg/internal/retry/wait
@@ -43,6 +43,8 @@ github.com/hashicorp/go-version
 github.com/inconshreveable/mousetrap
 # github.com/json-iterator/go v1.1.10
 github.com/json-iterator/go
+# github.com/k14s/imgpkg v0.2.1-0.20210111152818-734ea5fed42b
+github.com/k14s/imgpkg/pkg/imgpkg/lockconfig
 # github.com/kisielk/errcheck v1.4.0
 github.com/kisielk/errcheck
 github.com/kisielk/errcheck/internal/errcheck
@@ -56,7 +58,7 @@ github.com/modern-go/concurrent
 github.com/modern-go/reflect2
 # github.com/pkg/errors v0.9.1
 github.com/pkg/errors
-# github.com/spf13/cobra v0.0.5
+# github.com/spf13/cobra v1.0.0
 github.com/spf13/cobra
 # github.com/spf13/pflag v1.0.5
 github.com/spf13/pflag
@@ -65,9 +67,9 @@ github.com/vito/go-interact/interact
 github.com/vito/go-interact/interact/terminal
 # github.com/vmware-tanzu/carvel-vendir v0.14.1-0.20201119204632-393bea7fb738
 github.com/vmware-tanzu/carvel-vendir/pkg/vendir/versions
-# golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9
+# golang.org/x/crypto v0.0.0-20201002170205-7f63de1d35b0
 golang.org/x/crypto/ssh/terminal
-# golang.org/x/mod v0.2.0
+# golang.org/x/mod v0.3.0
 golang.org/x/mod/semver
 # golang.org/x/net v0.0.0-20201021035429-f5854403a974
 golang.org/x/net/http/httpguts
@@ -85,7 +87,7 @@ golang.org/x/text/secure/bidirule
 golang.org/x/text/transform
 golang.org/x/text/unicode/bidi
 golang.org/x/text/unicode/norm
-# golang.org/x/tools v0.0.0-20200619180055-7c47624df98f
+# golang.org/x/tools v0.0.0-20200916195026-c9a70fc28ce3
 golang.org/x/tools/go/gcexportdata
 golang.org/x/tools/go/internal/gcimporter
 golang.org/x/tools/go/internal/packagesdriver
@@ -102,7 +104,7 @@ golang.org/x/xerrors
 golang.org/x/xerrors/internal
 # gopkg.in/inf.v0 v0.9.1
 gopkg.in/inf.v0
-# gopkg.in/yaml.v2 v2.2.8
+# gopkg.in/yaml.v2 v2.3.0
 gopkg.in/yaml.v2
 # k8s.io/apimachinery v0.19.0
 k8s.io/apimachinery/pkg/api/resource

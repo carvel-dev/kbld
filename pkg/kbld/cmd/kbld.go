@@ -52,7 +52,7 @@ func NewKbldCmd(o *KbldOptions) *cobra.Command {
 
 	// Last one runs first
 	cobrautil.VisitCommands(cmd, cobrautil.ReconfigureCmdWithSubcmd)
-	cobrautil.VisitCommands(cmd, cobrautil.ReconfigureLeafCmd)
+	cobrautil.VisitCommands(cmd, cobrautil.DisallowExtraArgs)
 
 	cobrautil.VisitCommands(cmd, cobrautil.WrapRunEForCmd(func(*cobra.Command, []string) error {
 		o.UIFlags.ConfigureUI(o.ui)

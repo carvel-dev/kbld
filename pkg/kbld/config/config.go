@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 
 	semver "github.com/hashicorp/go-version"
+	"github.com/k14s/imgpkg/pkg/imgpkg/lockconfig"
 	ctlres "github.com/k14s/kbld/pkg/kbld/resources"
 	"github.com/k14s/kbld/pkg/kbld/version"
 	"github.com/vmware-tanzu/carvel-vendir/pkg/vendir/versions"
@@ -157,16 +158,14 @@ func NewConfigFromImagesLock(res ctlres.Resource) (Config, error) {
 		return Config{}, err
 	}
 
-	var imagesLock ImagesLock
-
-	err = yaml.Unmarshal(iLockBytes, &imagesLock)
+	imagesLock, err := lockconfig.NewImagesLockFromBytes(iLockBytes)
 	if err != nil {
-		return Config{}, fmt.Errorf("Unmarshaling %s: %s", res.Description(), err)
+		return Config{}, fmt.Errorf("Unmarshaling %s as ImagesLock: %s", res.Description(), err)
 	}
 
 	overridesConfig := NewConfig()
 
-	for _, image := range imagesLock.Spec.Images {
+	for _, image := range imagesLock.Images {
 		iOverride := ImageOverride{
 			ImageRef: ImageRef{
 				Image: image.Annotations[ImagesLockKbldID],

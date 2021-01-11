@@ -11,6 +11,7 @@ import (
 	"strings"
 
 	"github.com/cppforlife/go-cli-ui/ui"
+	"github.com/k14s/imgpkg/pkg/imgpkg/lockconfig"
 	ctlconf "github.com/k14s/kbld/pkg/kbld/config"
 	ctlimg "github.com/k14s/kbld/pkg/kbld/image"
 	ctllog "github.com/k14s/kbld/pkg/kbld/logger"
@@ -237,14 +238,19 @@ func (o *ResolveOptions) emitLockOutput(conf ctlconf.Conf, resolvedImages *Proce
 
 		return c.WriteToFile(o.LockOutput)
 	case o.ImgpkgLockOutput != "":
-		iLock := ctlconf.ImagesLock{APIVersion: ctlconf.ImagesLockAPIVersion, Kind: ctlconf.ImagesLockKind}
+		iLock := lockconfig.ImagesLock{
+			LockVersion: lockconfig.LockVersion{
+				APIVersion: lockconfig.ImagesLockAPIVersion,
+				Kind:       lockconfig.ImagesLockKind,
+			},
+		}
 		for _, urlImagePair := range resolvedImages.All() {
-			iLock.Spec.Images = append(iLock.Spec.Images, ctlconf.ImagesLockEntry{
+			iLock.Images = append(iLock.Images, lockconfig.ImageRef{
 				Image:       urlImagePair.Image.URL,
 				Annotations: map[string]string{ctlconf.ImagesLockKbldID: urlImagePair.UnprocessedImageURL.URL},
 			})
 		}
-		return iLock.WriteToFile(o.ImgpkgLockOutput)
+		return iLock.WriteToPath(o.ImgpkgLockOutput)
 	default:
 		return nil
 	}
