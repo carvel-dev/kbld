@@ -67,6 +67,7 @@ func (i BuiltImage) URL() (string, []ImageMeta, error) {
 			Pull:       i.buildSource.Docker.Build.Pull,
 			NoCache:    i.buildSource.Docker.Build.NoCache,
 			File:       i.buildSource.Docker.Build.File,
+			Buildkit:   i.buildSource.Docker.Build.Buildkit,
 			RawOptions: i.buildSource.Docker.Build.RawOptions,
 		}
 
