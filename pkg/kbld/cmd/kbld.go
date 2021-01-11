@@ -47,7 +47,6 @@ func NewKbldCmd(o *KbldOptions) *cobra.Command {
 	cmd.AddCommand(NewInspectCmd(NewInspectOptions(o.ui)))
 	cmd.AddCommand(NewPackageCmd(NewPackageOptions(o.ui)))
 	cmd.AddCommand(NewUnpackageCmd(NewUnpackageOptions(o.ui)))
-	cmd.AddCommand(NewWebsiteCmd(NewWebsiteOptions()))
 	cmd.AddCommand(NewVersionCmd(NewVersionOptions(o.ui)))
 	cmd.AddCommand(NewRelocateCmd(NewRelocateOptions(o.ui)))
 

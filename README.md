@@ -1,6 +1,6 @@
 # kbld
 
-- Website: https://get-kbld.io
+- Website: https://carvel.dev/kbld
 - Slack: [#carvel in Kubernetes slack](https://slack.kubernetes.io)
 - [Docs](docs/README.md) with topics about building, packaging images, blog posts, etc.
 - Install: Grab prebuilt binaries from the [Releases page](https://github.com/vmware-tanzu/carvel-kbld/releases) or [Homebrew Carvel tap](https://github.com/vmware-tanzu/homebrew-carvel)
@@ -12,7 +12,7 @@ Features:
 - Orchestrates image builds (delegates to tools like Docker, pack, kubectl-buildkit) and registry pushes
 - Works with local Docker daemon and remote registries, for development and production cases
 - Records metadata about image sources in annotation on Kubernetes resources (see examples below)
-- Resolves image references to their digest form (*immutable*) ([details](https://get-kbld.io/#why))
+- Resolves image references to their digest form (*immutable*) ([details](https://carvel.dev/kbld/docs/latest/#why-digest-references))
 - Provides a way to transport set of images in a single tarball between registries
   - maintaining exactly same digests, hence guaranteeing exactly same content
 - Not specific to Kubernetes, but works really well with Kubernetes configuration files  

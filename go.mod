@@ -3,7 +3,6 @@ module github.com/k14s/kbld
 go 1.13
 
 require (
-	github.com/aws/aws-lambda-go v1.9.0
 	github.com/cppforlife/cobrautil v0.0.0-20180924214100-a39a1714c920
 	github.com/cppforlife/go-cli-ui v0.0.0-20200506005011-4268990983cc
 	github.com/google/go-containerregistry v0.0.0-20200331213917-3d03ed9b1ca2
