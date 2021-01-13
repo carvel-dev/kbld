@@ -274,8 +274,8 @@ github.com/jstemmer/go-junit-report v0.0.0-20190106144839-af01ea7f8024/go.mod h1
 github.com/jstemmer/go-junit-report v0.9.1/go.mod h1:Brl9GWCQeLvo8nXZwPNNblvFj/XSXhF0NWZEnDohbsk=
 github.com/julienschmidt/httprouter v1.2.0/go.mod h1:SYymIcj16QtmaHHD7aYtjjsJG7VTCxuUUipMqKk8s4w=
 github.com/k14s/difflib v0.0.0-20201103203400-90558b9d63e4/go.mod h1:B0xN2MiNBGWOWi9CcfAo9LBI8IU4J1utlbOIJCsmKr4=
-github.com/k14s/imgpkg v0.2.1-0.20210111152818-734ea5fed42b h1:l1DthPIrpuqBHb6AArcz8m+3hEUBQPVPHPMvz4mMn60=
-github.com/k14s/imgpkg v0.2.1-0.20210111152818-734ea5fed42b/go.mod h1:UawhPTP5NySKEa+LW224ZlDccGb4qbSaiCyadSxgMSE=
+github.com/k14s/imgpkg v0.3.0 h1:WR0U9ZbTf2W68k0hoA6u28cDKvCiSE9UEKv7PxZy1zA=
+github.com/k14s/imgpkg v0.3.0/go.mod h1:UawhPTP5NySKEa+LW224ZlDccGb4qbSaiCyadSxgMSE=
 github.com/kisielk/errcheck v1.1.0/go.mod h1:EZBBE59ingxPouuu3KfxchcWSUPOHkagtvWXihfKN4Q=
 github.com/kisielk/errcheck v1.2.0/go.mod h1:/BMXB+zMLi60iA8Vv6Ksmxu/1UDYcXs4uQLJ+jE2L00=
 github.com/kisielk/errcheck v1.4.0 h1:ueN6QYA+c7eDQo7ebpNdYR8mUJZThiGz9PEoJEMGPzA=

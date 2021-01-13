@@ -43,7 +43,7 @@ github.com/hashicorp/go-version
 github.com/inconshreveable/mousetrap
 # github.com/json-iterator/go v1.1.10
 github.com/json-iterator/go
-# github.com/k14s/imgpkg v0.2.1-0.20210111152818-734ea5fed42b
+# github.com/k14s/imgpkg v0.3.0
 github.com/k14s/imgpkg/pkg/imgpkg/lockconfig
 # github.com/kisielk/errcheck v1.4.0
 github.com/kisielk/errcheck
