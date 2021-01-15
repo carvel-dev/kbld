@@ -28,7 +28,7 @@ func NewBuiltImage(url string, buildSource ctlconf.Source, imgDst *ctlconf.Image
 	return BuiltImage{url, buildSource, imgDst, docker, pack, kubectlBuildkit}
 }
 
-func (i BuiltImage) URL() (string, []ImageMeta, error) {
+func (i BuiltImage) URL() (string, []Meta, error) {
 	metas, err := i.sources()
 	if err != nil {
 		return "", nil, err
@@ -80,7 +80,7 @@ func (i BuiltImage) URL() (string, []ImageMeta, error) {
 	}
 }
 
-func (i BuiltImage) optionalPushWithDocker(dockerTmpRef ctlbdk.DockerTmpRef, metas []ImageMeta) (string, []ImageMeta, error) {
+func (i BuiltImage) optionalPushWithDocker(dockerTmpRef ctlbdk.DockerTmpRef, metas []Meta) (string, []Meta, error) {
 	if i.imgDst != nil {
 		digest, err := i.docker.Push(dockerTmpRef, i.imgDst.NewImage)
 		if err != nil {
@@ -115,8 +115,8 @@ type BuiltImageSourceLocal struct {
 
 func (BuiltImageSourceLocal) meta() {}
 
-func (i BuiltImage) sources() ([]ImageMeta, error) {
-	var sources []ImageMeta
+func (i BuiltImage) sources() ([]Meta, error) {
+	var sources []Meta
 
 	absPath, err := filepath.Abs(i.buildSource.Path)
 	if err != nil {

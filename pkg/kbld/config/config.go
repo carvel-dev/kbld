@@ -24,12 +24,12 @@ const (
 	imageKeysKind         = "ImageKeys"
 )
 
-type ConfigKind struct {
+type Kind struct {
 	APIVersion, Kind string
 }
 
 var (
-	configKinds = []ConfigKind{
+	configKinds = []Kind{
 		{configAPIVersion, configKind},
 		{configAPIVersion, configKind},
 		{configAPIVersion, sourcesKind},
@@ -333,9 +333,9 @@ func UniqueImageOverrides(overrides []ImageOverride) []ImageOverride {
 	return result
 }
 
-func (r SearchRule) UpdateStrategyWithDefaults() SearchRuleUpdateStrategy {
-	if r.UpdateStrategy != nil {
-		return *r.UpdateStrategy
+func (d SearchRule) UpdateStrategyWithDefaults() SearchRuleUpdateStrategy {
+	if d.UpdateStrategy != nil {
+		return *d.UpdateStrategy
 	}
 	return SearchRuleUpdateStrategy{
 		EntireString: &SearchRuleUpdateStrategyEntireString{},

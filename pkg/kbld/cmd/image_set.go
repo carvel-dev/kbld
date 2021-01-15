@@ -16,7 +16,7 @@ import (
 
 type ImageSet struct {
 	concurrency int
-	logger      *ctllog.LoggerPrefixWriter
+	logger      *ctllog.PrefixWriter
 }
 
 func (o ImageSet) Relocate(foundImages *UnprocessedImageURLs,

@@ -322,7 +322,7 @@ func (TarWriter) retry(fn func() error) error {
 type zeroReader struct{}
 
 func (r zeroReader) Read(p []byte) (n int, err error) {
-	for i, _ := range p {
+	for i := range p {
 		p[i] = 0
 	}
 	return len(p), nil

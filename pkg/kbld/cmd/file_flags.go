@@ -20,11 +20,11 @@ func (s *FileFlags) Set(cmd *cobra.Command) {
 	cmd.Flags().BoolVar(&s.Sort, "sort", true, "Sort by namespace, name, etc.")
 }
 
-func (f *FileFlags) AllResources() ([]ctlres.Resource, error) {
+func (s *FileFlags) AllResources() ([]ctlres.Resource, error) {
 	var rs []ctlres.Resource
 
 	// TODO do anything with kbld configs?
-	for _, file := range f.Files {
+	for _, file := range s.Files {
 		fileRs, err := ctlres.NewFileResources(file)
 		if err != nil {
 			return nil, err
@@ -45,8 +45,8 @@ func (f *FileFlags) AllResources() ([]ctlres.Resource, error) {
 	return rs, nil
 }
 
-func (f *FileFlags) ResourcesAndConfig() ([]ctlres.Resource, ctlconf.Conf, error) {
-	allRs, err := f.AllResources()
+func (s *FileFlags) ResourcesAndConfig() ([]ctlres.Resource, ctlconf.Conf, error) {
+	allRs, err := s.AllResources()
 	if err != nil {
 		return nil, ctlconf.Conf{}, err
 	}

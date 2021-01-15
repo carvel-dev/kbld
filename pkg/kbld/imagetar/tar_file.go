@@ -28,7 +28,7 @@ type tarFileChunk struct {
 var _ imagedesc.LayerContents = tarFileChunk{}
 
 type tarFileChunkReadCloser struct {
-	DebugId string
+	DebugID string
 	io.Reader
 	io.Closer
 }
@@ -65,7 +65,7 @@ func (f tarFile) openChunk(path string) (io.ReadCloser, error) {
 		}
 		if hdr.Name == path {
 			return tarFileChunkReadCloser{
-				DebugId: fmt.Sprintf("%s/%p", path, tf),
+				DebugID: fmt.Sprintf("%s/%p", path, tf),
 				Reader:  tf, Closer: file}, nil
 		}
 	}
