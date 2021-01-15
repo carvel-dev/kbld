@@ -20,8 +20,8 @@ func (s *RegistryFlags) Set(cmd *cobra.Command) {
 	cmd.Flags().BoolVar(&s.Insecure, "registry-insecure", false, "Allow the use of http when interacting with registries")
 }
 
-func (s *RegistryFlags) AsRegistryOpts() ctlreg.RegistryOpts {
-	return ctlreg.RegistryOpts{
+func (s *RegistryFlags) AsRegistryOpts() ctlreg.Opts {
+	return ctlreg.Opts{
 		CACertPaths:   s.CACertPaths,
 		VerifyCerts:   s.VerifyCerts,
 		Insecure:      s.Insecure,

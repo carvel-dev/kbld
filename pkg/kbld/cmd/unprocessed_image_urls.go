@@ -25,7 +25,7 @@ func (i *UnprocessedImageURLs) Add(url UnprocessedImageURL) {
 
 func (i *UnprocessedImageURLs) All() []UnprocessedImageURL {
 	var result []UnprocessedImageURL
-	for url, _ := range i.urls {
+	for url := range i.urls {
 		result = append(result, url)
 	}
 	sort.Slice(result, func(i, j int) bool {

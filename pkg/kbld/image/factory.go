@@ -13,10 +13,10 @@ import (
 )
 
 type Image interface {
-	URL() (string, []ImageMeta, error)
+	URL() (string, []Meta, error)
 }
 
-type ImageMeta interface {
+type Meta interface {
 	meta()
 }
 

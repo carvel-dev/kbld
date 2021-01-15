@@ -18,7 +18,7 @@ import (
 	regremote "github.com/google/go-containerregistry/pkg/v1/remote"
 )
 
-type RegistryOpts struct {
+type Opts struct {
 	CACertPaths   []string
 	VerifyCerts   bool
 	Insecure      bool
@@ -30,7 +30,7 @@ type Registry struct {
 	refOpts []regname.Option
 }
 
-func NewRegistry(opts RegistryOpts) (Registry, error) {
+func NewRegistry(opts Opts) (Registry, error) {
 	keychain := regauthn.NewMultiKeychain(NewEnvKeychain(opts.EnvAuthPrefix), regauthn.DefaultKeychain)
 	transport, err := newHTTPTransport(opts)
 	if err != nil {
@@ -150,7 +150,7 @@ func (i Registry) ListTags(repo regname.Repository) ([]string, error) {
 	return regremote.List(repo, i.opts...)
 }
 
-func newHTTPTransport(opts RegistryOpts) (*http.Transport, error) {
+func newHTTPTransport(opts Opts) (*http.Transport, error) {
 	pool, err := x509.SystemCertPool()
 	if err != nil {
 		pool = x509.NewCertPool()

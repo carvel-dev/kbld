@@ -15,8 +15,8 @@ type Images []Image
 
 type Image struct {
 	URL      string
-	Metas    []ctlimg.ImageMeta // empty when deserialized
-	metasRaw []interface{}      // populated when deserialized
+	Metas    []ctlimg.Meta // empty when deserialized
+	metasRaw []interface{} // populated when deserialized
 }
 
 func (imgs Images) ForImage(url string) (Image, bool) {

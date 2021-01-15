@@ -135,7 +135,7 @@ func (p Path) Matches(p2 Path) bool {
 	if len(p) != len(p2) {
 		return false
 	}
-	for i, _ := range p {
+	for i := range p {
 		if !p[i].Matches(p2[i]) {
 			return false
 		}
@@ -147,7 +147,7 @@ func (p Path) HasMatchingSuffix(ending Path) bool {
 	if len(p) < len(ending) {
 		return false
 	}
-	for i, _ := range ending {
+	for i := range ending {
 		if !p[len(p)-1-i].Matches(ending[len(ending)-1-i]) {
 			return false
 		}

@@ -40,7 +40,7 @@ func NewDigestedImageFromParts(url, digest string) DigestedImage {
 	return DigestedImage{nameWithDigest, nil}
 }
 
-func (i DigestedImage) URL() (string, []ImageMeta, error) {
+func (i DigestedImage) URL() (string, []Meta, error) {
 	if i.parseErr != nil {
 		return "", nil, i.parseErr
 	}

@@ -122,11 +122,11 @@ func (d Docker) Build(image, directory string, opts DockerBuildOpts) (DockerTmpR
 		return DockerTmpRef{}, err
 	}
 
-	return d.RetagStable(tmpRef, image, inspectData.Id, prefixedLogger)
+	return d.RetagStable(tmpRef, image, inspectData.ID, prefixedLogger)
 }
 
 func (d Docker) RetagStable(tmpRef DockerTmpRef, image, imageID string,
-	prefixedLogger *ctllog.LoggerPrefixWriter) (DockerTmpRef, error) {
+	prefixedLogger *ctllog.PrefixWriter) (DockerTmpRef, error) {
 
 	tb := ctlb.TagBuilder{}
 
@@ -243,7 +243,7 @@ func (d Docker) Push(tmpRef DockerTmpRef, imageDst string) (DockerImageDigest, e
 	// Try to detect if image we should be pushing isnt the one we ended up pushing
 	// given that its theoretically possible concurrent Docker commands
 	// may have retagged in the middle of the process.
-	if prevInspectData.Id != currInspectData.Id {
+	if prevInspectData.ID != currInspectData.ID {
 		prefixedLogger.Write([]byte(fmt.Sprintf("push race error: %s\n", err)))
 		return DockerImageDigest{}, err
 	}
@@ -267,7 +267,7 @@ func (d Docker) ensureDirectory(directory string) error {
 }
 
 func (d Docker) determineRepoDigest(inspectData dockerInspectData,
-	prefixedLogger *ctllog.LoggerPrefixWriter) (DockerImageDigest, error) {
+	prefixedLogger *ctllog.PrefixWriter) (DockerImageDigest, error) {
 
 	if len(inspectData.RepoDigests) == 0 {
 		prefixedLogger.Write([]byte("missing repo digest\n"))
@@ -289,7 +289,7 @@ func (d Docker) determineRepoDigest(inspectData dockerInspectData,
 		return DockerImageDigest{}, fmt.Errorf("Expected to find same repo digest, but found %#v", inspectData.RepoDigests)
 	}
 
-	for digest, _ := range digestStrs {
+	for digest := range digestStrs {
 		return DockerImageDigest{digest}, nil
 	}
 
@@ -297,7 +297,7 @@ func (d Docker) determineRepoDigest(inspectData dockerInspectData,
 }
 
 type dockerInspectData struct {
-	Id          string
+	ID          string
 	RepoDigests []string
 }
 

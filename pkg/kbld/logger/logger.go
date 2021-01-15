@@ -19,17 +19,17 @@ func NewLogger(writer io.Writer) Logger {
 	return Logger{writer: writer, writerLock: &sync.Mutex{}}
 }
 
-func (l Logger) NewPrefixedWriter(prefix string) *LoggerPrefixWriter {
-	return &LoggerPrefixWriter{prefix, l.writer, l.writerLock}
+func (l Logger) NewPrefixedWriter(prefix string) *PrefixWriter {
+	return &PrefixWriter{prefix, l.writer, l.writerLock}
 }
 
-type LoggerPrefixWriter struct {
+type PrefixWriter struct {
 	prefix     string
 	writer     io.Writer
 	writerLock *sync.Mutex
 }
 
-func (w *LoggerPrefixWriter) Write(data []byte) (int, error) {
+func (w *PrefixWriter) Write(data []byte) (int, error) {
 	newData := make([]byte, len(data))
 	copy(newData, data)
 
@@ -54,7 +54,7 @@ func (w *LoggerPrefixWriter) Write(data []byte) (int, error) {
 	return len(data), nil
 }
 
-func (w *LoggerPrefixWriter) WriteStr(str string, args ...interface{}) error {
+func (w *PrefixWriter) WriteStr(str string, args ...interface{}) error {
 	_, err := w.Write([]byte(fmt.Sprintf(str, args...)))
 	return err
 }

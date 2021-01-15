@@ -41,10 +41,10 @@ func (v ImageRefsVisitorFunc) Apply(res interface{}, searchRules []ctlconf.Searc
 		}
 		// Only use temporary references for values that are updated;
 		// otherwise future search rules may find tmp refs
-		tmpRefId := fmt.Sprintf(tmpRefPrefix+"%d__", tmpRefIdx)
-		tmpRefs[tmpRefId] = newVal
-		tmpRefIdx += 1
-		return tmpRefId, true
+		tmpRefID := fmt.Sprintf(tmpRefPrefix+"%d__", tmpRefIdx)
+		tmpRefs[tmpRefID] = newVal
+		tmpRefIdx++
+		return tmpRefID, true
 	}
 
 	// Use a single matcher that represents all rules instead

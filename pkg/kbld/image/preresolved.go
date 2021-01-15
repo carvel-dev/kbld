@@ -18,6 +18,6 @@ func NewPreresolvedImage(url string) PreresolvedImage {
 	return PreresolvedImage{url}
 }
 
-func (i PreresolvedImage) URL() (string, []ImageMeta, error) {
-	return i.url, []ImageMeta{PreresolvedImageSourceURL{Type: "preresolved", URL: i.url}}, nil
+func (i PreresolvedImage) URL() (string, []Meta, error) {
+	return i.url, []Meta{PreresolvedImageSourceURL{Type: "preresolved", URL: i.url}}, nil
 }
