@@ -9,8 +9,8 @@ import (
 
 	regv1 "github.com/google/go-containerregistry/pkg/v1"
 	"github.com/google/go-containerregistry/pkg/v1/types"
-	"github.com/google/go-containerregistry/pkg/v1/v1util"
-	regv1util "github.com/google/go-containerregistry/pkg/v1/v1util"
+	"github.com/k14s/kbld/pkg/kbld/imageutils/gzip"
+	"github.com/k14s/kbld/pkg/kbld/imageutils/verify"
 )
 
 type DescribedLayer struct {
@@ -40,12 +40,12 @@ func (l DescribedLayer) Uncompressed() (io.ReadCloser, error) {
 		return nil, fmt.Errorf("Computing digest: %v", err)
 	}
 
-	rc, err = regv1util.VerifyReadCloser(rc, h)
+	rc, err = verify.ReadCloser(rc, h)
 	if err != nil {
 		return nil, fmt.Errorf("Creating verified reader: %v", err)
 	}
 
-	return v1util.GzipReadCloser(rc), nil
+	return gzip.ReadCloser(rc), nil
 }
 
 func (l DescribedLayer) Size() (int64, error) { return l.desc.Size, nil }

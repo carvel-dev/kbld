@@ -1,4 +1,4 @@
-// Copyright 2018 Google LLC All Rights Reserved.
+// Copyright 2020 Google LLC All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package v1util
+package verify
 
 import (
 	"encoding/hex"
@@ -21,6 +21,7 @@ import (
 	"io"
 
 	v1 "github.com/google/go-containerregistry/pkg/v1"
+	"github.com/google/go-containerregistry/pkg/v1/internal/and"
 )
 
 type verifyReader struct {
@@ -42,15 +43,15 @@ func (vc *verifyReader) Read(b []byte) (int, error) {
 	return n, err
 }
 
-// VerifyReadCloser wraps the given io.ReadCloser to verify that its contents match
+// ReadCloser wraps the given io.ReadCloser to verify that its contents match
 // the provided v1.Hash before io.EOF is returned.
-func VerifyReadCloser(r io.ReadCloser, h v1.Hash) (io.ReadCloser, error) {
+func ReadCloser(r io.ReadCloser, h v1.Hash) (io.ReadCloser, error) {
 	w, err := v1.Hasher(h.Algorithm)
 	if err != nil {
 		return nil, err
 	}
 	r2 := io.TeeReader(r, w)
-	return &readAndCloser{
+	return &and.ReadCloser{
 		Reader: &verifyReader{
 			inner:    r2,
 			hasher:   w,
