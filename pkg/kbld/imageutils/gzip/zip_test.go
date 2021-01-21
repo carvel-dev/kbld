@@ -1,5 +1,6 @@
 // Copyright 2020 VMware, Inc.
 // SPDX-License-Identifier: Apache-2.0
+
 // Using this code as is from: https://github.com/google/go-containerregistry/tree/master/pkg/v1/internal
 
 // Copyright 2020 Google LLC All Rights Reserved.

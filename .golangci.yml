@@ -7,3 +7,6 @@ linters:
 linters-settings:
   goheader:
     template-path: code-header-template.txt
+issues:
+  max-issues-per-linter: 0
+  max-same-issues: 0 
