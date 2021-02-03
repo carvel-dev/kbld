@@ -12,6 +12,11 @@ if [ "$(kubectl-buildkit version)" != "refs/tags/v0.1.0" ]; then
   exit 1
 fi
 
+if [ "$(ko version)" != "0.8.0" ]; then
+  echo "Please install 'ko' from https://github.com/google/ko/releases/tag/v0.8.0"
+  exit 1
+fi
+
 go clean -testcache
 
 export KBLD_BINARY_PATH="${KBLD_BINARY_PATH:-$PWD/kbld}"
