@@ -6,7 +6,7 @@ on:
       - '*.md'
       - 'examples/**'
   pull_request:
-    types: [opened, reopened]
+    types: [opened, reopened, synchronize]
     paths-ignore:
       - 'docs/**'
       - '*.md'
