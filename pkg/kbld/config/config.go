@@ -59,6 +59,7 @@ type Source struct {
 	Docker          *SourceDockerOpts
 	Pack            *SourcePackOpts
 	KubectlBuildkit *SourceKubectlBuildkitOpts
+	Ko              *SourceKoOpts
 }
 
 type ImageOverride struct {
