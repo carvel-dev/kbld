@@ -38,7 +38,13 @@ func NewPackageCmd(o *PackageOptions) *cobra.Command {
 		Use:     "package",
 		Aliases: []string{"pkg"},
 		Short:   "Package configuration and images into tarball",
-		RunE:    func(_ *cobra.Command, _ []string) error { return o.Run() },
+		Hidden:  true,
+		Long: `
+Command "package" is deprecated, please use 'imgpkg push', learn more in https://carvel.dev/imgpkg/docs/latest/commands/#push
+
+Package configuration and images into tarball
+`,
+		RunE: func(_ *cobra.Command, _ []string) error { return o.Run() },
 	}
 	o.FileFlags.Set(cmd)
 	o.RegistryFlags.Set(cmd)
@@ -48,11 +54,17 @@ func NewPackageCmd(o *PackageOptions) *cobra.Command {
 }
 
 func (o *PackageOptions) Run() error {
+	logger := ctllog.NewLogger(os.Stderr)
+	warningLogger := logger.NewPrefixedWriter("Warning: ")
+	err := warningLogger.WriteStr(`Command "package" is deprecated, please use 'imgpkg push', learn more in https://carvel.dev/imgpkg/docs/latest/commands/#push`)
+	if err != nil {
+		return err
+	}
+
 	if len(o.OutputPath) == 0 {
 		return fmt.Errorf("Expected 'output' flag to be non-empty")
 	}
 
-	logger := ctllog.NewLogger(os.Stderr)
 	prefixedLogger := logger.NewPrefixedWriter("package | ")
 
 	rs, conf, err := o.FileFlags.ResourcesAndConfig()

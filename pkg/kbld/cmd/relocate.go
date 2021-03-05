@@ -35,9 +35,15 @@ func NewRelocateOptions(ui ui.UI) *RelocateOptions {
 
 func NewRelocateCmd(o *RelocateOptions) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "relocate",
-		Short: "Relocate images between two registries",
-		RunE:  func(_ *cobra.Command, _ []string) error { return o.Run() },
+		Use: "relocate",
+		Long: `
+Command "relocate" is deprecated, please use 'imgpkg copy', learn more in https://carvel.dev/imgpkg/docs/latest/commands/#copy
+
+Relocate images between two registries
+`,
+		Short:  "Relocate images between two registries",
+		Hidden: true,
+		RunE:   func(_ *cobra.Command, _ []string) error { return o.Run() },
 	}
 	o.FileFlags.Set(cmd)
 	o.RegistryFlags.Set(cmd)
@@ -48,6 +54,13 @@ func NewRelocateCmd(o *RelocateOptions) *cobra.Command {
 }
 
 func (o *RelocateOptions) Run() error {
+	logger := ctllog.NewLogger(os.Stderr)
+	warningLogger := logger.NewPrefixedWriter("Warning: ")
+	err := warningLogger.WriteStr(`Command "relocate" is deprecated, please use 'imgpkg copy', learn more in https://carvel.dev/imgpkg/docs/latest/commands/#copy`)
+	if err != nil {
+		return err
+	}
+
 	// basic checks
 	if len(o.Repository) == 0 {
 		return fmt.Errorf("Expected repository flag to be non-empty")
@@ -57,7 +70,6 @@ func (o *RelocateOptions) Run() error {
 		return fmt.Errorf("Expected at least one input file")
 	}
 
-	logger := ctllog.NewLogger(os.Stderr)
 	prefixedLogger := logger.NewPrefixedWriter("relocate | ")
 
 	// get resources from files

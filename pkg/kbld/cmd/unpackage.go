@@ -39,7 +39,13 @@ func NewUnpackageCmd(o *UnpackageOptions) *cobra.Command {
 		Use:     "unpackage",
 		Aliases: []string{"unpkg"},
 		Short:   "Unpackage configuration and images from tarball",
-		RunE:    func(_ *cobra.Command, _ []string) error { return o.Run() },
+		Hidden:  true,
+		Long: `
+Command "unpackage" is deprecated, please use 'imgpkg pull', learn more in https://carvel.dev/imgpkg/docs/latest/commands/#pull
+
+Unpackage configuration and images from tarball
+`,
+		RunE: func(_ *cobra.Command, _ []string) error { return o.Run() },
 	}
 	o.FileFlags.Set(cmd)
 	o.RegistryFlags.Set(cmd)
@@ -51,6 +57,13 @@ func NewUnpackageCmd(o *UnpackageOptions) *cobra.Command {
 }
 
 func (o *UnpackageOptions) Run() error {
+	logger := ctllog.NewLogger(os.Stderr)
+	warningLogger := logger.NewPrefixedWriter("Warning: ")
+	err := warningLogger.WriteStr(`Command "unpackage" is deprecated, please use 'imgpkg pull', learn more in https://carvel.dev/imgpkg/docs/latest/commands/#pull`)
+	if err != nil {
+		return err
+	}
+
 	if len(o.InputPath) == 0 {
 		return fmt.Errorf("Expected 'input' flag to be non-empty")
 	}
@@ -58,7 +71,6 @@ func (o *UnpackageOptions) Run() error {
 		return fmt.Errorf("Expected 'repository' flag to be non-empty")
 	}
 
-	logger := ctllog.NewLogger(os.Stderr)
 	prefixedLogger := logger.NewPrefixedWriter("unpackage | ")
 
 	nonConfigRs, conf, err := o.FileFlags.ResourcesAndConfig()
