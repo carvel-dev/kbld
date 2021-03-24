@@ -8,7 +8,7 @@ import (
 
 	regname "github.com/google/go-containerregistry/pkg/name"
 	ctlreg "github.com/k14s/kbld/pkg/kbld/registry"
-	"github.com/vmware-tanzu/carvel-vendir/pkg/vendir/versions"
+	versions "github.com/vmware-tanzu/carvel-vendir/pkg/vendir/versions/v1alpha1"
 )
 
 // TagSelectedImage respresents an image that will be resolved into url+digest

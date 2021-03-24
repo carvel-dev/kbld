@@ -10,7 +10,7 @@ require (
 	github.com/k14s/imgpkg v0.3.0
 	github.com/kisielk/errcheck v1.4.0
 	github.com/spf13/cobra v1.0.0
-	github.com/vmware-tanzu/carvel-vendir v0.14.1-0.20201119204632-393bea7fb738
+	github.com/vmware-tanzu/carvel-vendir v0.17.0
 	golang.org/x/sync v0.0.0-20201207232520-09787c993a3a
 	k8s.io/apimachinery v0.19.0
 	sigs.k8s.io/yaml v1.2.0
