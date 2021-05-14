@@ -260,6 +260,34 @@ path:
 			}},
 			OutputImages: []string{"nginx1", "nginx3"},
 		},
+		// Matching key within another matching key section
+		{
+			InputResource: map[string]interface{}{
+				// key matches, but not expecting a map
+				"key": map[string]interface{}{
+					// nested-key matches as well and is a string
+					"nested-key": "nginx1",
+					"key":        "nginx2",
+				},
+				"another-key": map[string]interface{}{
+					"key": "nginx3",
+				},
+			},
+			OutputResource: map[string]interface{}{
+				"key": map[string]interface{}{
+					"nested-key": "found:nginx1",
+					"key":        "found:nginx2",
+				},
+				"another-key": map[string]interface{}{
+					"key": "found:nginx3",
+				},
+			},
+			SearchRules: []ctlconf.SearchRule{
+				{KeyMatcher: &ctlconf.SearchRuleKeyMatcher{Name: "key"}},
+				{KeyMatcher: &ctlconf.SearchRuleKeyMatcher{Name: "nested-key"}},
+			},
+			OutputImages: []string{"nginx1", "nginx2", "nginx3"},
+		},
 	}
 
 	for _, ex := range exs {

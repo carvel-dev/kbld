@@ -33,6 +33,8 @@ func (f Fields) visit(keyPath ctlres.Path, res interface{}, visitorFunc FieldsVi
 			if matched, ext := f.matcher.Matches(newKeyPath, v); matched {
 				if newVal, update := visitorFunc(v, ext); update {
 					typedObj[k] = newVal
+				} else {
+					f.visit(newKeyPath, typedObj[k], visitorFunc)
 				}
 			} else {
 				f.visit(newKeyPath, typedObj[k], visitorFunc)
@@ -47,6 +49,8 @@ func (f Fields) visit(keyPath ctlres.Path, res interface{}, visitorFunc FieldsVi
 			if matched, ext := f.matcher.Matches(newKeyPath, v); matched {
 				if newVal, update := visitorFunc(v, ext); update {
 					typedObj[k] = newVal.(string)
+				} else {
+					f.visit(newKeyPath, typedObj[k], visitorFunc)
 				}
 			} else {
 				f.visit(newKeyPath, typedObj[k], visitorFunc)
@@ -63,6 +67,8 @@ func (f Fields) visit(keyPath ctlres.Path, res interface{}, visitorFunc FieldsVi
 			if matched, ext := f.matcher.Matches(newKeyPath, o); matched {
 				if newVal, update := visitorFunc(o, ext); update {
 					typedObj[i] = newVal
+				} else {
+					f.visit(newKeyPath, o, visitorFunc)
 				}
 			} else {
 				f.visit(newKeyPath, o, visitorFunc)
