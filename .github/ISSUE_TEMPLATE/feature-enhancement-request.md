@@ -2,7 +2,7 @@
 name: Feature request
 about: Suggest an idea for kbld
 title: ''
-labels: carvel-triage, enhancement
+labels: carvel triage, enhancement
 assignees: ''
 
 ---
