@@ -1,6 +1,6 @@
 module github.com/k14s/kbld
 
-go 1.13
+go 1.16
 
 require (
 	github.com/cppforlife/cobrautil v0.0.0-20200514214827-bb86e6965d72
