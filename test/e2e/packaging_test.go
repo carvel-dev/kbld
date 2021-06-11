@@ -11,8 +11,6 @@ import (
 	"os"
 	"strings"
 	"testing"
-
-	"github.com/k14s/kbld/pkg/kbld/version"
 )
 
 func TestPkgUnpkgSuccessful(t *testing.T) {
@@ -101,6 +99,9 @@ overrides:
 		t.Fatalf("Expected to find relocated lock file")
 	}
 
+	kbldVersionOutput, _ := kbld.RunWithOpts([]string{"version"}, RunOpts{})
+	kbldVersion := strings.SplitAfter(kbldVersionOutput, " ")[2]
+
 	expectedLockOut := strings.ReplaceAll(env.WithRegistries(`apiVersion: kbld.k14s.io/v1alpha1
 kind: Config
 minimumRequiredVersion: __ver__
@@ -111,7 +112,7 @@ overrides:
 - image: index.docker.io/library/redis@sha256:000339fb57e0ddf2d48d72f3341e47a8ca3b1beae9bdcb25a96323095b72a79b
   newImage: index.docker.io/*username*/kbld-test-pkg-unpkg@sha256:000339fb57e0ddf2d48d72f3341e47a8ca3b1beae9bdcb25a96323095b72a79b
   preresolved: true
-`), "__ver__", version.Version)
+`), "__ver__", strings.TrimSuffix(kbldVersion, "\n"))
 
 	if string(lockOutBs) != expectedLockOut {
 		t.Fatalf("Expected unpackage lock output >>>%s<<< to match >>>%s<<<", lockOutBs, expectedLockOut)
