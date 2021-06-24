@@ -12,6 +12,6 @@ require (
 	github.com/spf13/cobra v1.0.0
 	github.com/vmware-tanzu/carvel-vendir v0.17.0
 	golang.org/x/sync v0.0.0-20201207232520-09787c993a3a
-	k8s.io/apimachinery v0.19.0
+	k8s.io/apimachinery v0.21.2
 	sigs.k8s.io/yaml v1.2.0
 )
