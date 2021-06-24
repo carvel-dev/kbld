@@ -56,10 +56,10 @@ github.com/json-iterator/go
 # github.com/k14s/imgpkg v0.3.0
 ## explicit
 github.com/k14s/imgpkg/pkg/imgpkg/lockconfig
-# github.com/kisielk/errcheck v1.4.0
+# github.com/kisielk/errcheck v1.6.0
 ## explicit
 github.com/kisielk/errcheck
-github.com/kisielk/errcheck/internal/errcheck
+github.com/kisielk/errcheck/errcheck
 # github.com/mattn/go-colorable v0.0.9
 github.com/mattn/go-colorable
 # github.com/mattn/go-isatty v0.0.4
