@@ -26,7 +26,7 @@ import (
 // The set of query string keys that we expect to send as part of the registry
 // protocol. Anything else is potentially dangerous to leak, as it's probably
 // from a redirect. These redirects often included tokens or signed URLs.
-var paramWhitelist = map[string]struct{}{
+var paramAllowlist = map[string]struct{}{
 	// Token exchange
 	"scope":   {},
 	"service": {},
@@ -100,13 +100,13 @@ func (e *Error) Temporary() bool {
 	return true
 }
 
-// TODO(jonjohnsonjr): Consider moving to pkg/internal/redact.
+// TODO(jonjohnsonjr): Consider moving to internal/redact.
 func redactURL(original *url.URL) *url.URL {
 	qs := original.Query()
 	for k, v := range qs {
 		for i := range v {
-			if _, ok := paramWhitelist[k]; !ok {
-				// key is not in the whitelist
+			if _, ok := paramAllowlist[k]; !ok {
+				// key is not in the Allowlist
 				v[i] = "REDACTED"
 			}
 		}
@@ -163,6 +163,7 @@ var temporaryErrorCodes = map[ErrorCode]struct{}{
 }
 
 var temporaryStatusCodes = map[int]struct{}{
+	http.StatusRequestTimeout:      {},
 	http.StatusInternalServerError: {},
 	http.StatusBadGateway:          {},
 	http.StatusServiceUnavailable:  {},

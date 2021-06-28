@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package verify provides a ReadCloser that verifies content matches the
+// expected hash values.
 package verify
 
 import (
@@ -20,8 +22,8 @@ import (
 	"hash"
 	"io"
 
+	"github.com/google/go-containerregistry/internal/and"
 	v1 "github.com/google/go-containerregistry/pkg/v1"
-	"github.com/google/go-containerregistry/pkg/v1/internal/and"
 )
 
 type verifyReader struct {

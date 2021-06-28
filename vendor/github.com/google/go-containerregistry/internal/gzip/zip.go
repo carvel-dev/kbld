@@ -12,14 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package gzip provides helper functions for interacting with gzipped streams.
 package gzip
 
 import (
+	"bufio"
 	"bytes"
 	"compress/gzip"
 	"io"
 
-	"github.com/google/go-containerregistry/pkg/v1/internal/and"
+	"github.com/google/go-containerregistry/internal/and"
 )
 
 var gzipMagicHeader = []byte{'\x1f', '\x8b'}
@@ -38,11 +40,19 @@ func ReadCloser(r io.ReadCloser) io.ReadCloser {
 func ReadCloserLevel(r io.ReadCloser, level int) io.ReadCloser {
 	pr, pw := io.Pipe()
 
+	// For highly compressible layers, gzip.Writer will output a very small
+	// number of bytes per Write(). This is normally fine, but when pushing
+	// to a registry, we want to ensure that we're taking full advantage of
+	// the available bandwidth instead of sending tons of tiny writes over
+	// the wire.
+	// 64K ought to be small enough for anybody.
+	bw := bufio.NewWriterSize(pw, 2<<16)
+
 	// Returns err so we can pw.CloseWithError(err)
 	go func() error {
 		// TODO(go1.14): Just defer {pw,gw,r}.Close like you'd expect.
 		// Context: https://golang.org/issue/24283
-		gw, err := gzip.NewWriterLevel(pw, level)
+		gw, err := gzip.NewWriterLevel(bw, level)
 		if err != nil {
 			return pw.CloseWithError(err)
 		}
@@ -52,9 +62,20 @@ func ReadCloserLevel(r io.ReadCloser, level int) io.ReadCloser {
 			defer gw.Close()
 			return pw.CloseWithError(err)
 		}
+
+		// Close gzip writer to Flush it and write gzip trailers.
+		if err := gw.Close(); err != nil {
+			return pw.CloseWithError(err)
+		}
+
+		// Flush bufio writer to ensure we write out everything.
+		if err := bw.Flush(); err != nil {
+			return pw.CloseWithError(err)
+		}
+
+		// We don't really care if these fail.
 		defer pw.Close()
 		defer r.Close()
-		defer gw.Close()
 
 		return nil
 	}()
