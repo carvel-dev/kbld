@@ -4,6 +4,7 @@
 
 - [minikube](https://minikube.sigs.k8s.io/docs/)
 - [pack 0.8.1](https://github.com/buildpacks/pack)
+- [kubectl-buildkit](https://github.com/vmware-tanzu/buildkit-cli-for-kubectl/releases/tag/v0.1.0)
 
 ## Run Unit tests
 ```bash
