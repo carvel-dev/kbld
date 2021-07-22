@@ -27,22 +27,23 @@ github.com/go-logr/logr
 # github.com/gogo/protobuf v1.3.1
 github.com/gogo/protobuf/proto
 github.com/gogo/protobuf/sortkeys
-# github.com/google/go-containerregistry v0.4.0
+# github.com/google/go-containerregistry v0.5.1
 ## explicit
+github.com/google/go-containerregistry/internal/and
+github.com/google/go-containerregistry/internal/gzip
+github.com/google/go-containerregistry/internal/redact
+github.com/google/go-containerregistry/internal/retry
+github.com/google/go-containerregistry/internal/retry/wait
+github.com/google/go-containerregistry/internal/verify
 github.com/google/go-containerregistry/pkg/authn
-github.com/google/go-containerregistry/pkg/internal/redact
-github.com/google/go-containerregistry/pkg/internal/retry
-github.com/google/go-containerregistry/pkg/internal/retry/wait
 github.com/google/go-containerregistry/pkg/logs
 github.com/google/go-containerregistry/pkg/name
 github.com/google/go-containerregistry/pkg/v1
-github.com/google/go-containerregistry/pkg/v1/internal/and
-github.com/google/go-containerregistry/pkg/v1/internal/gzip
-github.com/google/go-containerregistry/pkg/v1/internal/verify
 github.com/google/go-containerregistry/pkg/v1/match
 github.com/google/go-containerregistry/pkg/v1/partial
 github.com/google/go-containerregistry/pkg/v1/remote
 github.com/google/go-containerregistry/pkg/v1/remote/transport
+github.com/google/go-containerregistry/pkg/v1/stream
 github.com/google/go-containerregistry/pkg/v1/types
 # github.com/google/gofuzz v1.1.0
 github.com/google/gofuzz
@@ -154,6 +155,7 @@ k8s.io/apimachinery/third_party/forked/golang/reflect
 # k8s.io/klog/v2 v2.4.0
 k8s.io/klog/v2
 # sigs.k8s.io/structured-merge-diff/v4 v4.0.2
+## explicit
 sigs.k8s.io/structured-merge-diff/v4/value
 # sigs.k8s.io/yaml v1.2.0
 ## explicit
