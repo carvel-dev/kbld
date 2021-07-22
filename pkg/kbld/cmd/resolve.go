@@ -20,6 +20,7 @@ import (
 	ctlser "github.com/k14s/kbld/pkg/kbld/search"
 	"github.com/k14s/kbld/pkg/kbld/version"
 	"github.com/spf13/cobra"
+	"sigs.k8s.io/yaml"
 )
 
 type ResolveOptions struct {
@@ -245,9 +246,16 @@ func (o *ResolveOptions) emitLockOutput(conf ctlconf.Conf, resolvedImages *Proce
 			},
 		}
 		for _, urlImagePair := range resolvedImages.All() {
+			imagesYAML, err := yaml.Marshal(urlImagePair.Image.Metas)
+			if err != nil {
+				return err
+			}
 			iLock.Images = append(iLock.Images, lockconfig.ImageRef{
-				Image:       urlImagePair.Image.URL,
-				Annotations: map[string]string{ctlconf.ImagesLockKbldID: urlImagePair.UnprocessedImageURL.URL},
+				Image: urlImagePair.Image.URL,
+				Annotations: map[string]string{
+					ctlconf.ImagesLockKbldID:    urlImagePair.UnprocessedImageURL.URL,
+					ctlconf.ImagesLockKbldMetas: string(imagesYAML),
+				},
 			})
 		}
 		return iLock.WriteToPath(o.ImgpkgLockOutput)
