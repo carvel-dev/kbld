@@ -1,5 +1,3 @@
-# github.com/blang/semver/v4 v4.0.0
-github.com/blang/semver/v4
 # github.com/cppforlife/cobrautil v0.0.0-20200514214827-bb86e6965d72
 ## explicit
 github.com/cppforlife/cobrautil
@@ -57,6 +55,8 @@ github.com/json-iterator/go
 # github.com/k14s/imgpkg v0.3.0
 ## explicit
 github.com/k14s/imgpkg/pkg/imgpkg/lockconfig
+# github.com/k14s/semver/v4 v4.0.1-0.20210701191048-266d47ac6115
+github.com/k14s/semver/v4
 # github.com/kisielk/errcheck v1.6.0
 ## explicit
 github.com/kisielk/errcheck
@@ -76,7 +76,7 @@ github.com/opencontainers/image-spec/specs-go
 github.com/opencontainers/image-spec/specs-go/v1
 # github.com/pkg/errors v0.9.1
 github.com/pkg/errors
-# github.com/spf13/cobra v1.0.0
+# github.com/spf13/cobra v1.1.3
 ## explicit
 github.com/spf13/cobra
 # github.com/spf13/pflag v1.0.5
@@ -84,7 +84,7 @@ github.com/spf13/pflag
 # github.com/vito/go-interact v0.0.0-20171111012221-fa338ed9e9ec
 github.com/vito/go-interact/interact
 github.com/vito/go-interact/interact/terminal
-# github.com/vmware-tanzu/carvel-vendir v0.17.0
+# github.com/vmware-tanzu/carvel-vendir v0.21.1
 ## explicit
 github.com/vmware-tanzu/carvel-vendir/pkg/vendir/versions/v1alpha1
 # golang.org/x/crypto v0.0.0-20201002170205-7f63de1d35b0
@@ -125,7 +125,7 @@ golang.org/x/xerrors
 golang.org/x/xerrors/internal
 # gopkg.in/inf.v0 v0.9.1
 gopkg.in/inf.v0
-# gopkg.in/yaml.v2 v2.3.0
+# gopkg.in/yaml.v2 v2.4.0
 gopkg.in/yaml.v2
 # k8s.io/apimachinery v0.19.0
 ## explicit
