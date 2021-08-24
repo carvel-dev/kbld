@@ -1,7 +1,3 @@
-// Copyright 2018 The Go Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
-
 package packages
 
 import (
@@ -9,6 +5,7 @@ import (
 	"fmt"
 	"go/parser"
 	"go/token"
+	"log"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -34,12 +31,9 @@ func (state *golistState) processGolistOverlay(response *responseDeduper) (modif
 		// This is an approximation of import path to id. This can be
 		// wrong for tests, vendored packages, and a number of other cases.
 		havePkgs[pkg.PkgPath] = pkg.ID
-		dir, err := commonDir(pkg.GoFiles)
-		if err != nil {
-			return nil, nil, err
-		}
-		if dir != "" {
-			pkgOfDir[dir] = append(pkgOfDir[dir], pkg)
+		x := commonDir(pkg.GoFiles)
+		if x != "" {
+			pkgOfDir[x] = append(pkgOfDir[x], pkg)
 		}
 	}
 
@@ -259,7 +253,7 @@ func (state *golistState) processGolistOverlay(response *responseDeduper) (modif
 	return modifiedPkgs, needPkgs, err
 }
 
-// resolveImport finds the ID of a package given its import path.
+// resolveImport finds the the ID of a package given its import path.
 // In particular, it will find the right vendored copy when in GOPATH mode.
 func (state *golistState) resolveImport(sourceDir, importPath string) (string, error) {
 	env, err := state.getEnv()
@@ -443,21 +437,20 @@ func extractPackageName(filename string, contents []byte) (string, bool) {
 	return f.Name.Name, true
 }
 
-// commonDir returns the directory that all files are in, "" if files is empty,
-// or an error if they aren't in the same directory.
-func commonDir(files []string) (string, error) {
+func commonDir(a []string) string {
 	seen := make(map[string]bool)
-	for _, f := range files {
+	x := append([]string{}, a...)
+	for _, f := range x {
 		seen[filepath.Dir(f)] = true
 	}
 	if len(seen) > 1 {
-		return "", fmt.Errorf("files (%v) are in more than one directory: %v", files, seen)
+		log.Fatalf("commonDir saw %v for %v", seen, x)
 	}
 	for k := range seen {
-		// seen has only one element; return it.
-		return k, nil
+		// len(seen) == 1
+		return k
 	}
-	return "", nil // no files
+	return "" // no files
 }
 
 // It is possible that the files in the disk directory dir have a different package
