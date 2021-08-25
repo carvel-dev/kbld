@@ -39,7 +39,9 @@ func NewKbldCmd(o *KbldOptions) *cobra.Command {
 	// Disable docs header
 	cmd.DisableAutoGenTag = true
 
-	// TODO bash completion
+	// We need to do a little work for the automatic "completion" command to function as designed.
+	cmd.CompletionOptions.DisableDefaultCmd = true
+
 	cmd.SetOutput(uiBlockWriter{o.ui}) // setting output for cmd.Help()
 
 	o.UIFlags.Set(cmd)
