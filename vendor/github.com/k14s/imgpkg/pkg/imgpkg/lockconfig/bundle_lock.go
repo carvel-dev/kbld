@@ -51,26 +51,26 @@ func NewBundleLockFromBytes(data []byte) (BundleLock, error) {
 	return lock, nil
 }
 
-func (c BundleLock) Validate() error {
-	if c.APIVersion != BundleLockAPIVersion {
+func (b BundleLock) Validate() error {
+	if b.APIVersion != BundleLockAPIVersion {
 		return fmt.Errorf("Validating apiVersion: Unknown version (known: %s)", BundleLockAPIVersion)
 	}
-	if c.Kind != BundleLockKind {
+	if b.Kind != BundleLockKind {
 		return fmt.Errorf("Validating kind: Unknown kind (known: %s)", BundleLockKind)
 	}
-	if _, err := regname.NewDigest(c.Bundle.Image); err != nil {
-		return fmt.Errorf("Expected ref to be in digest form, got '%s'", c.Bundle.Image)
+	if _, err := regname.NewDigest(b.Bundle.Image); err != nil {
+		return fmt.Errorf("Expected ref to be in digest form, got '%s'", b.Bundle.Image)
 	}
 	return nil
 }
 
-func (c BundleLock) AsBytes() ([]byte, error) {
-	err := c.Validate()
+func (b BundleLock) AsBytes() ([]byte, error) {
+	err := b.Validate()
 	if err != nil {
 		return nil, fmt.Errorf("Validating bundle lock: %s", err)
 	}
 
-	bs, err := yaml.Marshal(c)
+	bs, err := yaml.Marshal(b)
 	if err != nil {
 		return nil, fmt.Errorf("Marshaling config: %s", err)
 	}
@@ -78,8 +78,8 @@ func (c BundleLock) AsBytes() ([]byte, error) {
 	return []byte(fmt.Sprintf("---\n%s", bs)), nil
 }
 
-func (c BundleLock) WriteToPath(path string) error {
-	bs, err := c.AsBytes()
+func (b BundleLock) WriteToPath(path string) error {
+	bs, err := b.AsBytes()
 	if err != nil {
 		return err
 	}
