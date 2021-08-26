@@ -1,5 +1,6 @@
 /kbld
 /kbld-darwin-amd64
+/kbld-darwin-arm64
 /kbld-linux-amd64
 /kbld-windows-amd64.exe
 /tmp
