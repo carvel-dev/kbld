@@ -14,10 +14,11 @@
 ```
 
 ## Run E2E tests against minikube registry
+Install virtualbox from https://www.virtualbox.org/wiki/Downloads. After installing the first time, you may need to reboot.
 ```bash
 # Bootstrap k8s cluster and enable docker registry
 # X.X.X.X must be replaced with your subnetmask of "minikube ip"
-minikube start --driver=docker --insecure-registry=X.X.X.X/16
+minikube start --driver=virtualbox --insecure-registry=X.X.X.X/16
 # Build kbld binary for testing
 ./hack/build.sh
 # Make your env aware of the docker registry
