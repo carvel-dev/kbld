@@ -9,7 +9,7 @@ import (
 	ctlreg "github.com/k14s/kbld/pkg/kbld/registry"
 )
 
-// TaggedImage respresents an image that will be tagged when its URL is requested
+// TaggedImage represents an image that will be tagged when its URL is requested
 type TaggedImage struct {
 	image    Image
 	imgDst   ctlconf.ImageDestination

@@ -11,7 +11,7 @@ import (
 	versions "github.com/vmware-tanzu/carvel-vendir/pkg/vendir/versions/v1alpha1"
 )
 
-// TagSelectedImage respresents an image that will be resolved into url+digest
+// TagSelectedImage represents an image that will be resolved into url+digest
 type TagSelectedImage struct {
 	url       string
 	selection *versions.VersionSelection

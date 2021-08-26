@@ -69,13 +69,13 @@ type ImageOverride struct {
 	NewImage     string                     `json:"newImage"`
 	Preresolved  bool                       `json:"preresolved,omitempty"`
 	TagSelection *versions.VersionSelection `json:"tagSelection,omitempty"`
-	ImageMetas   []ImageMeta
+	ImageMetas   []ImageMeta                `json:",omitempty"`
 }
 
 type ImageMeta struct {
-	URL  string `json:"URL"`
-	Type string `json:"Type"`
-	Tag  string `json:"Tag"`
+	URL  string `json:"URL,omitempty"`
+	Type string `json:"Type,omitempty"`
+	Tag  string `json:"Tag,omitempty"`
 }
 
 type ImageDestination struct {

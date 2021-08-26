@@ -28,8 +28,7 @@ func (i PreresolvedImage) URL() (string, []Meta, error) {
 	if len(i.metas) > 0 {
 		var givenMetas []Meta
 		for _, m := range i.metas {
-			//TODO: should we change Type to 'preresolved' or keep whatever is given from lockfile?
-			givenMetas = append(givenMetas, PreresolvedImageSourceURL{Type: m.Type, URL: m.URL, Tag: m.Tag})
+			givenMetas = append(givenMetas, PreresolvedImageSourceURL{Type: "preresolved", URL: m.URL, Tag: m.Tag})
 		}
 		return i.url, givenMetas, nil
 	}

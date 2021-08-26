@@ -10,7 +10,7 @@ import (
 	ctlreg "github.com/k14s/kbld/pkg/kbld/registry"
 )
 
-// ResolvedImage respresents an image that will be resolved into url+digest
+// ResolvedImage represents an image that will be resolved into url+digest
 type ResolvedImage struct {
 	url      string
 	registry ctlreg.Registry
