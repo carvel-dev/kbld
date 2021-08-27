@@ -79,6 +79,7 @@ jobs:
             console.log(checksums)
 
             return `${checksums['kbld-darwin-amd64']}  ./kbld-darwin-amd64
+            ${checksums['kbld-darwin-arm64']}  ./kbld-darwin-arm64
             ${checksums['kbld-linux-amd64']}  ./kbld-linux-amd64
             ${checksums['kbld-windows-amd64.exe']}  ./kbld-windows-amd64.exe`
 
