@@ -1,0 +1,15 @@
+load("@io_bazel_rules_docker//container:container.bzl", "container_image")
+load("@io_bazel_rules_docker//go:image.bzl", "go_image")
+
+package(default_visibility = ["//visibility:public"])
+
+go_image(
+    name = "simple-app-go-image",
+    srcs = ["app.go"],
+    importpath = "github.com/carvel-kbld/test/e2e/assets/simple-app",
+)
+
+container_image(
+    name = "simple-app",
+    base = ":simple-app-go-image",
+)
