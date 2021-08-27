@@ -17,6 +17,11 @@ if [ "$(ko version)" != "0.8.0" ]; then
   exit 1
 fi
 
+if [ "$(bazel --version | grep -o '4.2.0')" != "4.2.0" ]; then
+    echo "Please install 'bazel' from https://github.com/bazelbuild/bazel/releases/tag/4.2.0"
+    exit 1
+fi
+
 go clean -testcache
 
 export KBLD_BINARY_PATH="${KBLD_BINARY_PATH:-$PWD/kbld}"

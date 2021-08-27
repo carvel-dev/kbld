@@ -4,6 +4,7 @@
 package image
 
 import (
+	ctlbbz "github.com/k14s/kbld/pkg/kbld/builder/bazel"
 	ctlbdk "github.com/k14s/kbld/pkg/kbld/builder/docker"
 	ctlbko "github.com/k14s/kbld/pkg/kbld/builder/ko"
 	ctlbkb "github.com/k14s/kbld/pkg/kbld/builder/kubectlbuildkit"
@@ -48,9 +49,10 @@ func (f Factory) New(url string) Image {
 		pack := ctlbpk.NewPack(docker, f.logger)
 		kubectlBuildkit := ctlbkb.NewKubectlBuildkit(f.logger)
 		ko := ctlbko.NewKo(f.logger)
+		bazel := ctlbbz.NewBazel(docker, f.logger)
 
 		builtImg := NewBuiltImage(url, srcConf, imgDstConf,
-			docker, pack, kubectlBuildkit, ko)
+			docker, pack, kubectlBuildkit, ko, bazel)
 
 		if imgDstConf != nil {
 			return NewTaggedImage(builtImg, *imgDstConf, f.registry)
