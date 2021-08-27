@@ -246,20 +246,38 @@ func (o *ResolveOptions) emitLockOutput(conf ctlconf.Conf, resolvedImages *Proce
 			},
 		}
 		for _, urlImagePair := range resolvedImages.All() {
-			imagesYAML, err := yaml.Marshal(urlImagePair.Image.Metas)
-			if err != nil {
-				return err
-			}
+			anns := imgpkgLockAnnotations(urlImagePair)
+
 			iLock.Images = append(iLock.Images, lockconfig.ImageRef{
-				Image: urlImagePair.Image.URL,
-				Annotations: map[string]string{
-					ctlconf.ImagesLockKbldID:    urlImagePair.UnprocessedImageURL.URL,
-					ctlconf.ImagesLockKbldMetas: string(imagesYAML),
-				},
+				Image:       urlImagePair.Image.URL,
+				Annotations: anns,
 			})
 		}
 		return iLock.WriteToPath(o.ImgpkgLockOutput)
 	default:
 		return nil
 	}
+}
+
+func imgpkgLockAnnotations(i ProcessedImageItem) map[string]string {
+	anns := map[string]string{
+		ctlconf.ImagesLockKbldID: i.UnprocessedImageURL.URL,
+	}
+
+	imageMetas := i.Image.MetasDescription()
+	if imageMetas != nil && len(imageMetas) > 0 {
+		metaYaml, err := yaml.Marshal([]ctlconf.ImageMeta{
+			{
+				URL:  imageMetas[0].URL,
+				Type: "preresolved",
+				Tag:  imageMetas[0].Tag,
+			},
+		})
+		if err != nil {
+			return anns
+		}
+		anns[ctlconf.ImagesLockKbldMetas] = string(metaYaml)
+	}
+
+	return anns
 }

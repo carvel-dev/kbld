@@ -11,23 +11,34 @@ import (
 )
 
 var (
-	imgLock = `---
+	imgLockWithMetas = `---
 apiVersion: imgpkg.carvel.dev/v1alpha1
 images:
 - annotations:
     kbld.carvel.dev/id: nginx:1.14.2
     kbld.carvel.dev/metas: |
       - Tag: 1.14.2
-        Type: resolved
+        Type: preresolved
         URL: nginx:1.14.2
   image: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
 - annotations:
     kbld.carvel.dev/id: sample-app
     kbld.carvel.dev/metas: |
       - Tag: 1.15.1
-        Type: resolved
+        Type: preresolved
         URL: nginx:1.15.1
   image: index.docker.io/library/nginx@sha256:4a5573037f358b6cdfa2f3e8a9c33a5cf11bcd1675ca72ca76fbe5bd77d0d682
+kind: ImagesLock
+`
+	imgLockNoMetas = `---
+apiVersion: imgpkg.carvel.dev/v1alpha1
+images:
+- annotations:
+    kbld.carvel.dev/id: index.docker.io/library/nginx@sha256:4a5573037f358b6cdfa2f3e8a9c33a5cf11bcd1675ca72ca76fbe5bd77d0d682
+  image: index.docker.io/library/nginx@sha256:4a5573037f358b6cdfa2f3e8a9c33a5cf11bcd1675ca72ca76fbe5bd77d0d682
+- annotations:
+    kbld.carvel.dev/id: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
+  image: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
 kind: ImagesLock
 `
 )
@@ -172,8 +183,8 @@ images:
 		t.Fatalf("Failed while reading " + path)
 	}
 
-	if string(bs) != imgLock {
-		t.Fatalf("Expected >>>%s<<< to match >>>%s<<<", bs, imgLock)
+	if string(bs) != imgLockWithMetas {
+		t.Fatalf("Expected >>>%s<<< to match >>>%s<<<", bs, imgLockWithMetas)
 	}
 }
 
@@ -181,7 +192,7 @@ func TestImgpkgLockFileNotInOutput(t *testing.T) {
 	env := BuildEnv(t)
 	kbld := Kbld{t, env.Namespace, env.KbldBinaryPath, Logger{}}
 
-	input := imgLock
+	input := imgLockWithMetas
 	out, _ := kbld.RunWithOpts([]string{"-f", "-", "--images-annotation=false"}, RunOpts{
 		StdinReader: strings.NewReader(input),
 	})
@@ -201,7 +212,7 @@ images:
 - image: nginx:1.14.2
 - image: sample-app
 ---
-` + imgLock
+` + imgLockWithMetas
 
 	out, _ := kbld.RunWithOpts([]string{"-f", "-", "--images-annotation=false"}, RunOpts{
 		StdinReader: strings.NewReader(input),
@@ -227,7 +238,7 @@ images:
 - image: nginx:1.14.2
 - image: sample-app
 ---
-` + imgLock
+` + imgLockWithMetas
 
 	out, _ := kbld.RunWithOpts([]string{"-f", "-"}, RunOpts{
 		StdinReader: strings.NewReader(input),
@@ -255,4 +266,40 @@ metadata:
 		t.Fatalf("Expected >>>%s<<< to match >>>%s<<<", out, expectedOut)
 	}
 
+}
+
+func TestImgpkgLockOutputSuccessfulOnDigestedImage(t *testing.T) {
+	env := BuildEnv(t)
+	kbld := Kbld{t, env.Namespace, env.KbldBinaryPath, Logger{}}
+
+	input := `
+images:
+- image: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
+- image: index.docker.io/library/nginx@sha256:4a5573037f358b6cdfa2f3e8a9c33a5cf11bcd1675ca72ca76fbe5bd77d0d682
+`
+
+	path := "/tmp/kbld-test-lock-output-successful"
+	defer os.RemoveAll(path)
+
+	out, _ := kbld.RunWithOpts([]string{"-f", "-", "--images-annotation=false", "--imgpkg-lock-output=" + path}, RunOpts{
+		StdinReader: strings.NewReader(input),
+	})
+
+	expectedOut := `---
+images:
+- image: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
+- image: index.docker.io/library/nginx@sha256:4a5573037f358b6cdfa2f3e8a9c33a5cf11bcd1675ca72ca76fbe5bd77d0d682
+`
+	if out != expectedOut {
+		t.Fatalf("Expected >>>%s<<< to match >>>%s<<<", out, expectedOut)
+	}
+
+	bs, err := ioutil.ReadFile(path)
+	if err != nil {
+		t.Fatalf("Failed while reading " + path)
+	}
+
+	if string(bs) != imgLockNoMetas {
+		t.Fatalf("Expected >>>%s<<< to match >>>%s<<<", bs, imgLockWithMetas)
+	}
 }

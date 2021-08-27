@@ -7,6 +7,7 @@ import (
 	"reflect"
 	"strings"
 
+	ctlconf "github.com/k14s/kbld/pkg/kbld/config"
 	ctlimg "github.com/k14s/kbld/pkg/kbld/image"
 	"sigs.k8s.io/yaml"
 )
@@ -36,6 +37,21 @@ func (i Image) Description() string {
 	}
 
 	return strings.TrimSpace(string(yamlBytes))
+}
+
+func (i Image) MetasDescription() []ctlconf.ImageMeta {
+	imageMetas, err := yaml.Marshal(i.Metas)
+	if err != nil {
+		return nil
+	}
+
+	var metas []ctlconf.ImageMeta
+	err = yaml.Unmarshal(imageMetas, &metas)
+	if err != nil {
+		return nil
+	}
+
+	return metas
 }
 
 type imageStruct struct {
