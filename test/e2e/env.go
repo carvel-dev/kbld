@@ -11,9 +11,9 @@ import (
 
 type Env struct {
 	Namespace            string
-	DockerHubUsername    string
-	DockerHubHostname    string
-	SkipStressTests      bool
+	DockerHubUsername    string  // username with which to authenticate to registry and prefix image URLs
+	DockerHubHostname    string  // hostname of registry (default: docker.io)
+	SkipStressTests      bool    // skip tests that involve a larger number of images
 	SkipWhenHTTPRegistry bool
 	KbldBinaryPath       string
 }

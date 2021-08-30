@@ -6,6 +6,7 @@
 - [pack 0.8.1](https://github.com/buildpacks/pack)
 
 ## Run Unit tests
+
 ```bash
 # Run all tests
 ./hack/test.sh
@@ -13,21 +14,11 @@
 ./hack/test.sh -run TestLogger
 ```
 
-## Run E2E tests against minikube registry
-Install virtualbox from https://www.virtualbox.org/wiki/Downloads. After installing the first time, you may need to reboot.
-```bash
-# Bootstrap k8s cluster and enable docker registry
-# X.X.X.X must be replaced with your subnetmask of "minikube ip"
-minikube start --driver=virtualbox --insecure-registry=X.X.X.X/16
-# Build kbld binary for testing
-./hack/build.sh
-# Make your env aware of the docker registry
-eval $(minikube docker-env)
-# Run all tests
-./hack/test-all-minikube-local-registry.sh
-# or run single test
-./hack/test-all-minikube-local-registry.sh -run TestDockerBuildSuccessful
-```
+## E2E Tests
+
+These tests run against real-world components; some setup is required to them successfully.
+
+Details at [test/e2e/README.md](../test/e2e/README.md).
 
 ## Source Code Structure
 
