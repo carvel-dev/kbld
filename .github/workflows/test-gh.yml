@@ -37,7 +37,8 @@ jobs:
         set -e -x
 
         mkdir -p ~/.docker/machine/cache
-        curl -Lo ~/.docker/machine/cache/boot2docker.iso https://github.com/boot2docker/boot2docker/releases/download/v19.03.12/boot2docker.iso
+        wget -O -nv https://github.com/boot2docker/boot2docker/releases/download/v19.03.12/boot2docker.iso > ~/.docker/machine/cache/boot2docker.iso
+
         brew install docker docker-machine
 
         # Install ytt, kapp for build and tests
@@ -65,9 +66,6 @@ jobs:
 
         # Ensure that there is no existing kbld installed
         rm -f /tmp/bin/kbld
-
-        git config --global user.email "dummy@k14s.io"
-        git config --global user.name "Dummy dummy"
 
         wget -O- -nv https://storage.googleapis.com/kubernetes-release/release/v1.19.0/bin/darwin/amd64/kubectl > /tmp/bin/kubectl
         chmod +x /tmp/bin/kubectl
