@@ -18,14 +18,14 @@ images:
     kbld.carvel.dev/id: nginx:1.14.2
     kbld.carvel.dev/metas: |
       - Tag: 1.14.2
-        Type: preresolved
+        Type: resolved
         URL: nginx:1.14.2
   image: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
 - annotations:
     kbld.carvel.dev/id: sample-app
     kbld.carvel.dev/metas: |
       - Tag: 1.15.1
-        Type: preresolved
+        Type: resolved
         URL: nginx:1.15.1
   image: index.docker.io/library/nginx@sha256:4a5573037f358b6cdfa2f3e8a9c33a5cf11bcd1675ca72ca76fbe5bd77d0d682
 kind: ImagesLock
@@ -253,13 +253,17 @@ metadata:
     kbld.k14s.io/images: |
       - Metas:
         - Tag: 1.15.1
-          Type: preresolved
+          Type: resolved
           URL: nginx:1.15.1
+        - Type: preresolved
+          URL: index.docker.io/library/nginx@sha256:4a5573037f358b6cdfa2f3e8a9c33a5cf11bcd1675ca72ca76fbe5bd77d0d682
         URL: index.docker.io/library/nginx@sha256:4a5573037f358b6cdfa2f3e8a9c33a5cf11bcd1675ca72ca76fbe5bd77d0d682
       - Metas:
         - Tag: 1.14.2
-          Type: preresolved
+          Type: resolved
           URL: nginx:1.14.2
+        - Type: preresolved
+          URL: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
         URL: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
 `
 	if out != expectedOut {

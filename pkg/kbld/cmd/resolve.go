@@ -266,13 +266,15 @@ func (o *ResolveOptions) imgpkgLockAnnotations(i ProcessedImageItem) map[string]
 
 	imageMetas := i.Image.MetasDescription()
 	if imageMetas != nil && len(imageMetas) > 0 {
-		metaYaml, err := yaml.Marshal([]ctlconf.ImageMeta{
-			{
-				URL:  imageMetas[0].URL,
-				Type: "preresolved",
-				Tag:  imageMetas[0].Tag,
-			},
-		})
+		var metas []ctlconf.ImageMeta
+		for _, m := range imageMetas {
+			metas = append(metas, ctlconf.ImageMeta{
+				URL:  m.URL,
+				Type: m.Type,
+				Tag:  m.Tag,
+			})
+		}
+		metaYaml, err := yaml.Marshal(metas)
 		if err != nil {
 			return anns
 		}
