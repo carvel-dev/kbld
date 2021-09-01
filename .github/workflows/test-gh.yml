@@ -37,7 +37,7 @@ jobs:
         set -e -x
 
         mkdir -p ~/.docker/machine/cache
-        wget -O -nv https://github.com/boot2docker/boot2docker/releases/download/v19.03.12/boot2docker.iso > ~/.docker/machine/cache/boot2docker.iso
+        wget -O- -nv https://github.com/boot2docker/boot2docker/releases/download/v19.03.12/boot2docker.iso > ~/.docker/machine/cache/boot2docker.iso
 
         brew install docker docker-machine
 
