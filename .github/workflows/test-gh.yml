@@ -55,11 +55,11 @@ jobs:
         # ... for builders using Docker
         echo "${DOCKERHUB_ACCESS_TOKEN}" | docker login --username "${DOCKERHUB_USERNAME}" --password-stdin
         # ... for kubectl-buildkit
-        kubectl create secret docker-registry buildkit \
+        minikube kubectl --ssh=true -- create secret docker-registry buildkit \
           --docker-username="${DOCKERHUB_USERNAME}" \
           --docker-password="${DOCKERHUB_ACCESS_TOKEN}"
         # ... for any other service account that pulls images from DockerHub
-        kubectl create secret docker-registry dockerhub-credentials \
+        minikube kubectl --ssh=true -- create secret docker-registry dockerhub-credentials \
           --docker-username="${DOCKERHUB_USERNAME}" \
           --docker-password="${DOCKERHUB_ACCESS_TOKEN}"
 
