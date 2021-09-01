@@ -73,9 +73,14 @@ type ImageOverride struct {
 }
 
 type ImageMeta struct {
-	URL  string `json:"URL,omitempty" yaml:"URL,omitempty"`
-	Type string `json:"Type,omitempty" yaml:"Type,omitempty"`
-	Tag  string `json:"Tag,omitempty" yaml:"Tag,omitempty"`
+	URL       string   `json:",omitempty" yaml:",omitempty"`
+	Type      string   `json:",omitempty" yaml:",omitempty"`
+	Tag       string   `json:",omitempty" yaml:",omitempty"`
+	Path      string   `json:",omitempty" yaml:",omitempty"`
+	RemoteURL string   `json:",omitempty" yaml:",omitempty"`
+	SHA       string   `json:",omitempty" yaml:",omitempty"`
+	Dirty     bool     `json:",omitempty" yaml:",omitempty"`
+	Tags      []string `json:",omitempty" yaml:",omitempty"`
 }
 
 type ImageDestination struct {

@@ -268,11 +268,7 @@ func (o *ResolveOptions) imgpkgLockAnnotations(i ProcessedImageItem) map[string]
 	if imageMetas != nil && len(imageMetas) > 0 {
 		var metas []ctlconf.ImageMeta
 		for _, m := range imageMetas {
-			metas = append(metas, ctlconf.ImageMeta{
-				URL:  m.URL,
-				Type: m.Type,
-				Tag:  m.Tag,
-			})
+			metas = append(metas, m)
 		}
 		metaYaml, err := yaml.Marshal(metas)
 		if err != nil {
