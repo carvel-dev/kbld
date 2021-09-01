@@ -18,6 +18,7 @@ jobs:
   test-all:
     name: Test GH
     runs-on: macos-latest
+    environment: DockerHub E2E
     steps:
     - name: Set up Go 1.x
       uses: actions/setup-go@v2
@@ -29,6 +30,9 @@ jobs:
         path: src/github.com/${{ github.repository }}
         fetch-depth: 0
     - name: Run Tests
+      env:
+        DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+        DOCKERHUB_ACCESS_TOKEN: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
       run: |
         set -e -x
 
@@ -46,6 +50,18 @@ jobs:
         chmod +x /tmp/bin/minikube
         minikube start --driver=virtualbox --insecure-registry=192.168.99.100/16
         eval $(minikube docker-env --shell=bash)
+
+        # Authenticate to DockerHub to avoid test failures due to rate limiting
+        # ... for builders using Docker
+        echo "${DOCKERHUB_ACCESS_TOKEN}" | docker login --username "${DOCKERHUB_USERNAME}" --password-stdin
+        # ... for kubectl-buildkit
+        kubectl create secret docker-registry buildkit \
+          --docker-username="${DOCKERHUB_USERNAME}" \
+          --docker-password="${DOCKERHUB_ACCESS_TOKEN}"
+        # ... for any other service account that pulls images from DockerHub
+        kubectl create secret docker-registry dockerhub-credentials \
+          --docker-username="${DOCKERHUB_USERNAME}" \
+          --docker-password="${DOCKERHUB_ACCESS_TOKEN}"
 
         # Ensure that there is no existing kbld installed
         rm -f /tmp/bin/kbld
