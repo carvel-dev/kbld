@@ -177,7 +177,10 @@ func NewConfigFromImagesLock(res ctlres.Resource) (Config, error) {
 
 	for _, image := range imagesLock.Images {
 		var iMetas []ImageMeta
-		yaml.Unmarshal([]byte(image.Annotations[ImagesLockKbldMetas]), &iMetas)
+		err := yaml.Unmarshal([]byte(image.Annotations[ImagesLockKbldMetas]), &iMetas)
+		if err != nil {
+			return Config{}, fmt.Errorf("Unmarshaling %s metas annotation: %s", res.Description(), err)
+		}
 		iOverride := ImageOverride{
 			ImageRef: ImageRef{
 				Image: image.Annotations[ImagesLockKbldID],

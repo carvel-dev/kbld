@@ -246,7 +246,7 @@ func (o *ResolveOptions) emitLockOutput(conf ctlconf.Conf, resolvedImages *Proce
 			},
 		}
 		for _, urlImagePair := range resolvedImages.All() {
-			anns := imgpkgLockAnnotations(urlImagePair)
+			anns := o.imgpkgLockAnnotations(urlImagePair)
 
 			iLock.Images = append(iLock.Images, lockconfig.ImageRef{
 				Image:       urlImagePair.Image.URL,
@@ -259,7 +259,7 @@ func (o *ResolveOptions) emitLockOutput(conf ctlconf.Conf, resolvedImages *Proce
 	}
 }
 
-func imgpkgLockAnnotations(i ProcessedImageItem) map[string]string {
+func (o *ResolveOptions) imgpkgLockAnnotations(i ProcessedImageItem) map[string]string {
 	anns := map[string]string{
 		ctlconf.ImagesLockKbldID: i.UnprocessedImageURL.URL,
 	}

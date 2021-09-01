@@ -26,11 +26,11 @@ func NewPreresolvedImage(url string, metas []config.ImageMeta) PreresolvedImage 
 
 func (i PreresolvedImage) URL() (string, []Meta, error) {
 	if len(i.metas) > 0 {
-		var givenMetas []Meta
+		var imageMetas []Meta
 		for _, m := range i.metas {
-			givenMetas = append(givenMetas, PreresolvedImageSourceURL{Type: "preresolved", URL: m.URL, Tag: m.Tag})
+			imageMetas = append(imageMetas, PreresolvedImageSourceURL{Type: "preresolved", URL: m.URL, Tag: m.Tag})
 		}
-		return i.url, givenMetas, nil
+		return i.url, imageMetas, nil
 	}
 	return i.url, []Meta{PreresolvedImageSourceURL{Type: "preresolved", URL: i.url}}, nil
 }
