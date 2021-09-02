@@ -11,6 +11,7 @@ require (
 	github.com/kisielk/errcheck v1.6.0
 	github.com/spf13/cobra v1.2.1
 	github.com/vmware-tanzu/carvel-vendir v0.22.0
+	golang.org/x/crypto v0.0.0-20210817164053-32db794688a5 // indirect
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
 	k8s.io/apimachinery v0.22.1
 	sigs.k8s.io/yaml v1.2.0
