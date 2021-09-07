@@ -22,4 +22,4 @@ sources:
   path: test/e2e/assets/simple-app
   bazel:
     build:
-      label: :simple-app
+      target: :simple-app

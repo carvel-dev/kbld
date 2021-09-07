@@ -25,12 +25,12 @@ sources:
   path: assets/simple-app
   bazel:
     build:
-      label: :simple-app
+      target: :simple-app
 - image: docker.io/*username*/kbld-e2e-tests-build2
   path: assets/simple-app
   bazel:
     build:
-      label: :simple-app
+      target: :simple-app
 ---
 apiVersion: kbld.k14s.io/v1alpha1
 kind: ImageDestinations

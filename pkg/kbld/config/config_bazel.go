@@ -8,6 +8,6 @@ type SourceBazelOpts struct {
 }
 
 type SourceBazelBuildOpts struct {
-	Label      *string   `json:"label"`
+	Target     *string   `json:"target"`
 	RawOptions *[]string `json:"rawOptions"`
 }

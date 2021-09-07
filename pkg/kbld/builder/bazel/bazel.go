@@ -51,11 +51,11 @@ func (b *Bazel) Build(image, directory string, opts config.SourceBazelBuildOpts)
 
 		cmdArgs := []string{"run"}
 
-		if opts.Label == nil {
-			return ctlbdk.DockerTmpRef{}, fmt.Errorf("Expected label to be specified, but was not")
+		if opts.Target == nil {
+			return ctlbdk.DockerTmpRef{}, fmt.Errorf("Expected target to be specified, but was not")
 		}
 
-		cmdArgs = append(cmdArgs, *opts.Label)
+		cmdArgs = append(cmdArgs, *opts.Target)
 
 		if opts.RawOptions != nil {
 			cmdArgs = append(cmdArgs, *opts.RawOptions...)
