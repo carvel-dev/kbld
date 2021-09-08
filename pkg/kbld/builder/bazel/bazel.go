@@ -16,15 +16,6 @@ import (
 )
 
 var (
-	// Example output that includes the final digest:
-	// INFO: Analyzed target //:simple-app (0 packages loaded, 0 targets configured).
-	// INFO: Found 1 target...
-	// Target //:simple-app up-to-date:
-	//   bazel-bin/simple-app-layer.tar
-	// INFO: Elapsed time: 0.148s, Critical Path: 0.00s
-	// INFO: 1 process: 1 internal.
-	// INFO: Build completed successfully, 1 total action
-	// INFO: Build completed successfully, 1 total action
 	// Loaded image ID: sha256:328b5f47550c85cea5284911ad4d284ce20e8240d61d2610eb6cb4aa8b43c19e
 	// Tagging 328b5f47550c85cea5284911ad4d284ce20e8240d61d2610eb6cb4aa8b43c19e as bazel:simple-app
 	bazelImageID = regexp.MustCompile("Loaded image ID: (sha256:)([0-9a-z]+)")
