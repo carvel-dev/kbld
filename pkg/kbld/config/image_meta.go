@@ -5,7 +5,6 @@ package config
 
 import (
 	"encoding/json"
-	"fmt"
 
 	"sigs.k8s.io/yaml"
 )
@@ -72,14 +71,15 @@ func (m *ImageMeta) UnmarshalJSON(data []byte) error {
 		return err
 	}
 
-	var local BuiltImageSourceLocal
-	var git BuiltImageSourceGit
-	var res ResolvedImageSourceURL
-	var preres PreresolvedImageSourceURL
-	var tag TaggedImageMeta
-
 	for _, item := range list {
+		var local BuiltImageSourceLocal
+		var git BuiltImageSourceGit
+		var res ResolvedImageSourceURL
+		var preres PreresolvedImageSourceURL
+		var tag TaggedImageMeta
+
 		yamlItem, _ := yaml.Marshal(&item)
+
 		switch {
 		case yaml.Unmarshal(yamlItem, &local) == nil && local.Type == "local":
 			m.Metas = append(m.Metas, local)
@@ -91,8 +91,6 @@ func (m *ImageMeta) UnmarshalJSON(data []byte) error {
 			m.Metas = append(m.Metas, preres)
 		case yaml.Unmarshal(yamlItem, &tag) == nil && tag.Type == "tagged":
 			m.Metas = append(m.Metas, tag)
-		default:
-			return fmt.Errorf("Unknown Image Meta")
 		}
 	}
 	return nil
