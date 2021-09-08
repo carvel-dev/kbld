@@ -69,18 +69,7 @@ type ImageOverride struct {
 	NewImage     string                     `json:"newImage"`
 	Preresolved  bool                       `json:"preresolved,omitempty"`
 	TagSelection *versions.VersionSelection `json:"tagSelection,omitempty"`
-	ImageMetas   []ImageMeta                `json:",omitempty"`
-}
-
-type ImageMeta struct {
-	URL       string   `json:",omitempty" yaml:",omitempty"`
-	Type      string   `json:",omitempty" yaml:",omitempty"`
-	Tag       string   `json:",omitempty" yaml:",omitempty"`
-	Path      string   `json:",omitempty" yaml:",omitempty"`
-	RemoteURL string   `json:",omitempty" yaml:",omitempty"`
-	SHA       string   `json:",omitempty" yaml:",omitempty"`
-	Dirty     bool     `json:",omitempty" yaml:",omitempty"`
-	Tags      []string `json:",omitempty" yaml:",omitempty"`
+	ImageMetas   []Meta                     `json:",omitempty"`
 }
 
 type ImageDestination struct {
@@ -181,10 +170,9 @@ func NewConfigFromImagesLock(res ctlres.Resource) (Config, error) {
 	overridesConfig := NewConfig()
 
 	for _, image := range imagesLock.Images {
-		var iMetas []ImageMeta
-		err := yaml.Unmarshal([]byte(image.Annotations[ImagesLockKbldMetas]), &iMetas)
+		imageMeta, err := metasHistory(image.Annotations[ImagesLockKbldMetas])
 		if err != nil {
-			return Config{}, fmt.Errorf("Unmarshaling %s metas annotation: %s", res.Description(), err)
+			return Config{}, fmt.Errorf("Unmarshaling %s as %s annotation:  %s", res.Description(), ImagesLockKbldMetas, err)
 		}
 		iOverride := ImageOverride{
 			ImageRef: ImageRef{
@@ -192,7 +180,7 @@ func NewConfigFromImagesLock(res ctlres.Resource) (Config, error) {
 			},
 			NewImage:    image.Image,
 			Preresolved: true,
-			ImageMetas:  iMetas,
+			ImageMetas:  imageMeta,
 		}
 		overridesConfig.Overrides = append(overridesConfig.Overrides, iOverride)
 	}

@@ -7,6 +7,7 @@ import (
 	"fmt"
 
 	regname "github.com/google/go-containerregistry/pkg/name"
+	ctlconf "github.com/k14s/kbld/pkg/kbld/config"
 	ctlreg "github.com/k14s/kbld/pkg/kbld/registry"
 	versions "github.com/vmware-tanzu/carvel-vendir/pkg/vendir/versions/v1alpha1"
 )
@@ -24,7 +25,7 @@ func NewTagSelectedImage(url string, selection *versions.VersionSelection,
 	return TagSelectedImage{url, selection, registry}
 }
 
-func (i TagSelectedImage) URL() (string, []Meta, error) {
+func (i TagSelectedImage) URL() (string, []ctlconf.Meta, error) {
 	repo, err := regname.NewRepository(i.url, regname.WeakValidation)
 	if err != nil {
 		return "", nil, err

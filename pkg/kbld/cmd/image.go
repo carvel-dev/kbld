@@ -8,7 +8,6 @@ import (
 	"strings"
 
 	ctlconf "github.com/k14s/kbld/pkg/kbld/config"
-	ctlimg "github.com/k14s/kbld/pkg/kbld/image"
 	"sigs.k8s.io/yaml"
 )
 
@@ -16,7 +15,7 @@ type Images []Image
 
 type Image struct {
 	URL      string
-	Metas    []ctlimg.Meta // empty when deserialized
+	Metas    []ctlconf.Meta // empty when deserialized
 	metasRaw []interface{} // populated when deserialized
 }
 
@@ -37,21 +36,6 @@ func (i Image) Description() string {
 	}
 
 	return strings.TrimSpace(string(yamlBytes))
-}
-
-func (i Image) MetasDescription() []ctlconf.ImageMeta {
-	imageMetas, err := yaml.Marshal(i.Metas)
-	if err != nil {
-		return nil
-	}
-
-	var metas []ctlconf.ImageMeta
-	err = yaml.Unmarshal(imageMetas, &metas)
-	if err != nil {
-		return nil
-	}
-
-	return metas
 }
 
 type imageStruct struct {

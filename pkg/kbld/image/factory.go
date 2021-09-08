@@ -15,11 +15,7 @@ import (
 )
 
 type Image interface {
-	URL() (string, []Meta, error)
-}
-
-type Meta interface {
-	meta()
+	URL() (string, []ctlconf.Meta, error)
 }
 
 type Factory struct {

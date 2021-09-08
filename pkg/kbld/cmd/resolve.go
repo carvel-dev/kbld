@@ -263,14 +263,9 @@ func (o *ResolveOptions) imgpkgLockAnnotations(i ProcessedImageItem) map[string]
 	anns := map[string]string{
 		ctlconf.ImagesLockKbldID: i.UnprocessedImageURL.URL,
 	}
-
-	imageMetas := i.Image.MetasDescription()
-	if imageMetas != nil && len(imageMetas) > 0 {
-		var metas []ctlconf.ImageMeta
-		for _, m := range imageMetas {
-			metas = append(metas, m)
-		}
-		metaYaml, err := yaml.Marshal(metas)
+	imageMetas := i.Metas
+	if len(imageMetas) > 0 {
+		metaYaml, err := yaml.Marshal(imageMetas)
 		if err != nil {
 			return anns
 		}
