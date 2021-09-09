@@ -70,7 +70,7 @@ func (i BuiltImage) URL() (string, []Meta, error) {
 		return i.optionalPushWithDocker(dockerTmpRef, metas)
 
 	case i.buildSource.Bazel != nil:
-		dockerTmpRef, err := i.bazel.Build(urlRepo, i.buildSource.Path, i.buildSource.Bazel.Build)
+		dockerTmpRef, err := i.bazel.Run(urlRepo, i.buildSource.Path, i.buildSource.Bazel.Run)
 		if err != nil {
 			return "", nil, err
 		}

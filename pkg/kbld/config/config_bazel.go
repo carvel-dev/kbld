@@ -4,7 +4,7 @@
 package config
 
 type SourceBazelOpts struct {
-	Build SourceBazelBuildOpts
+	Run SourceBazelBuildOpts
 }
 
 type SourceBazelBuildOpts struct {
