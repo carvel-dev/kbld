@@ -4,10 +4,10 @@
 package config
 
 type SourceBazelOpts struct {
-	Run SourceBazelBuildOpts
+	Run SourceBazelRunOpts
 }
 
-type SourceBazelBuildOpts struct {
+type SourceBazelRunOpts struct {
 	Target     *string   `json:"target"`
 	RawOptions *[]string `json:"rawOptions"`
 }
