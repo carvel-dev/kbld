@@ -18,6 +18,7 @@ jobs:
   test-all:
     name: Test GH
     runs-on: macos-latest
+    environment: DockerHub E2E
     steps:
     - name: Set up Go 1.x
       uses: actions/setup-go@v2
@@ -29,40 +30,55 @@ jobs:
         path: src/github.com/${{ github.repository }}
         fetch-depth: 0
     - name: Run Tests
+      env:
+        DOCKERHUB_USERNAME: k8slt
+        DOCKERHUB_ACCESS_TOKEN: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
       run: |
         set -e -x
 
         mkdir -p ~/.docker/machine/cache
-        curl -Lo ~/.docker/machine/cache/boot2docker.iso https://github.com/boot2docker/boot2docker/releases/download/v19.03.12/boot2docker.iso
+        wget -O- -nv https://github.com/boot2docker/boot2docker/releases/download/v19.03.12/boot2docker.iso > ~/.docker/machine/cache/boot2docker.iso
+
         brew install docker docker-machine
 
         # Install ytt, kapp for build and tests
         mkdir -p /tmp/bin
         export PATH=/tmp/bin:$PATH
 
-        wget -O- https://k14s.io/install.sh | K14SIO_INSTALL_BIN_DIR=/tmp/bin bash
+        wget -O- -nv https://k14s.io/install.sh | K14SIO_INSTALL_BIN_DIR=/tmp/bin bash
 
-        wget -O- https://github.com/kubernetes/minikube/releases/download/v1.10.0/minikube-darwin-amd64 > /tmp/bin/minikube
+        wget -O- -nv https://github.com/kubernetes/minikube/releases/latest/download/minikube-darwin-amd64 > /tmp/bin/minikube
         chmod +x /tmp/bin/minikube
-        minikube start --driver=virtualbox --insecure-registry=192.168.99.100/16
+        minikube start --driver=virtualbox --insecure-registry=192.168.0.0/16
         eval $(minikube docker-env --shell=bash)
+
+        # Authenticate to DockerHub to avoid test failures due to rate limiting
+        # ... for builders using Docker
+        set +x
+          echo "${DOCKERHUB_ACCESS_TOKEN}" | docker login --username "${DOCKERHUB_USERNAME}" --password-stdin
+          # ... for kubectl-buildkit
+          minikube kubectl --ssh=true -- create secret docker-registry buildkit \
+            --docker-username="${DOCKERHUB_USERNAME}" \
+            --docker-password="${DOCKERHUB_ACCESS_TOKEN}"
+          # ... for any other service account that pulls images from DockerHub
+          minikube kubectl --ssh=true -- create secret docker-registry dockerhub-credentials \
+            --docker-username="${DOCKERHUB_USERNAME}" \
+            --docker-password="${DOCKERHUB_ACCESS_TOKEN}"
+        set -x
 
         # Ensure that there is no existing kbld installed
         rm -f /tmp/bin/kbld
 
-        git config --global user.email "dummy@k14s.io"
-        git config --global user.name "Dummy dummy"
-
-        wget -O- https://storage.googleapis.com/kubernetes-release/release/v1.19.0/bin/darwin/amd64/kubectl > /tmp/bin/kubectl
+        wget -O- -nv https://storage.googleapis.com/kubernetes-release/release/v1.19.0/bin/darwin/amd64/kubectl > /tmp/bin/kubectl
         chmod +x /tmp/bin/kubectl
 
-        wget -O- https://github.com/vmware-tanzu/buildkit-cli-for-kubectl/releases/download/v0.1.0/darwin-refs.tags.v0.1.0.tgz > /tmp/kb-cli.tgz
+        wget -O- -nv https://github.com/vmware-tanzu/buildkit-cli-for-kubectl/releases/download/v0.1.0/darwin-refs.tags.v0.1.0.tgz > /tmp/kb-cli.tgz
         tar xzvf /tmp/kb-cli.tgz -C /tmp/bin
 
-        wget -O- https://github.com/buildpacks/pack/releases/download/v0.8.1/pack-v0.8.1-macos.tgz > /tmp/pack-cli.tgz
+        wget -O- -nv https://github.com/buildpacks/pack/releases/download/v0.8.1/pack-v0.8.1-macos.tgz > /tmp/pack-cli.tgz
         tar xzvf /tmp/pack-cli.tgz -C /tmp/bin
 
-        wget -O- https://github.com/google/ko/releases/download/v0.8.0/ko_0.8.0_Darwin_x86_64.tar.gz > /tmp/ko.tgz
+        wget -O- -nv https://github.com/google/ko/releases/download/v0.8.0/ko_0.8.0_Darwin_x86_64.tar.gz > /tmp/ko.tgz
         tar xzvf /tmp/ko.tgz -C /tmp/bin
 
         cd "src/github.com/${{ github.repository }}"
