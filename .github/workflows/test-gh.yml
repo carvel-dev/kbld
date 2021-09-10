@@ -52,9 +52,12 @@ jobs:
         minikube start --driver=virtualbox --insecure-registry=192.168.0.0/16
         eval $(minikube docker-env --shell=bash)
 
-        # Authenticate to DockerHub to avoid test failures due to rate limiting
-        # ... for builders using Docker
-        set +x
+        # when this workflow runs of a pull request based on a fork, secrets are unavailable
+        # https://docs.github.com/en/actions/reference/encrypted-secrets#using-encrypted-secrets-in-a-workflow
+        if [[ "${DOCKERHUB_ACCESS_TOKEN}" != "" ]]; then
+          # Authenticate to DockerHub to avoid test failures due to rate limiting
+          # ... for builders using Docker
+          set +x
           echo "${DOCKERHUB_ACCESS_TOKEN}" | docker login --username "${DOCKERHUB_USERNAME}" --password-stdin
           # ... for kubectl-buildkit
           minikube kubectl --ssh=true -- create secret docker-registry buildkit \
@@ -64,7 +67,10 @@ jobs:
           minikube kubectl --ssh=true -- create secret docker-registry dockerhub-credentials \
             --docker-username="${DOCKERHUB_USERNAME}" \
             --docker-password="${DOCKERHUB_ACCESS_TOKEN}"
-        set -x
+          set -x
+        else
+          echo "No DockerHub Access Token set; skipping Docker authentication. There may be rate limit errors."
+        fi
 
         # Ensure that there is no existing kbld installed
         rm -f /tmp/bin/kbld
