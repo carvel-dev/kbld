@@ -6,6 +6,7 @@ package image
 import (
 	"path/filepath"
 
+	ctlbbz "github.com/k14s/kbld/pkg/kbld/builder/bazel"
 	ctlbdk "github.com/k14s/kbld/pkg/kbld/builder/docker"
 	ctlbko "github.com/k14s/kbld/pkg/kbld/builder/ko"
 	ctlbkb "github.com/k14s/kbld/pkg/kbld/builder/kubectlbuildkit"
@@ -22,12 +23,13 @@ type BuiltImage struct {
 	pack            ctlbpk.Pack
 	kubectlBuildkit ctlbkb.KubectlBuildkit
 	ko              ctlbko.Ko
+	bazel           ctlbbz.Bazel
 }
 
 func NewBuiltImage(url string, buildSource ctlconf.Source, imgDst *ctlconf.ImageDestination,
-	docker ctlbdk.Docker, pack ctlbpk.Pack, kubectlBuildkit ctlbkb.KubectlBuildkit, ko ctlbko.Ko) BuiltImage {
+	docker ctlbdk.Docker, pack ctlbpk.Pack, kubectlBuildkit ctlbkb.KubectlBuildkit, ko ctlbko.Ko, bazel ctlbbz.Bazel) BuiltImage {
 
-	return BuiltImage{url, buildSource, imgDst, docker, pack, kubectlBuildkit, ko}
+	return BuiltImage{url, buildSource, imgDst, docker, pack, kubectlBuildkit, ko, bazel}
 }
 
 func (i BuiltImage) URL() (string, []Meta, error) {
@@ -61,6 +63,14 @@ func (i BuiltImage) URL() (string, []Meta, error) {
 
 	case i.buildSource.Ko != nil:
 		dockerTmpRef, err := i.ko.Build(urlRepo, i.buildSource.Path, i.buildSource.Ko.Build)
+		if err != nil {
+			return "", nil, err
+		}
+
+		return i.optionalPushWithDocker(dockerTmpRef, metas)
+
+	case i.buildSource.Bazel != nil:
+		dockerTmpRef, err := i.bazel.Run(urlRepo, i.buildSource.Path, i.buildSource.Bazel.Run)
 		if err != nil {
 			return "", nil, err
 		}

@@ -60,6 +60,7 @@ type Source struct {
 	Pack            *SourcePackOpts
 	KubectlBuildkit *SourceKubectlBuildkitOpts
 	Ko              *SourceKoOpts
+	Bazel           *SourceBazelOpts
 }
 
 type ImageOverride struct {
