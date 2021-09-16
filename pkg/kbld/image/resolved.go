@@ -49,7 +49,7 @@ func (i ResolvedImage) URL() (string, []ctlconf.Meta, error) {
 		return "", nil, err
 	}
 
-	metas = append(metas, ctlconf.ResolvedImageSourceURL{Type: "resolved", URL: i.url, Tag: tag.TagStr()})
+	metas = append(metas, ctlconf.ResolvedImageSourceURL{Type: ctlconf.ResolvedMeta, URL: i.url, Tag: tag.TagStr()})
 
 	return url, metas, nil
 }

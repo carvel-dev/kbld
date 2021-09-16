@@ -69,7 +69,7 @@ type ImageOverride struct {
 	NewImage     string                     `json:"newImage"`
 	Preresolved  bool                       `json:"preresolved,omitempty"`
 	TagSelection *versions.VersionSelection `json:"tagSelection,omitempty"`
-	ImageMetas   []Meta                     `json:",omitempty"`
+	ImageMetas   []Meta                     `json:"metas,omitempty"`
 }
 
 type ImageDestination struct {
@@ -170,7 +170,7 @@ func NewConfigFromImagesLock(res ctlres.Resource) (Config, error) {
 	overridesConfig := NewConfig()
 
 	for _, image := range imagesLock.Images {
-		imageMeta, err := metasHistory(image.Annotations[ImagesLockKbldMetas])
+		imgMeta, err := NewMetasFromString(image.Annotations[ImagesLockKbldMetas])
 		if err != nil {
 			return Config{}, fmt.Errorf("Unmarshaling %s as %s annotation:  %s", res.Description(), ImagesLockKbldMetas, err)
 		}
@@ -180,7 +180,7 @@ func NewConfigFromImagesLock(res ctlres.Resource) (Config, error) {
 			},
 			NewImage:    image.Image,
 			Preresolved: true,
-			ImageMetas:  imageMeta,
+			ImageMetas:  imgMeta,
 		}
 		overridesConfig.Overrides = append(overridesConfig.Overrides, iOverride)
 	}

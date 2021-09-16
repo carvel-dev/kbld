@@ -13,11 +13,16 @@ type PreresolvedImage struct {
 }
 
 func NewPreresolvedImage(url string, metas []ctlconf.Meta) PreresolvedImage {
-	return PreresolvedImage{url, metas}
+	return PreresolvedImage{url, copyAndAppendMeta(metas)}
 }
 
 func (i PreresolvedImage) URL() (string, []ctlconf.Meta, error) {
-	imageMetas := append(i.metas, ctlconf.PreresolvedImageSourceURL{Type: "preresolved", URL: i.url})
-
+	imageMetas := copyAndAppendMeta(i.metas, ctlconf.PreresolvedImageSourceURL{Type: ctlconf.PreresolvedMeta, URL: i.url})
 	return i.url, imageMetas, nil
+}
+
+func copyAndAppendMeta(existing []ctlconf.Meta, new ...ctlconf.Meta) []ctlconf.Meta {
+	all := make([]ctlconf.Meta, len(existing), len(existing)+len(new))
+	copy(all, existing)
+	return append(all, new...)
 }

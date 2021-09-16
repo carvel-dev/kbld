@@ -127,7 +127,7 @@ func (i BuiltImage) sources() ([]ctlconf.Meta, error) {
 	}
 
 	sources = append(sources, ctlconf.BuiltImageSourceLocal{
-		Type: "local",
+		Type: ctlconf.LocalMeta,
 		Path: absPath,
 	})
 
@@ -135,7 +135,7 @@ func (i BuiltImage) sources() ([]ctlconf.Meta, error) {
 
 	if gitRepo.IsValid() {
 		var err error
-		git := ctlconf.BuiltImageSourceGit{Type: "git"}
+		git := ctlconf.BuiltImageSourceGit{Type: ctlconf.GitMeta}
 
 		git.RemoteURL, err = gitRepo.RemoteURL()
 		if err != nil {
