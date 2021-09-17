@@ -14,7 +14,7 @@ type Meta interface {
 }
 
 type imageMeta struct {
-	Metas []Meta
+	Metas []Meta `json:"metas,omitempty"`
 }
 
 const (
@@ -26,33 +26,33 @@ const (
 )
 
 type BuiltImageSourceGit struct {
-	Type      string // always set to GitMeta
-	RemoteURL string `json:",omitempty" yaml:",omitempty"`
-	SHA       string
-	Dirty     bool
-	Tags      []string `json:",omitempty" yaml:",omitempty"`
+	Type      string   `json:"type"` // always set to GitMeta
+	RemoteURL string   `json:"remoteUrl"`
+	SHA       string   `json:"sha"`
+	Dirty     bool     `json:"dirty"`
+	Tags      []string `json:"tags,omitempty"`
 }
 
 type BuiltImageSourceLocal struct {
-	Type string // always set to LocalMeta
-	Path string
+	Type string `json:"type"` // always set to LocalMeta
+	Path string `json:"path"`
 }
 
 type ResolvedImageSourceURL struct {
-	Type string // always set to ResolvedMeta
-	URL  string
-	Tag  string
+	Type string `json:"type"` // always set to ResolvedMeta
+	URL  string `json:"url"`
+	Tag  string `json:"tag,omitempty"`
 }
 
 type TaggedImageMeta struct {
-	Type string // always set to TaggedMeta
-	Tags []string
+	Type string   `json:"type"` // always set to TaggedMeta
+	Tags []string `json:"tags"`
 }
 
 type PreresolvedImageSourceURL struct {
-	Type string // always set to PreresolvedMeta
-	URL  string
-	Tag  string `json:",omitempty" yaml:",omitempty"`
+	Type string `json:"type"` // always set to PreresolvedMeta
+	URL  string `json:"url"`
+	Tag  string `json:"tag,omitempty"`
 }
 
 func (BuiltImageSourceGit) meta()       {}
