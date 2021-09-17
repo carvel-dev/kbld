@@ -69,16 +69,16 @@ kind: Object
 metadata:
   annotations:
     kbld.k14s.io/images: |
-      - Metas:
-        - Tag: 1.14.2
-          Type: resolved
-          URL: nginx:1.14.2
-        URL: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
-      - Metas:
-        - Tag: 1.14.2
-          Type: resolved
-          URL: library/nginx:1.14.2
-        URL: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
+      - metas:
+        - tag: 1.14.2
+          type: resolved
+          url: nginx:1.14.2
+        url: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
+      - metas:
+        - tag: 1.14.2
+          type: resolved
+          url: library/nginx:1.14.2
+        url: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
 spec:
 - image: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
 - image: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
@@ -125,18 +125,18 @@ kind: Object
 metadata:
   annotations:
     kbld.k14s.io/images: |
-      - Metas:
-        - Type: preresolved
-          URL: aaa
-        URL: aaa
-      - Metas:
-        - Type: preresolved
-          URL: bbb
-        URL: bbb
-      - Metas:
-        - Type: preresolved
-          URL: ccc
-        URL: ccc
+      - metas:
+        - type: preresolved
+          url: aaa
+        url: aaa
+      - metas:
+        - type: preresolved
+          url: bbb
+        url: bbb
+      - metas:
+        - type: preresolved
+          url: ccc
+        url: ccc
 spec:
 - image: bbb
 - image: aaa
@@ -491,16 +491,16 @@ kind: Object
 metadata:
   annotations:
     kbld.k14s.io/images: |
-      - Metas:
-        - Tag: 1.14.1
-          Type: resolved
-          URL: index.docker.io/library/nginx:1.14.1
-        URL: index.docker.io/library/nginx@sha256:32fdf92b4e986e109e4db0865758020cb0c3b70d6ba80d02fe87bad5cc3dc228
-      - Metas:
-        - Tag: 1.14.2
-          Type: resolved
-          URL: index.docker.io/library/nginx:1.14.2
-        URL: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
+      - metas:
+        - tag: 1.14.1
+          type: resolved
+          url: index.docker.io/library/nginx:1.14.1
+        url: index.docker.io/library/nginx@sha256:32fdf92b4e986e109e4db0865758020cb0c3b70d6ba80d02fe87bad5cc3dc228
+      - metas:
+        - tag: 1.14.2
+          type: resolved
+          url: index.docker.io/library/nginx:1.14.2
+        url: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
 spec:
 - image: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
 - image: index.docker.io/library/nginx@sha256:32fdf92b4e986e109e4db0865758020cb0c3b70d6ba80d02fe87bad5cc3dc228
