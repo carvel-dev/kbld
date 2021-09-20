@@ -139,7 +139,7 @@ golang.org/x/xerrors/internal
 gopkg.in/inf.v0
 # gopkg.in/yaml.v2 v2.4.0
 gopkg.in/yaml.v2
-# k8s.io/apimachinery v0.22.1
+# k8s.io/apimachinery v0.22.2
 ## explicit
 k8s.io/apimachinery/pkg/api/resource
 k8s.io/apimachinery/pkg/apis/meta/v1
