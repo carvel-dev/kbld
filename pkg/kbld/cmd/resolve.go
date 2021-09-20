@@ -235,8 +235,6 @@ func (o *ResolveOptions) emitLockOutput(conf ctlconf.Conf, resolvedImages *Proce
 			})
 		}
 
-		c.Overrides = ctlconf.UniqueImageOverrides(c.Overrides)
-
 		return c.WriteToFile(o.LockOutput)
 	case o.ImgpkgLockOutput != "":
 		iLock := lockconfig.ImagesLock{

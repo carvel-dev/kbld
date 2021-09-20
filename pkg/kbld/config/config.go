@@ -6,7 +6,6 @@ package config
 import (
 	"fmt"
 	"io/ioutil"
-	"reflect"
 
 	semver "github.com/hashicorp/go-version"
 	"github.com/k14s/imgpkg/pkg/imgpkg/lockconfig"
@@ -325,13 +324,21 @@ func (d Config) WriteToFile(path string) error {
 	return nil
 }
 
+// Equal reports whether this ImageOverride is equal to another ImageOverride.
+//   (`ImageMeta` is descriptive — not identifying — so not part of equality)
+func (d ImageOverride) Equal(other ImageOverride) bool {
+	return d.ImageRef == other.ImageRef &&
+		d.NewImage == other.NewImage &&
+		d.Preresolved == other.Preresolved &&
+		d.TagSelection == other.TagSelection
+}
+
 func UniqueImageOverrides(overrides []ImageOverride) []ImageOverride {
 	var result []ImageOverride
 	for _, override := range overrides {
 		var found bool
 		for _, addedOverride := range result {
-			// using DeepEqual instead of '==' since ImageOverride contains a slice
-			if reflect.DeepEqual(addedOverride, override) {
+			if override.Equal(addedOverride) {
 				found = true
 				break
 			}
