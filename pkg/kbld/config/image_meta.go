@@ -17,42 +17,69 @@ type imageMeta struct {
 	Metas []Meta `json:"metas,omitempty"`
 }
 
-const (
-	GitMeta         = "git"
-	LocalMeta       = "local"
-	ResolvedMeta    = "resolved"
-	TaggedMeta      = "tagged"
-	PreresolvedMeta = "preresolved"
-)
-
 type BuiltImageSourceGit struct {
-	Type      string   `json:"type"` // always set to GitMeta
-	RemoteURL string   `json:"remoteUrl"`
-	SHA       string   `json:"sha"`
-	Dirty     bool     `json:"dirty"`
-	Tags      []string `json:"tags,omitempty"`
+	Details struct {
+		RemoteURL string   `json:"remoteURL"`
+		SHA       string   `json:"sha"`
+		Dirty     bool     `json:"dirty"`
+		Tags      []string `json:"tags,omitempty"`
+	} `json:"git"`
+}
+
+func NewBuiltImageSourceGit(sha string) *BuiltImageSourceGit {
+	newSource := &BuiltImageSourceGit{}
+	newSource.Details.SHA = sha
+	return newSource
 }
 
 type BuiltImageSourceLocal struct {
-	Type string `json:"type"` // always set to LocalMeta
-	Path string `json:"path"`
+	Details struct {
+		Path string `json:"path"`
+	} `json:"local"`
+}
+
+func NewBuiltImageSourceLocal(path string) *BuiltImageSourceLocal {
+	newSource := &BuiltImageSourceLocal{}
+	newSource.Details.Path = path
+	return newSource
 }
 
 type ResolvedImageSourceURL struct {
-	Type string `json:"type"` // always set to ResolvedMeta
-	URL  string `json:"url"`
-	Tag  string `json:"tag,omitempty"`
+	Details struct {
+		URL string `json:"url"`
+		Tag string `json:"tag,omitempty"`
+	} `json:"resolved"`
+}
+
+func NewResolvedImageSourceURL(url string) *ResolvedImageSourceURL {
+	newSource := &ResolvedImageSourceURL{}
+	newSource.Details.URL = url
+	return newSource
 }
 
 type TaggedImageMeta struct {
-	Type string   `json:"type"` // always set to TaggedMeta
-	Tags []string `json:"tags"`
+	Details struct {
+		Tags []string `json:"tags"`
+	} `json:"tagged"`
+}
+
+func NewTaggedImageMeta(tags []string) *TaggedImageMeta {
+	newSource := &TaggedImageMeta{}
+	newSource.Details.Tags = tags
+	return newSource
 }
 
 type PreresolvedImageSourceURL struct {
-	Type string `json:"type"` // always set to PreresolvedMeta
-	URL  string `json:"url"`
-	Tag  string `json:"tag,omitempty"`
+	Details struct {
+		URL string `json:"url"`
+		Tag string `json:"tag,omitempty"`
+	} `json:"preresolved"`
+}
+
+func NewPreresolvedImageSourceURL(url string) *PreresolvedImageSourceURL {
+	newSource := &PreresolvedImageSourceURL{}
+	newSource.Details.URL = url
+	return newSource
 }
 
 func (BuiltImageSourceGit) meta()       {}
@@ -89,15 +116,15 @@ func (m *imageMeta) UnmarshalJSON(data []byte) error {
 		yamlItem, _ := yaml.Marshal(&item)
 
 		switch {
-		case yaml.Unmarshal(yamlItem, &local) == nil && local.Type == LocalMeta:
+		case yaml.Unmarshal(yamlItem, &local) == nil && local.Details.Path != "":
 			m.Metas = append(m.Metas, local)
-		case yaml.Unmarshal(yamlItem, &git) == nil && git.Type == GitMeta:
+		case yaml.Unmarshal(yamlItem, &git) == nil && git.Details.SHA != "":
 			m.Metas = append(m.Metas, git)
-		case yaml.Unmarshal(yamlItem, &res) == nil && res.Type == ResolvedMeta:
+		case yaml.Unmarshal(yamlItem, &res) == nil && res.Details.URL != "":
 			m.Metas = append(m.Metas, res)
-		case yaml.Unmarshal(yamlItem, &preres) == nil && preres.Type == PreresolvedMeta:
+		case yaml.Unmarshal(yamlItem, &preres) == nil && preres.Details.URL != "":
 			m.Metas = append(m.Metas, preres)
-		case yaml.Unmarshal(yamlItem, &tag) == nil && tag.Type == TaggedMeta:
+		case yaml.Unmarshal(yamlItem, &tag) == nil && len(tag.Details.Tags) > 0:
 			m.Metas = append(m.Metas, tag)
 		default:
 			// ignore unknown meta.

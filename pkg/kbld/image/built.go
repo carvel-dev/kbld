@@ -126,33 +126,31 @@ func (i BuiltImage) sources() ([]ctlconf.Meta, error) {
 		return nil, err
 	}
 
-	sources = append(sources, ctlconf.BuiltImageSourceLocal{
-		Type: ctlconf.LocalMeta,
-		Path: absPath,
-	})
+	sources = append(sources, ctlconf.NewBuiltImageSourceLocal(absPath))
 
 	gitRepo := NewGitRepo(absPath)
 
 	if gitRepo.IsValid() {
 		var err error
-		git := ctlconf.BuiltImageSourceGit{Type: ctlconf.GitMeta}
 
-		git.RemoteURL, err = gitRepo.RemoteURL()
+		sha, err := gitRepo.HeadSHA()
 		if err != nil {
 			return nil, err
 		}
 
-		git.SHA, err = gitRepo.HeadSHA()
+		git := ctlconf.NewBuiltImageSourceGit(sha)
+
+		git.Details.RemoteURL, err = gitRepo.RemoteURL()
 		if err != nil {
 			return nil, err
 		}
 
-		git.Dirty, err = gitRepo.IsDirty()
+		git.Details.Dirty, err = gitRepo.IsDirty()
 		if err != nil {
 			return nil, err
 		}
 
-		git.Tags, err = gitRepo.HeadTags()
+		git.Details.Tags, err = gitRepo.HeadTags()
 		if err != nil {
 			return nil, err
 		}

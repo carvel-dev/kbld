@@ -17,16 +17,16 @@ images:
 - annotations:
     kbld.carvel.dev/id: nginx:1.14.2
     kbld.carvel.dev/metas: |
-      - tag: 1.14.2
-        type: resolved
-        url: nginx:1.14.2
+      - resolved:
+          tag: 1.14.2
+          url: nginx:1.14.2
   image: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
 - annotations:
     kbld.carvel.dev/id: sample-app
     kbld.carvel.dev/metas: |
-      - tag: 1.15.1
-        type: resolved
-        url: nginx:1.15.1
+      - resolved:
+          tag: 1.15.1
+          url: nginx:1.15.1
   image: index.docker.io/library/nginx@sha256:4a5573037f358b6cdfa2f3e8a9c33a5cf11bcd1675ca72ca76fbe5bd77d0d682
 kind: ImagesLock
 `
@@ -36,22 +36,22 @@ images:
 - annotations:
     kbld.carvel.dev/id: nginx:1.14.2
     kbld.carvel.dev/metas: |
-      - path: path/to/source
-        type: local
-      - dirty: true
-        remoteUrl: git@github.com:vmware-tanzu/carvel-kbld.git
-        sha: f7988fb6c02e0ce69257d9bd9cf37ae20a60f1d
-        type: git
+      - local:
+          path: path/to/source
+      - git:
+          dirty: true
+          remoteURL: git@github.com:vmware-tanzu/carvel-kbld.git
+          sha: f7988fb6c02e0ce69257d9bd9cf37ae20a60f1d
   image: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
 - annotations:
     kbld.carvel.dev/id: sample-app
     kbld.carvel.dev/metas: |
-      - path: path/to/source
-        type: local
-      - dirty: true
-        remoteUrl: git@github.com:vmware-tanzu/carvel-kbld.git
-        sha: 4a5573037f358b6cdfa2f3e8a9c33a5cf11bcd1
-        type: git
+      - local:
+          path: path/to/source
+      - git:
+          dirty: true
+          remoteURL: git@github.com:vmware-tanzu/carvel-kbld.git
+          sha: 4a5573037f358b6cdfa2f3e8a9c33a5cf11bcd1
   image: index.docker.io/library/nginx@sha256:4a5573037f358b6cdfa2f3e8a9c33a5cf11bcd1675ca72ca76fbe5bd77d0d682
 kind: ImagesLock
 `
@@ -61,26 +61,26 @@ images:
 - annotations:
     kbld.carvel.dev/id: nginx:1.14.2
     kbld.carvel.dev/metas: |
-      - path: path/to/source
-        type: local
-      - dirty: true
-        remoteUrl: git@github.com:vmware-tanzu/carvel-kbld.git
-        sha: f7988fb6c02e0ce69257d9bd9cf37ae20a60f1d
-        type: git
-      - type: preresolved
-        url: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
+      - local:
+          path: path/to/source
+      - git:
+          dirty: true
+          remoteURL: git@github.com:vmware-tanzu/carvel-kbld.git
+          sha: f7988fb6c02e0ce69257d9bd9cf37ae20a60f1d
+      - preresolved:
+          url: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
   image: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
 - annotations:
     kbld.carvel.dev/id: sample-app
     kbld.carvel.dev/metas: |
-      - path: path/to/source
-        type: local
-      - dirty: true
-        remoteUrl: git@github.com:vmware-tanzu/carvel-kbld.git
-        sha: 4a5573037f358b6cdfa2f3e8a9c33a5cf11bcd1
-        type: git
-      - type: preresolved
-        url: index.docker.io/library/nginx@sha256:4a5573037f358b6cdfa2f3e8a9c33a5cf11bcd1675ca72ca76fbe5bd77d0d682
+      - local:
+          path: path/to/source
+      - git:
+          dirty: true
+          remoteURL: git@github.com:vmware-tanzu/carvel-kbld.git
+          sha: 4a5573037f358b6cdfa2f3e8a9c33a5cf11bcd1
+      - preresolved:
+          url: index.docker.io/library/nginx@sha256:4a5573037f358b6cdfa2f3e8a9c33a5cf11bcd1675ca72ca76fbe5bd77d0d682
   image: index.docker.io/library/nginx@sha256:4a5573037f358b6cdfa2f3e8a9c33a5cf11bcd1675ca72ca76fbe5bd77d0d682
 kind: ImagesLock
 `
@@ -280,18 +280,18 @@ metadata:
   annotations:
     kbld.k14s.io/images: |
       - metas:
-        - tag: 1.15.1
-          type: resolved
-          url: nginx:1.15.1
-        - type: preresolved
-          url: index.docker.io/library/nginx@sha256:4a5573037f358b6cdfa2f3e8a9c33a5cf11bcd1675ca72ca76fbe5bd77d0d682
+        - resolved:
+            tag: 1.15.1
+            url: nginx:1.15.1
+        - preresolved:
+            url: index.docker.io/library/nginx@sha256:4a5573037f358b6cdfa2f3e8a9c33a5cf11bcd1675ca72ca76fbe5bd77d0d682
         url: index.docker.io/library/nginx@sha256:4a5573037f358b6cdfa2f3e8a9c33a5cf11bcd1675ca72ca76fbe5bd77d0d682
       - metas:
-        - tag: 1.14.2
-          type: resolved
-          url: nginx:1.14.2
-        - type: preresolved
-          url: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
+        - resolved:
+            tag: 1.14.2
+            url: nginx:1.14.2
+        - preresolved:
+            url: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
         url: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
 `
 	if out != expectedOut {
@@ -324,24 +324,24 @@ metadata:
   annotations:
     kbld.k14s.io/images: |
       - metas:
-        - path: path/to/source
-          type: local
-        - dirty: true
-          remoteUrl: git@github.com:vmware-tanzu/carvel-kbld.git
-          sha: 4a5573037f358b6cdfa2f3e8a9c33a5cf11bcd1
-          type: git
-        - type: preresolved
-          url: index.docker.io/library/nginx@sha256:4a5573037f358b6cdfa2f3e8a9c33a5cf11bcd1675ca72ca76fbe5bd77d0d682
+        - local:
+            path: path/to/source
+        - git:
+            dirty: true
+            remoteURL: git@github.com:vmware-tanzu/carvel-kbld.git
+            sha: 4a5573037f358b6cdfa2f3e8a9c33a5cf11bcd1
+        - preresolved:
+            url: index.docker.io/library/nginx@sha256:4a5573037f358b6cdfa2f3e8a9c33a5cf11bcd1675ca72ca76fbe5bd77d0d682
         url: index.docker.io/library/nginx@sha256:4a5573037f358b6cdfa2f3e8a9c33a5cf11bcd1675ca72ca76fbe5bd77d0d682
       - metas:
-        - path: path/to/source
-          type: local
-        - dirty: true
-          remoteUrl: git@github.com:vmware-tanzu/carvel-kbld.git
-          sha: f7988fb6c02e0ce69257d9bd9cf37ae20a60f1d
-          type: git
-        - type: preresolved
-          url: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
+        - local:
+            path: path/to/source
+        - git:
+            dirty: true
+            remoteURL: git@github.com:vmware-tanzu/carvel-kbld.git
+            sha: f7988fb6c02e0ce69257d9bd9cf37ae20a60f1d
+        - preresolved:
+            url: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
         url: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
 `
 	if out != expectedOut {
