@@ -8,21 +8,21 @@ import (
 )
 
 type PreresolvedImage struct {
-	url   string
-	metas []ctlconf.Meta
+	url     string
+	origins []ctlconf.Origin
 }
 
-func NewPreresolvedImage(url string, metas []ctlconf.Meta) PreresolvedImage {
-	return PreresolvedImage{url, copyAndAppendMeta(metas)}
+func NewPreresolvedImage(url string, origins []ctlconf.Origin) PreresolvedImage {
+	return PreresolvedImage{url, copyAndAppendOrigins(origins)}
 }
 
-func (i PreresolvedImage) URL() (string, []ctlconf.Meta, error) {
-	imageMetas := copyAndAppendMeta(i.metas, ctlconf.NewPreresolvedImageSourceURL(i.url))
+func (i PreresolvedImage) URL() (string, []ctlconf.Origin, error) {
+	imageMetas := copyAndAppendOrigins(i.origins, ctlconf.NewPreresolvedImageSourceURL(i.url))
 	return i.url, imageMetas, nil
 }
 
-func copyAndAppendMeta(existing []ctlconf.Meta, new ...ctlconf.Meta) []ctlconf.Meta {
-	all := make([]ctlconf.Meta, len(existing), len(existing)+len(new))
+func copyAndAppendOrigins(existing []ctlconf.Origin, new ...ctlconf.Origin) []ctlconf.Origin {
+	all := make([]ctlconf.Origin, len(existing), len(existing)+len(new))
 	copy(all, existing)
 	return append(all, new...)
 }

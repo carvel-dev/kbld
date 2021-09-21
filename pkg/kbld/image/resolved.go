@@ -21,7 +21,7 @@ func NewResolvedImage(url string, registry ctlreg.Registry) ResolvedImage {
 	return ResolvedImage{url, registry}
 }
 
-func (i ResolvedImage) URL() (string, []ctlconf.Meta, error) {
+func (i ResolvedImage) URL() (string, []ctlconf.Origin, error) {
 	tag, err := regname.NewTag(i.url, regname.WeakValidation)
 	if err != nil {
 		return "", nil, err
@@ -44,14 +44,14 @@ func (i ResolvedImage) URL() (string, []ctlconf.Meta, error) {
 		return "", nil, fmt.Errorf("Expected digest resolution to be consistent over two separate requests")
 	}
 
-	url, metas, err := NewDigestedImageFromParts(tag.Repository.String(), imgDescriptor.Digest.String()).URL()
+	url, origins, err := NewDigestedImageFromParts(tag.Repository.String(), imgDescriptor.Digest.String()).URL()
 	if err != nil {
 		return "", nil, err
 	}
 
 	resolvedSource := ctlconf.NewResolvedImageSourceURL(i.url)
 	resolvedSource.Details.Tag = tag.TagStr()
-	metas = append(metas, resolvedSource)
+	origins = append(origins, resolvedSource)
 
-	return url, metas, nil
+	return url, origins, nil
 }

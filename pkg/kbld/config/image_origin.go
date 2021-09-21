@@ -9,12 +9,12 @@ import (
 	"sigs.k8s.io/yaml"
 )
 
-type Meta interface {
-	meta()
+type Origin interface {
+	origin()
 }
 
-type imageMeta struct {
-	Metas []Meta `json:"metas,omitempty"`
+type imageOrigin struct {
+	Origins []Origin `json:"origins,omitempty"`
 }
 
 type BuiltImageSourceGit struct {
@@ -57,14 +57,14 @@ func NewResolvedImageSourceURL(url string) *ResolvedImageSourceURL {
 	return newSource
 }
 
-type TaggedImageMeta struct {
+type TaggedImageOrigin struct {
 	Details struct {
 		Tags []string `json:"tags"`
 	} `json:"tagged"`
 }
 
-func NewTaggedImageMeta(tags []string) *TaggedImageMeta {
-	newSource := &TaggedImageMeta{}
+func NewTaggedImageOrigin(tags []string) *TaggedImageOrigin {
+	newSource := &TaggedImageOrigin{}
 	newSource.Details.Tags = tags
 	return newSource
 }
@@ -82,24 +82,24 @@ func NewPreresolvedImageSourceURL(url string) *PreresolvedImageSourceURL {
 	return newSource
 }
 
-func (BuiltImageSourceGit) meta()       {}
-func (BuiltImageSourceLocal) meta()     {}
-func (ResolvedImageSourceURL) meta()    {}
-func (TaggedImageMeta) meta()           {}
-func (PreresolvedImageSourceURL) meta() {}
+func (BuiltImageSourceGit) origin()       {}
+func (BuiltImageSourceLocal) origin()     {}
+func (ResolvedImageSourceURL) origin()    {}
+func (TaggedImageOrigin) origin()         {}
+func (PreresolvedImageSourceURL) origin() {}
 
-func NewMetasFromString(metas string) ([]Meta, error) {
-	imgMeta := imageMeta{}
-	err := yaml.Unmarshal([]byte(metas), &imgMeta)
+func NewOriginsFromString(origins string) ([]Origin, error) {
+	imgOrigin := imageOrigin{}
+	err := yaml.Unmarshal([]byte(origins), &imgOrigin)
 	if err != nil {
-		return []Meta{}, err
+		return []Origin{}, err
 	}
-	return imgMeta.Metas, nil
+	return imgOrigin.Origins, nil
 }
 
-var _ json.Unmarshaler = &imageMeta{}
+var _ json.Unmarshaler = &imageOrigin{}
 
-func (m *imageMeta) UnmarshalJSON(data []byte) error {
+func (m *imageOrigin) UnmarshalJSON(data []byte) error {
 	var list []interface{}
 	err := yaml.Unmarshal(data, &list)
 	if err != nil {
@@ -111,25 +111,25 @@ func (m *imageMeta) UnmarshalJSON(data []byte) error {
 		var git BuiltImageSourceGit
 		var res ResolvedImageSourceURL
 		var preres PreresolvedImageSourceURL
-		var tag TaggedImageMeta
+		var tag TaggedImageOrigin
 
 		yamlItem, _ := yaml.Marshal(&item)
 
 		switch {
 		case yaml.Unmarshal(yamlItem, &local) == nil && local.Details.Path != "":
-			m.Metas = append(m.Metas, local)
+			m.Origins = append(m.Origins, local)
 		case yaml.Unmarshal(yamlItem, &git) == nil && git.Details.SHA != "":
-			m.Metas = append(m.Metas, git)
+			m.Origins = append(m.Origins, git)
 		case yaml.Unmarshal(yamlItem, &res) == nil && res.Details.URL != "":
-			m.Metas = append(m.Metas, res)
+			m.Origins = append(m.Origins, res)
 		case yaml.Unmarshal(yamlItem, &preres) == nil && preres.Details.URL != "":
-			m.Metas = append(m.Metas, preres)
+			m.Origins = append(m.Origins, preres)
 		case yaml.Unmarshal(yamlItem, &tag) == nil && len(tag.Details.Tags) > 0:
-			m.Metas = append(m.Metas, tag)
+			m.Origins = append(m.Origins, tag)
 		default:
-			// ignore unknown meta.
+			// ignore unknown origin.
 			// At this time...
-			// - "Meta" are provided as primarily optional diagnostic information
+			// - "Origin" are provided as primarily optional diagnostic information
 			//   rather than operational data (read: less important). Losing
 			//   this information does not change the correctness of kbld's
 			//   primary purpose during deployment: to rewrite image references.

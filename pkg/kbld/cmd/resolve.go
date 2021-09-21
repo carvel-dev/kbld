@@ -259,12 +259,12 @@ func (o *ResolveOptions) imgpkgLockAnnotations(i ProcessedImageItem) map[string]
 	anns := map[string]string{
 		ctlconf.ImagesLockKbldID: i.UnprocessedImageURL.URL,
 	}
-	if len(i.Metas) > 0 {
-		bs, err := yaml.Marshal(i.Metas)
+	if len(i.Origins) > 0 {
+		bs, err := yaml.Marshal(i.Origins)
 		if err != nil {
 			return anns
 		}
-		anns[ctlconf.ImagesLockKbldMetas] = string(bs)
+		anns[ctlconf.ImagesLockKbldOrigins] = string(bs)
 	}
 
 	return anns

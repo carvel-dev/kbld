@@ -20,8 +20,8 @@ func NewTaggedImage(image Image, imgDst ctlconf.ImageDestination, registry ctlre
 	return TaggedImage{image, imgDst, registry}
 }
 
-func (i TaggedImage) URL() (string, []ctlconf.Meta, error) {
-	url, metas, err := i.image.URL()
+func (i TaggedImage) URL() (string, []ctlconf.Origin, error) {
+	url, origins, err := i.image.URL()
 	if err != nil {
 		return "", nil, err
 	}
@@ -46,8 +46,8 @@ func (i TaggedImage) URL() (string, []ctlconf.Meta, error) {
 			}
 		}
 
-		metas = append(metas, ctlconf.NewTaggedImageMeta(i.imgDst.Tags))
+		origins = append(origins, ctlconf.NewTaggedImageOrigin(i.imgDst.Tags))
 	}
 
-	return url, metas, err
+	return url, origins, err
 }

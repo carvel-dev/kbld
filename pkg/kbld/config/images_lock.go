@@ -4,6 +4,6 @@
 package config
 
 const (
-	ImagesLockKbldID    = "kbld.carvel.dev/id"
-	ImagesLockKbldMetas = "kbld.carvel.dev/metas"
+	ImagesLockKbldID      = "kbld.carvel.dev/id"
+	ImagesLockKbldOrigins = "kbld.carvel.dev/origins"
 )

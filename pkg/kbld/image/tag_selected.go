@@ -25,7 +25,7 @@ func NewTagSelectedImage(url string, selection *versions.VersionSelection,
 	return TagSelectedImage{url, selection, registry}
 }
 
-func (i TagSelectedImage) URL() (string, []ctlconf.Meta, error) {
+func (i TagSelectedImage) URL() (string, []ctlconf.Origin, error) {
 	repo, err := regname.NewRepository(i.url, regname.WeakValidation)
 	if err != nil {
 		return "", nil, err
