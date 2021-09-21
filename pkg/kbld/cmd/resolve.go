@@ -20,6 +20,7 @@ import (
 	ctlser "github.com/k14s/kbld/pkg/kbld/search"
 	"github.com/k14s/kbld/pkg/kbld/version"
 	"github.com/spf13/cobra"
+	"sigs.k8s.io/yaml"
 )
 
 type ResolveOptions struct {
@@ -234,8 +235,6 @@ func (o *ResolveOptions) emitLockOutput(conf ctlconf.Conf, resolvedImages *Proce
 			})
 		}
 
-		c.Overrides = ctlconf.UniqueImageOverrides(c.Overrides)
-
 		return c.WriteToFile(o.LockOutput)
 	case o.ImgpkgLockOutput != "":
 		iLock := lockconfig.ImagesLock{
@@ -247,11 +246,26 @@ func (o *ResolveOptions) emitLockOutput(conf ctlconf.Conf, resolvedImages *Proce
 		for _, urlImagePair := range resolvedImages.All() {
 			iLock.Images = append(iLock.Images, lockconfig.ImageRef{
 				Image:       urlImagePair.Image.URL,
-				Annotations: map[string]string{ctlconf.ImagesLockKbldID: urlImagePair.UnprocessedImageURL.URL},
+				Annotations: o.imgpkgLockAnnotations(urlImagePair),
 			})
 		}
 		return iLock.WriteToPath(o.ImgpkgLockOutput)
 	default:
 		return nil
 	}
+}
+
+func (o *ResolveOptions) imgpkgLockAnnotations(i ProcessedImageItem) map[string]string {
+	anns := map[string]string{
+		ctlconf.ImagesLockKbldID: i.UnprocessedImageURL.URL,
+	}
+	if len(i.Metas) > 0 {
+		bs, err := yaml.Marshal(i.Metas)
+		if err != nil {
+			return anns
+		}
+		anns[ctlconf.ImagesLockKbldMetas] = string(bs)
+	}
+
+	return anns
 }

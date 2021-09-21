@@ -9,25 +9,18 @@ import (
 	ctlreg "github.com/k14s/kbld/pkg/kbld/registry"
 )
 
-// TaggedImage respresents an image that will be tagged when its URL is requested
+// TaggedImage represents an image that will be tagged when its URL is requested
 type TaggedImage struct {
 	image    Image
 	imgDst   ctlconf.ImageDestination
 	registry ctlreg.Registry
 }
 
-type TaggedImageMeta struct {
-	Type string // always set to 'tagged'
-	Tags []string
-}
-
-func (TaggedImageMeta) meta() {}
-
 func NewTaggedImage(image Image, imgDst ctlconf.ImageDestination, registry ctlreg.Registry) TaggedImage {
 	return TaggedImage{image, imgDst, registry}
 }
 
-func (i TaggedImage) URL() (string, []Meta, error) {
+func (i TaggedImage) URL() (string, []ctlconf.Meta, error) {
 	url, metas, err := i.image.URL()
 	if err != nil {
 		return "", nil, err
@@ -53,7 +46,7 @@ func (i TaggedImage) URL() (string, []Meta, error) {
 			}
 		}
 
-		metas = append(metas, TaggedImageMeta{Type: "tagged", Tags: i.imgDst.Tags})
+		metas = append(metas, ctlconf.TaggedImageMeta{Type: ctlconf.TaggedMeta, Tags: i.imgDst.Tags})
 	}
 
 	return url, metas, err

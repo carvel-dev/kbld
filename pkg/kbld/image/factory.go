@@ -15,11 +15,7 @@ import (
 )
 
 type Image interface {
-	URL() (string, []Meta, error)
-}
-
-type Meta interface {
-	meta()
+	URL() (string, []ctlconf.Meta, error)
 }
 
 type Factory struct {
@@ -36,7 +32,7 @@ func (f Factory) New(url string) Image {
 	if overrideConf, found := f.shouldOverride(url); found {
 		url = overrideConf.NewImage
 		if overrideConf.Preresolved {
-			return NewPreresolvedImage(url)
+			return NewPreresolvedImage(url, overrideConf.ImageMetas)
 		} else if overrideConf.TagSelection != nil {
 			return NewTagSelectedImage(url, overrideConf.TagSelection, f.registry)
 		}

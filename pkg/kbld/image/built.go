@@ -32,7 +32,7 @@ func NewBuiltImage(url string, buildSource ctlconf.Source, imgDst *ctlconf.Image
 	return BuiltImage{url, buildSource, imgDst, docker, pack, kubectlBuildkit, ko, bazel}
 }
 
-func (i BuiltImage) URL() (string, []Meta, error) {
+func (i BuiltImage) URL() (string, []ctlconf.Meta, error) {
 	metas, err := i.sources()
 	if err != nil {
 		return "", nil, err
@@ -100,7 +100,7 @@ func (i BuiltImage) URL() (string, []Meta, error) {
 	}
 }
 
-func (i BuiltImage) optionalPushWithDocker(dockerTmpRef ctlbdk.DockerTmpRef, metas []Meta) (string, []Meta, error) {
+func (i BuiltImage) optionalPushWithDocker(dockerTmpRef ctlbdk.DockerTmpRef, metas []ctlconf.Meta) (string, []ctlconf.Meta, error) {
 	if i.imgDst != nil {
 		digest, err := i.docker.Push(dockerTmpRef, i.imgDst.NewImage)
 		if err != nil {
@@ -118,33 +118,16 @@ func (i BuiltImage) optionalPushWithDocker(dockerTmpRef ctlbdk.DockerTmpRef, met
 	return dockerTmpRef.AsString(), metas, nil
 }
 
-type BuiltImageSourceGit struct {
-	Type      string // always set to 'git'
-	RemoteURL string `json:",omitempty" yaml:",omitempty"`
-	SHA       string
-	Dirty     bool
-	Tags      []string `json:",omitempty" yaml:",omitempty"`
-}
-
-func (BuiltImageSourceGit) meta() {}
-
-type BuiltImageSourceLocal struct {
-	Type string // always set to 'local'
-	Path string
-}
-
-func (BuiltImageSourceLocal) meta() {}
-
-func (i BuiltImage) sources() ([]Meta, error) {
-	var sources []Meta
+func (i BuiltImage) sources() ([]ctlconf.Meta, error) {
+	var sources []ctlconf.Meta
 
 	absPath, err := filepath.Abs(i.buildSource.Path)
 	if err != nil {
 		return nil, err
 	}
 
-	sources = append(sources, BuiltImageSourceLocal{
-		Type: "local",
+	sources = append(sources, ctlconf.BuiltImageSourceLocal{
+		Type: ctlconf.LocalMeta,
 		Path: absPath,
 	})
 
@@ -152,7 +135,7 @@ func (i BuiltImage) sources() ([]Meta, error) {
 
 	if gitRepo.IsValid() {
 		var err error
-		git := BuiltImageSourceGit{Type: "git"}
+		git := ctlconf.BuiltImageSourceGit{Type: ctlconf.GitMeta}
 
 		git.RemoteURL, err = gitRepo.RemoteURL()
 		if err != nil {

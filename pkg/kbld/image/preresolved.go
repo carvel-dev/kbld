@@ -3,21 +3,26 @@
 
 package image
 
+import (
+	ctlconf "github.com/k14s/kbld/pkg/kbld/config"
+)
+
 type PreresolvedImage struct {
-	url string
+	url   string
+	metas []ctlconf.Meta
 }
 
-type PreresolvedImageSourceURL struct {
-	Type string // always set to 'preresolved'
-	URL  string
+func NewPreresolvedImage(url string, metas []ctlconf.Meta) PreresolvedImage {
+	return PreresolvedImage{url, copyAndAppendMeta(metas)}
 }
 
-func (PreresolvedImageSourceURL) meta() {}
-
-func NewPreresolvedImage(url string) PreresolvedImage {
-	return PreresolvedImage{url}
+func (i PreresolvedImage) URL() (string, []ctlconf.Meta, error) {
+	imageMetas := copyAndAppendMeta(i.metas, ctlconf.PreresolvedImageSourceURL{Type: ctlconf.PreresolvedMeta, URL: i.url})
+	return i.url, imageMetas, nil
 }
 
-func (i PreresolvedImage) URL() (string, []Meta, error) {
-	return i.url, []Meta{PreresolvedImageSourceURL{Type: "preresolved", URL: i.url}}, nil
+func copyAndAppendMeta(existing []ctlconf.Meta, new ...ctlconf.Meta) []ctlconf.Meta {
+	all := make([]ctlconf.Meta, len(existing), len(existing)+len(new))
+	copy(all, existing)
+	return append(all, new...)
 }

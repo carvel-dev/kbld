@@ -68,6 +68,7 @@ type ImageOverride struct {
 	NewImage     string                     `json:"newImage"`
 	Preresolved  bool                       `json:"preresolved,omitempty"`
 	TagSelection *versions.VersionSelection `json:"tagSelection,omitempty"`
+	ImageMetas   []Meta                     `json:"metas,omitempty"`
 }
 
 type ImageDestination struct {
@@ -168,12 +169,17 @@ func NewConfigFromImagesLock(res ctlres.Resource) (Config, error) {
 	overridesConfig := NewConfig()
 
 	for _, image := range imagesLock.Images {
+		imgMeta, err := NewMetasFromString(image.Annotations[ImagesLockKbldMetas])
+		if err != nil {
+			return Config{}, fmt.Errorf("Unmarshaling %s as %s annotation:  %s", res.Description(), ImagesLockKbldMetas, err)
+		}
 		iOverride := ImageOverride{
 			ImageRef: ImageRef{
 				Image: image.Annotations[ImagesLockKbldID],
 			},
 			NewImage:    image.Image,
 			Preresolved: true,
+			ImageMetas:  imgMeta,
 		}
 		overridesConfig.Overrides = append(overridesConfig.Overrides, iOverride)
 	}
@@ -318,12 +324,21 @@ func (d Config) WriteToFile(path string) error {
 	return nil
 }
 
+// Equal reports whether this ImageOverride is equal to another ImageOverride.
+//   (`ImageMeta` is descriptive — not identifying — so not part of equality)
+func (d ImageOverride) Equal(other ImageOverride) bool {
+	return d.ImageRef == other.ImageRef &&
+		d.NewImage == other.NewImage &&
+		d.Preresolved == other.Preresolved &&
+		d.TagSelection == other.TagSelection
+}
+
 func UniqueImageOverrides(overrides []ImageOverride) []ImageOverride {
 	var result []ImageOverride
 	for _, override := range overrides {
 		var found bool
 		for _, addedOverride := range result {
-			if addedOverride == override {
+			if override.Equal(addedOverride) {
 				found = true
 				break
 			}

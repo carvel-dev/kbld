@@ -11,15 +11,88 @@ import (
 )
 
 var (
-	imgLock = `---
+	imgLockWithResolvedMetas = `---
 apiVersion: imgpkg.carvel.dev/v1alpha1
 images:
 - annotations:
     kbld.carvel.dev/id: nginx:1.14.2
+    kbld.carvel.dev/metas: |
+      - Tag: 1.14.2
+        Type: resolved
+        URL: nginx:1.14.2
   image: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
 - annotations:
     kbld.carvel.dev/id: sample-app
+    kbld.carvel.dev/metas: |
+      - Tag: 1.15.1
+        Type: resolved
+        URL: nginx:1.15.1
   image: index.docker.io/library/nginx@sha256:4a5573037f358b6cdfa2f3e8a9c33a5cf11bcd1675ca72ca76fbe5bd77d0d682
+kind: ImagesLock
+`
+	imgLockWithBuiltMetas = `---
+apiVersion: imgpkg.carvel.dev/v1alpha1
+images:
+- annotations:
+    kbld.carvel.dev/id: nginx:1.14.2
+    kbld.carvel.dev/metas: |
+      - Path: path/to/source
+        Type: local
+      - Dirty: true
+        RemoteURL: git@github.com:vmware-tanzu/carvel-kbld.git
+        SHA: f7988fb6c02e0ce69257d9bd9cf37ae20a60f1d
+        Type: git
+  image: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
+- annotations:
+    kbld.carvel.dev/id: sample-app
+    kbld.carvel.dev/metas: |
+      - Path: path/to/source
+        Type: local
+      - Dirty: true
+        RemoteURL: git@github.com:vmware-tanzu/carvel-kbld.git
+        SHA: 4a5573037f358b6cdfa2f3e8a9c33a5cf11bcd1
+        Type: git
+  image: index.docker.io/library/nginx@sha256:4a5573037f358b6cdfa2f3e8a9c33a5cf11bcd1675ca72ca76fbe5bd77d0d682
+kind: ImagesLock
+`
+	imgLockWithBuiltAndPreresolvedMetas = `---
+apiVersion: imgpkg.carvel.dev/v1alpha1
+images:
+- annotations:
+    kbld.carvel.dev/id: nginx:1.14.2
+    kbld.carvel.dev/metas: |
+      - Path: path/to/source
+        Type: local
+      - Dirty: true
+        RemoteURL: git@github.com:vmware-tanzu/carvel-kbld.git
+        SHA: f7988fb6c02e0ce69257d9bd9cf37ae20a60f1d
+        Type: git
+      - Type: preresolved
+        URL: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
+  image: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
+- annotations:
+    kbld.carvel.dev/id: sample-app
+    kbld.carvel.dev/metas: |
+      - Path: path/to/source
+        Type: local
+      - Dirty: true
+        RemoteURL: git@github.com:vmware-tanzu/carvel-kbld.git
+        SHA: 4a5573037f358b6cdfa2f3e8a9c33a5cf11bcd1
+        Type: git
+      - Type: preresolved
+        URL: index.docker.io/library/nginx@sha256:4a5573037f358b6cdfa2f3e8a9c33a5cf11bcd1675ca72ca76fbe5bd77d0d682
+  image: index.docker.io/library/nginx@sha256:4a5573037f358b6cdfa2f3e8a9c33a5cf11bcd1675ca72ca76fbe5bd77d0d682
+kind: ImagesLock
+`
+	imgLock = `---
+apiVersion: imgpkg.carvel.dev/v1alpha1
+images:
+- annotations:
+    kbld.carvel.dev/id: index.docker.io/library/nginx@sha256:4a5573037f358b6cdfa2f3e8a9c33a5cf11bcd1675ca72ca76fbe5bd77d0d682
+  image: index.docker.io/library/nginx@sha256:4a5573037f358b6cdfa2f3e8a9c33a5cf11bcd1675ca72ca76fbe5bd77d0d682
+- annotations:
+    kbld.carvel.dev/id: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
+  image: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
 kind: ImagesLock
 `
 )
@@ -164,8 +237,8 @@ images:
 		t.Fatalf("Failed while reading " + path)
 	}
 
-	if string(bs) != imgLock {
-		t.Fatalf("Expected >>>%s<<< to match >>>%s<<<", bs, imgLock)
+	if string(bs) != imgLockWithResolvedMetas {
+		t.Fatalf("Expected >>>%s<<< to match >>>%s<<<", bs, imgLockWithResolvedMetas)
 	}
 }
 
@@ -193,9 +266,112 @@ images:
 - image: nginx:1.14.2
 - image: sample-app
 ---
-` + imgLock
+` + imgLockWithResolvedMetas
 
-	out, _ := kbld.RunWithOpts([]string{"-f", "-", "--images-annotation=false"}, RunOpts{
+	out, _ := kbld.RunWithOpts([]string{"-f", "-"}, RunOpts{
+		StdinReader: strings.NewReader(input),
+	})
+
+	expectedOut := `---
+images:
+- image: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
+- image: index.docker.io/library/nginx@sha256:4a5573037f358b6cdfa2f3e8a9c33a5cf11bcd1675ca72ca76fbe5bd77d0d682
+metadata:
+  annotations:
+    kbld.k14s.io/images: |
+      - Metas:
+        - Tag: 1.15.1
+          Type: resolved
+          URL: nginx:1.15.1
+        - Type: preresolved
+          URL: index.docker.io/library/nginx@sha256:4a5573037f358b6cdfa2f3e8a9c33a5cf11bcd1675ca72ca76fbe5bd77d0d682
+        URL: index.docker.io/library/nginx@sha256:4a5573037f358b6cdfa2f3e8a9c33a5cf11bcd1675ca72ca76fbe5bd77d0d682
+      - Metas:
+        - Tag: 1.14.2
+          Type: resolved
+          URL: nginx:1.14.2
+        - Type: preresolved
+          URL: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
+        URL: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
+`
+	if out != expectedOut {
+		t.Fatalf("Expected >>>%s<<< to match >>>%s<<<", out, expectedOut)
+	}
+}
+
+func TestImgpkgLockFileMetasSuccessful(t *testing.T) {
+	env := BuildEnv(t)
+	kbld := Kbld{t, env.Namespace, env.KbldBinaryPath, Logger{}}
+
+	input := `
+images:
+- image: nginx:1.14.2
+- image: sample-app
+---
+` + imgLockWithBuiltMetas
+
+	path := "/tmp/kbld-test-lock-metas"
+	defer os.RemoveAll(path)
+	out, _ := kbld.RunWithOpts([]string{"-f", "-", "--imgpkg-lock-output=" + path}, RunOpts{
+		StdinReader: strings.NewReader(input),
+	})
+
+	expectedOut := `---
+images:
+- image: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
+- image: index.docker.io/library/nginx@sha256:4a5573037f358b6cdfa2f3e8a9c33a5cf11bcd1675ca72ca76fbe5bd77d0d682
+metadata:
+  annotations:
+    kbld.k14s.io/images: |
+      - Metas:
+        - Path: path/to/source
+          Type: local
+        - Dirty: true
+          RemoteURL: git@github.com:vmware-tanzu/carvel-kbld.git
+          SHA: 4a5573037f358b6cdfa2f3e8a9c33a5cf11bcd1
+          Type: git
+        - Type: preresolved
+          URL: index.docker.io/library/nginx@sha256:4a5573037f358b6cdfa2f3e8a9c33a5cf11bcd1675ca72ca76fbe5bd77d0d682
+        URL: index.docker.io/library/nginx@sha256:4a5573037f358b6cdfa2f3e8a9c33a5cf11bcd1675ca72ca76fbe5bd77d0d682
+      - Metas:
+        - Path: path/to/source
+          Type: local
+        - Dirty: true
+          RemoteURL: git@github.com:vmware-tanzu/carvel-kbld.git
+          SHA: f7988fb6c02e0ce69257d9bd9cf37ae20a60f1d
+          Type: git
+        - Type: preresolved
+          URL: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
+        URL: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
+`
+	if out != expectedOut {
+		t.Fatalf("Expected >>>%s<<< to match >>>%s<<<", out, expectedOut)
+	}
+
+	bs, err := ioutil.ReadFile(path)
+	if err != nil {
+		t.Fatalf("Failed while reading " + path)
+	}
+
+	if string(bs) != imgLockWithBuiltAndPreresolvedMetas {
+		t.Fatalf("Expected >>>%s<<< to match >>>%s<<<", bs, imgLockWithBuiltAndPreresolvedMetas)
+	}
+}
+
+func TestImgpkgLockOutputSuccessfulDigestedImageHasNoMetas(t *testing.T) {
+	env := BuildEnv(t)
+	kbld := Kbld{t, env.Namespace, env.KbldBinaryPath, Logger{}}
+
+	input := `
+images:
+- image: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
+- image: index.docker.io/library/nginx@sha256:4a5573037f358b6cdfa2f3e8a9c33a5cf11bcd1675ca72ca76fbe5bd77d0d682
+`
+
+	path := "/tmp/kbld-test-lock-output-successful"
+	defer os.RemoveAll(path)
+
+	out, _ := kbld.RunWithOpts([]string{"-f", "-", "--images-annotation=false", "--imgpkg-lock-output=" + path}, RunOpts{
 		StdinReader: strings.NewReader(input),
 	})
 
@@ -208,4 +384,13 @@ images:
 		t.Fatalf("Expected >>>%s<<< to match >>>%s<<<", out, expectedOut)
 	}
 
+	bs, err := ioutil.ReadFile(path)
+	if err != nil {
+		t.Fatalf("Failed while reading " + path)
+	}
+
+	// For Digest references, Image Lock should not have metas since there is no image metadata
+	if string(bs) != imgLock {
+		t.Fatalf("Expected >>>%s<<< to match >>>%s<<<", bs, imgLock)
+	}
 }

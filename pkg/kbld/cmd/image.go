@@ -7,7 +7,7 @@ import (
 	"reflect"
 	"strings"
 
-	ctlimg "github.com/k14s/kbld/pkg/kbld/image"
+	ctlconf "github.com/k14s/kbld/pkg/kbld/config"
 	"sigs.k8s.io/yaml"
 )
 
@@ -15,8 +15,8 @@ type Images []Image
 
 type Image struct {
 	URL      string
-	Metas    []ctlimg.Meta // empty when deserialized
-	metasRaw []interface{} // populated when deserialized
+	Metas    []ctlconf.Meta // empty when deserialized
+	metasRaw []interface{}  // populated when deserialized
 }
 
 func (imgs Images) ForImage(url string) (Image, bool) {

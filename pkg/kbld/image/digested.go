@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	regname "github.com/google/go-containerregistry/pkg/name"
+	ctlconf "github.com/k14s/kbld/pkg/kbld/config"
 )
 
 const digestSep = "@"
@@ -40,7 +41,7 @@ func NewDigestedImageFromParts(url, digest string) DigestedImage {
 	return DigestedImage{nameWithDigest, nil}
 }
 
-func (i DigestedImage) URL() (string, []Meta, error) {
+func (i DigestedImage) URL() (string, []ctlconf.Meta, error) {
 	if i.parseErr != nil {
 		return "", nil, i.parseErr
 	}
