@@ -46,7 +46,7 @@ func (i TaggedImage) URL() (string, []ctlconf.Meta, error) {
 			}
 		}
 
-		metas = append(metas, ctlconf.TaggedImageMeta{Type: ctlconf.TaggedMeta, Tags: i.imgDst.Tags})
+		metas = append(metas, ctlconf.Meta{Tagged: &ctlconf.MetaTagged{Tags: i.imgDst.Tags}})
 	}
 
 	return url, metas, err

@@ -39,8 +39,8 @@ func (i Image) Description() string {
 }
 
 type imageStruct struct {
-	URL   string
-	Metas []interface{}
+	URL   string        `json:"url"`
+	Metas []interface{} `json:"metas,omitempty"`
 }
 
 func (st imageStruct) equal(other imageStruct) bool {

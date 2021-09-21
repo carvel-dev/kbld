@@ -17,7 +17,7 @@ func NewPreresolvedImage(url string, metas []ctlconf.Meta) PreresolvedImage {
 }
 
 func (i PreresolvedImage) URL() (string, []ctlconf.Meta, error) {
-	imageMetas := copyAndAppendMeta(i.metas, ctlconf.PreresolvedImageSourceURL{Type: ctlconf.PreresolvedMeta, URL: i.url})
+	imageMetas := copyAndAppendMeta(i.metas, ctlconf.Meta{Preresolved: &ctlconf.MetaPreresolved{URL: i.url}})
 	return i.url, imageMetas, nil
 }
 
