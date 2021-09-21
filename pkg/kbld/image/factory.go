@@ -4,6 +4,8 @@
 package image
 
 import (
+	"fmt"
+
 	ctlbbz "github.com/k14s/kbld/pkg/kbld/builder/bazel"
 	ctlbdk "github.com/k14s/kbld/pkg/kbld/builder/docker"
 	ctlbko "github.com/k14s/kbld/pkg/kbld/builder/ko"
@@ -19,13 +21,18 @@ type Image interface {
 }
 
 type Factory struct {
-	conf     ctlconf.Conf
+	opts     FactoryOpts
 	registry ctlreg.Registry
 	logger   ctllog.Logger
 }
 
-func NewFactory(conf ctlconf.Conf, registry ctlreg.Registry, logger ctllog.Logger) Factory {
-	return Factory{conf, registry, logger}
+type FactoryOpts struct {
+	Conf           ctlconf.Conf
+	AllowedToBuild bool
+}
+
+func NewFactory(opts FactoryOpts, registry ctlreg.Registry, logger ctllog.Logger) Factory {
+	return Factory{opts, registry, logger}
 }
 
 func (f Factory) New(url string) Image {
@@ -39,6 +46,10 @@ func (f Factory) New(url string) Image {
 	}
 
 	if srcConf, found := f.shouldBuild(url); found {
+		if !f.opts.AllowedToBuild {
+			return NewErrImage(fmt.Errorf("Building of images is disallowed (tried to build '%s' because a source was configured for it)", url))
+		}
+
 		imgDstConf := f.optionalPushConf(url)
 
 		docker := ctlbdk.NewDocker(f.logger)
@@ -67,7 +78,7 @@ func (f Factory) New(url string) Image {
 
 func (f Factory) shouldOverride(url string) (ctlconf.ImageOverride, bool) {
 	urlMatcher := Matcher{url}
-	for _, override := range f.conf.ImageOverrides() {
+	for _, override := range f.opts.Conf.ImageOverrides() {
 		if urlMatcher.Matches(override.ImageRef) {
 			return override, true
 		}
@@ -77,7 +88,7 @@ func (f Factory) shouldOverride(url string) (ctlconf.ImageOverride, bool) {
 
 func (f Factory) shouldBuild(url string) (ctlconf.Source, bool) {
 	urlMatcher := Matcher{url}
-	for _, src := range f.conf.Sources() {
+	for _, src := range f.opts.Conf.Sources() {
 		if urlMatcher.Matches(src.ImageRef) {
 			return src, true
 		}
@@ -87,7 +98,7 @@ func (f Factory) shouldBuild(url string) (ctlconf.Source, bool) {
 
 func (f Factory) optionalPushConf(url string) *ctlconf.ImageDestination {
 	urlMatcher := Matcher{url}
-	for _, dst := range f.conf.ImageDestinations() {
+	for _, dst := range f.opts.Conf.ImageDestinations() {
 		if urlMatcher.Matches(dst.ImageRef) {
 			return &dst
 		}

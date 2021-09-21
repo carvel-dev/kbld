@@ -28,6 +28,7 @@ type ResolveOptions struct {
 
 	FileFlags        FileFlags
 	RegistryFlags    RegistryFlags
+	AllowedToBuild   bool
 	BuildConcurrency int
 	ImagesAnnotation bool
 	ImageMapFile     string
@@ -47,6 +48,7 @@ func NewResolveCmd(o *ResolveOptions) *cobra.Command {
 	}
 	o.FileFlags.Set(cmd)
 	o.RegistryFlags.Set(cmd)
+	cmd.Flags().BoolVar(&o.AllowedToBuild, "build", true, "Allow building of images")
 	cmd.Flags().IntVar(&o.BuildConcurrency, "build-concurrency", 4, "Set maximum number of concurrent builds")
 	cmd.Flags().BoolVar(&o.ImagesAnnotation, "images-annotation", true, "Annotate resources with images annotation")
 	cmd.Flags().StringVar(&o.ImageMapFile, "image-map-file", "", "Set image map file (/cnab/app/relocation-mapping.json in CNAB)")
@@ -77,7 +79,8 @@ func (o *ResolveOptions) Run() error {
 		return err
 	}
 
-	imgFactory := ctlimg.NewFactory(conf, registry, logger)
+	opts := ctlimg.FactoryOpts{Conf: conf, AllowedToBuild: o.AllowedToBuild}
+	imgFactory := ctlimg.NewFactory(opts, registry, logger)
 
 	resolvedImages, err := o.resolveImages(nonConfigRs, conf, imgFactory)
 	if err != nil {
