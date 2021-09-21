@@ -14,9 +14,9 @@ import (
 type Images []Image
 
 type Image struct {
-	URL      string
-	Metas    []ctlconf.Meta // empty when deserialized
-	metasRaw []interface{}  // populated when deserialized
+	URL        string
+	Origins    []ctlconf.Origin // empty when deserialized
+	originsRaw []interface{}    // populated when deserialized
 }
 
 func (imgs Images) ForImage(url string) (Image, bool) {
@@ -30,7 +30,7 @@ func (imgs Images) ForImage(url string) (Image, bool) {
 
 // TODO only works after deserialization
 func (i Image) Description() string {
-	yamlBytes, err := yaml.Marshal(i.metasRaw)
+	yamlBytes, err := yaml.Marshal(i.originsRaw)
 	if err != nil {
 		return "[]" // TODO deal better?
 	}
@@ -39,12 +39,12 @@ func (i Image) Description() string {
 }
 
 type imageStruct struct {
-	URL   string
-	Metas []interface{}
+	URL     string        `json:"url"`
+	Origins []interface{} `json:"origins,omitempty"`
 }
 
 func (st imageStruct) equal(other imageStruct) bool {
-	return st.URL == other.URL && reflect.DeepEqual(st.Metas, other.Metas)
+	return st.URL == other.URL && reflect.DeepEqual(st.Origins, other.Origins)
 }
 
 func contains(structs []imageStruct, st imageStruct) bool {
@@ -60,9 +60,9 @@ func newImageStructs(images []Image) []imageStruct {
 	var result []imageStruct
 	for _, img := range images {
 		st := newImageStruct(img)
-		// if Metas is empty then the image was already in digest form and we didn't need to resolve
+		// if Origins is empty then the image was already in digest form and we didn't need to resolve
 		// it, so the annotation isn't very useful
-		if len(st.Metas) > 0 {
+		if len(st.Origins) > 0 {
 			// also check for duplicates before adding
 			if !contains(result, st) {
 				result = append(result, st)
@@ -74,8 +74,8 @@ func newImageStructs(images []Image) []imageStruct {
 
 func newImageStruct(image Image) imageStruct {
 	result := imageStruct{URL: image.URL}
-	for _, meta := range image.Metas {
-		result.Metas = append(result.Metas, meta)
+	for _, origin := range image.Origins {
+		result.Origins = append(result.Origins, origin)
 	}
 	return result
 }
@@ -83,7 +83,7 @@ func newImageStruct(image Image) imageStruct {
 func newImages(structs []imageStruct) []Image {
 	var result []Image
 	for _, st := range structs {
-		result = append(result, Image{URL: st.URL, metasRaw: st.Metas})
+		result = append(result, Image{URL: st.URL, originsRaw: st.Origins})
 	}
 	return result
 }

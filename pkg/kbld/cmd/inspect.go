@@ -67,14 +67,14 @@ func (o *InspectOptions) Run() error {
 	}
 
 	for _, resWithImg := range foundImages {
-		metasDesc, err := resWithImg.MetasDescription()
+		originsDesc, err := resWithImg.OriginsDescription()
 		if err != nil {
 			return err
 		}
 
 		table.Rows = append(table.Rows, []uitable.Value{
 			uitable.NewValueString(resWithImg.URL),
-			uitable.NewValueString(metasDesc),
+			uitable.NewValueString(originsDesc),
 			uitable.NewValueString(resWithImg.Resource.Description()),
 		})
 	}
@@ -106,7 +106,7 @@ type foundResourceWithImage struct {
 	Resource ctlres.Resource
 }
 
-func (s foundResourceWithImage) MetasDescription() (string, error) {
+func (s foundResourceWithImage) OriginsDescription() (string, error) {
 	images, err := NewResourceWithImages(s.Resource.DeepCopyRaw(), nil).Images()
 	if err != nil {
 		return "", err
