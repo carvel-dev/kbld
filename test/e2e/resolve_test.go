@@ -49,7 +49,7 @@ func TestResolveSuccessfulWithAnnotations(t *testing.T) {
 
 	// The repetition in this input is so it can test for:
 	// 1) resolving
-	// 2) filtering annotations with null metas (which happens with digests, which don't get resolved)
+	// 2) filtering annotations with null origins (which happens with digests, which don't get resolved)
 	// 3) de-duplicating annotations
 	input := `
 kind: Object
@@ -69,12 +69,12 @@ kind: Object
 metadata:
   annotations:
     kbld.k14s.io/images: |
-      - metas:
+      - origins:
         - resolved:
             tag: 1.14.2
             url: nginx:1.14.2
         url: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
-      - metas:
+      - origins:
         - resolved:
             tag: 1.14.2
             url: library/nginx:1.14.2
@@ -125,15 +125,15 @@ kind: Object
 metadata:
   annotations:
     kbld.k14s.io/images: |
-      - metas:
+      - origins:
         - preresolved:
             url: aaa
         url: aaa
-      - metas:
+      - origins:
         - preresolved:
             url: bbb
         url: bbb
-      - metas:
+      - origins:
         - preresolved:
             url: ccc
         url: ccc
@@ -491,12 +491,12 @@ kind: Object
 metadata:
   annotations:
     kbld.k14s.io/images: |
-      - metas:
+      - origins:
         - resolved:
             tag: 1.14.1
             url: index.docker.io/library/nginx:1.14.1
         url: index.docker.io/library/nginx@sha256:32fdf92b4e986e109e4db0865758020cb0c3b70d6ba80d02fe87bad5cc3dc228
-      - metas:
+      - origins:
         - resolved:
             tag: 1.14.2
             url: index.docker.io/library/nginx:1.14.2

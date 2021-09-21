@@ -11,31 +11,31 @@ import (
 )
 
 var (
-	imgLockWithResolvedMetas = `---
+	imgLockWithResolvedOrigins = `---
 apiVersion: imgpkg.carvel.dev/v1alpha1
 images:
 - annotations:
     kbld.carvel.dev/id: nginx:1.14.2
-    kbld.carvel.dev/metas: |
+    kbld.carvel.dev/origins: |
       - resolved:
           tag: 1.14.2
           url: nginx:1.14.2
   image: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
 - annotations:
     kbld.carvel.dev/id: sample-app
-    kbld.carvel.dev/metas: |
+    kbld.carvel.dev/origins: |
       - resolved:
           tag: 1.15.1
           url: nginx:1.15.1
   image: index.docker.io/library/nginx@sha256:4a5573037f358b6cdfa2f3e8a9c33a5cf11bcd1675ca72ca76fbe5bd77d0d682
 kind: ImagesLock
 `
-	imgLockWithBuiltMetas = `---
+	imgLockWithBuiltOrigins = `---
 apiVersion: imgpkg.carvel.dev/v1alpha1
 images:
 - annotations:
     kbld.carvel.dev/id: nginx:1.14.2
-    kbld.carvel.dev/metas: |
+    kbld.carvel.dev/origins: |
       - local:
           path: path/to/source
       - git:
@@ -45,7 +45,7 @@ images:
   image: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
 - annotations:
     kbld.carvel.dev/id: sample-app
-    kbld.carvel.dev/metas: |
+    kbld.carvel.dev/origins: |
       - local:
           path: path/to/source
       - git:
@@ -55,12 +55,12 @@ images:
   image: index.docker.io/library/nginx@sha256:4a5573037f358b6cdfa2f3e8a9c33a5cf11bcd1675ca72ca76fbe5bd77d0d682
 kind: ImagesLock
 `
-	imgLockWithBuiltAndPreresolvedMetas = `---
+	imgLockWithBuiltAndPreresolvedOrigins = `---
 apiVersion: imgpkg.carvel.dev/v1alpha1
 images:
 - annotations:
     kbld.carvel.dev/id: nginx:1.14.2
-    kbld.carvel.dev/metas: |
+    kbld.carvel.dev/origins: |
       - local:
           path: path/to/source
       - git:
@@ -72,7 +72,7 @@ images:
   image: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
 - annotations:
     kbld.carvel.dev/id: sample-app
-    kbld.carvel.dev/metas: |
+    kbld.carvel.dev/origins: |
       - local:
           path: path/to/source
       - git:
@@ -237,8 +237,8 @@ images:
 		t.Fatalf("Failed while reading " + path)
 	}
 
-	if string(bs) != imgLockWithResolvedMetas {
-		t.Fatalf("Expected >>>%s<<< to match >>>%s<<<", bs, imgLockWithResolvedMetas)
+	if string(bs) != imgLockWithResolvedOrigins {
+		t.Fatalf("Expected >>>%s<<< to match >>>%s<<<", bs, imgLockWithResolvedOrigins)
 	}
 }
 
@@ -266,7 +266,7 @@ images:
 - image: nginx:1.14.2
 - image: sample-app
 ---
-` + imgLockWithResolvedMetas
+` + imgLockWithResolvedOrigins
 
 	out, _ := kbld.RunWithOpts([]string{"-f", "-"}, RunOpts{
 		StdinReader: strings.NewReader(input),
@@ -279,14 +279,14 @@ images:
 metadata:
   annotations:
     kbld.k14s.io/images: |
-      - metas:
+      - origins:
         - resolved:
             tag: 1.15.1
             url: nginx:1.15.1
         - preresolved:
             url: index.docker.io/library/nginx@sha256:4a5573037f358b6cdfa2f3e8a9c33a5cf11bcd1675ca72ca76fbe5bd77d0d682
         url: index.docker.io/library/nginx@sha256:4a5573037f358b6cdfa2f3e8a9c33a5cf11bcd1675ca72ca76fbe5bd77d0d682
-      - metas:
+      - origins:
         - resolved:
             tag: 1.14.2
             url: nginx:1.14.2
@@ -299,7 +299,7 @@ metadata:
 	}
 }
 
-func TestImgpkgLockFileMetasSuccessful(t *testing.T) {
+func TestImgpkgLockFileOriginsSuccessful(t *testing.T) {
 	env := BuildEnv(t)
 	kbld := Kbld{t, env.Namespace, env.KbldBinaryPath, Logger{}}
 
@@ -308,9 +308,9 @@ images:
 - image: nginx:1.14.2
 - image: sample-app
 ---
-` + imgLockWithBuiltMetas
+` + imgLockWithBuiltOrigins
 
-	path := "/tmp/kbld-test-lock-metas"
+	path := "/tmp/kbld-test-lock-origins"
 	defer os.RemoveAll(path)
 	out, _ := kbld.RunWithOpts([]string{"-f", "-", "--imgpkg-lock-output=" + path}, RunOpts{
 		StdinReader: strings.NewReader(input),
@@ -323,7 +323,7 @@ images:
 metadata:
   annotations:
     kbld.k14s.io/images: |
-      - metas:
+      - origins:
         - local:
             path: path/to/source
         - git:
@@ -333,7 +333,7 @@ metadata:
         - preresolved:
             url: index.docker.io/library/nginx@sha256:4a5573037f358b6cdfa2f3e8a9c33a5cf11bcd1675ca72ca76fbe5bd77d0d682
         url: index.docker.io/library/nginx@sha256:4a5573037f358b6cdfa2f3e8a9c33a5cf11bcd1675ca72ca76fbe5bd77d0d682
-      - metas:
+      - origins:
         - local:
             path: path/to/source
         - git:
@@ -353,12 +353,12 @@ metadata:
 		t.Fatalf("Failed while reading " + path)
 	}
 
-	if string(bs) != imgLockWithBuiltAndPreresolvedMetas {
-		t.Fatalf("Expected >>>%s<<< to match >>>%s<<<", bs, imgLockWithBuiltAndPreresolvedMetas)
+	if string(bs) != imgLockWithBuiltAndPreresolvedOrigins {
+		t.Fatalf("Expected >>>%s<<< to match >>>%s<<<", bs, imgLockWithBuiltAndPreresolvedOrigins)
 	}
 }
 
-func TestImgpkgLockOutputSuccessfulDigestedImageHasNoMetas(t *testing.T) {
+func TestImgpkgLockOutputSuccessfulDigestedImageHasNoOrigins(t *testing.T) {
 	env := BuildEnv(t)
 	kbld := Kbld{t, env.Namespace, env.KbldBinaryPath, Logger{}}
 
@@ -389,7 +389,7 @@ images:
 		t.Fatalf("Failed while reading " + path)
 	}
 
-	// For Digest references, Image Lock should not have metas since there is no image metadata
+	// For Digest references, Image Lock should not have origins since there is no image metadata
 	if string(bs) != imgLock {
 		t.Fatalf("Expected >>>%s<<< to match >>>%s<<<", bs, imgLock)
 	}

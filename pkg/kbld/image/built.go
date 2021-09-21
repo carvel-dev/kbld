@@ -32,8 +32,8 @@ func NewBuiltImage(url string, buildSource ctlconf.Source, imgDst *ctlconf.Image
 	return BuiltImage{url, buildSource, imgDst, docker, pack, kubectlBuildkit, ko, bazel}
 }
 
-func (i BuiltImage) URL() (string, []ctlconf.Meta, error) {
-	metas, err := i.sources()
+func (i BuiltImage) URL() (string, []ctlconf.Origin, error) {
+	origins, err := i.sources()
 	if err != nil {
 		return "", nil, err
 	}
@@ -54,12 +54,12 @@ func (i BuiltImage) URL() (string, []ctlconf.Meta, error) {
 			return "", nil, err
 		}
 
-		return i.optionalPushWithDocker(dockerTmpRef, metas)
+		return i.optionalPushWithDocker(dockerTmpRef, origins)
 
 	case i.buildSource.KubectlBuildkit != nil:
 		url, err := i.kubectlBuildkit.BuildAndPush(
 			urlRepo, i.buildSource.Path, i.imgDst, *i.buildSource.KubectlBuildkit)
-		return url, metas, err
+		return url, origins, err
 
 	case i.buildSource.Ko != nil:
 		dockerTmpRef, err := i.ko.Build(urlRepo, i.buildSource.Path, i.buildSource.Ko.Build)
@@ -67,7 +67,7 @@ func (i BuiltImage) URL() (string, []ctlconf.Meta, error) {
 			return "", nil, err
 		}
 
-		return i.optionalPushWithDocker(dockerTmpRef, metas)
+		return i.optionalPushWithDocker(dockerTmpRef, origins)
 
 	case i.buildSource.Bazel != nil:
 		dockerTmpRef, err := i.bazel.Run(urlRepo, i.buildSource.Path, i.buildSource.Bazel.Run)
@@ -75,7 +75,7 @@ func (i BuiltImage) URL() (string, []ctlconf.Meta, error) {
 			return "", nil, err
 		}
 
-		return i.optionalPushWithDocker(dockerTmpRef, metas)
+		return i.optionalPushWithDocker(dockerTmpRef, origins)
 
 	default:
 		if i.buildSource.Docker == nil {
@@ -96,37 +96,37 @@ func (i BuiltImage) URL() (string, []ctlconf.Meta, error) {
 			return "", nil, err
 		}
 
-		return i.optionalPushWithDocker(dockerTmpRef, metas)
+		return i.optionalPushWithDocker(dockerTmpRef, origins)
 	}
 }
 
-func (i BuiltImage) optionalPushWithDocker(dockerTmpRef ctlbdk.DockerTmpRef, metas []ctlconf.Meta) (string, []ctlconf.Meta, error) {
+func (i BuiltImage) optionalPushWithDocker(dockerTmpRef ctlbdk.DockerTmpRef, origins []ctlconf.Origin) (string, []ctlconf.Origin, error) {
 	if i.imgDst != nil {
 		digest, err := i.docker.Push(dockerTmpRef, i.imgDst.NewImage)
 		if err != nil {
 			return "", nil, err
 		}
 
-		url, metas2, err := NewDigestedImageFromParts(i.imgDst.NewImage, digest.AsString()).URL()
+		url, moreOrigins, err := NewDigestedImageFromParts(i.imgDst.NewImage, digest.AsString()).URL()
 		if err != nil {
 			return "", nil, err
 		}
 
-		return url, append(metas, metas2...), nil
+		return url, append(origins, moreOrigins...), nil
 	}
 
-	return dockerTmpRef.AsString(), metas, nil
+	return dockerTmpRef.AsString(), origins, nil
 }
 
-func (i BuiltImage) sources() ([]ctlconf.Meta, error) {
-	var sources []ctlconf.Meta
+func (i BuiltImage) sources() ([]ctlconf.Origin, error) {
+	var sources []ctlconf.Origin
 
 	absPath, err := filepath.Abs(i.buildSource.Path)
 	if err != nil {
 		return nil, err
 	}
 
-	sources = append(sources, ctlconf.Meta{Local: &ctlconf.MetaLocal{Path: absPath}})
+	sources = append(sources, ctlconf.Origin{Local: &ctlconf.OriginLocal{Path: absPath}})
 
 	gitRepo := NewGitRepo(absPath)
 
@@ -138,7 +138,7 @@ func (i BuiltImage) sources() ([]ctlconf.Meta, error) {
 			return nil, err
 		}
 
-		git := ctlconf.MetaGit{SHA: sha}
+		git := ctlconf.OriginGit{SHA: sha}
 
 		git.RemoteURL, err = gitRepo.RemoteURL()
 		if err != nil {
@@ -155,7 +155,7 @@ func (i BuiltImage) sources() ([]ctlconf.Meta, error) {
 			return nil, err
 		}
 
-		sources = append(sources, ctlconf.Meta{Git: &git})
+		sources = append(sources, ctlconf.Origin{Git: &git})
 	}
 
 	return sources, nil

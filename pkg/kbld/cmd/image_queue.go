@@ -55,7 +55,7 @@ func (b *ImageQueue) worker(workWg *sync.WaitGroup, queueCh <-chan UnprocessedIm
 func (b *ImageQueue) work(workWg *sync.WaitGroup, unprocessedImageURL UnprocessedImageURL) {
 	defer workWg.Done()
 
-	imgURL, metas, err := b.imgFactory.New(unprocessedImageURL.URL).URL()
+	imgURL, origins, err := b.imgFactory.New(unprocessedImageURL.URL).URL()
 	if err != nil {
 		b.outputErrsLock.Lock()
 		b.outputErrs = append(b.outputErrs, fmt.Errorf("Resolving image '%s': %s", unprocessedImageURL.URL, err))
@@ -64,6 +64,6 @@ func (b *ImageQueue) work(workWg *sync.WaitGroup, unprocessedImageURL Unprocesse
 	}
 
 	b.outputImagesLock.Lock()
-	b.outputImages.Add(unprocessedImageURL, Image{URL: imgURL, Metas: metas})
+	b.outputImages.Add(unprocessedImageURL, Image{URL: imgURL, Origins: origins})
 	b.outputImagesLock.Unlock()
 }
