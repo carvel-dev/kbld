@@ -5,14 +5,16 @@ package cmd
 
 import (
 	"sort"
+
+	"sigs.k8s.io/yaml"
 )
 
 type UnprocessedImageURL struct {
-	URL string
+	URL string `json:"image"`
 }
 
 type UnprocessedImageURLs struct {
-	urls map[UnprocessedImageURL]struct{}
+	urls map[UnprocessedImageURL]struct{} `json:"unresolved"`
 }
 
 func NewUnprocessedImageURLs() *UnprocessedImageURLs {
@@ -32,4 +34,8 @@ func (i *UnprocessedImageURLs) All() []UnprocessedImageURL {
 		return result[i].URL < result[j].URL
 	})
 	return result
+}
+
+func (i *UnprocessedImageURLs) Bytes() ([]byte, error) {
+	return yaml.Marshal(i.All())
 }
