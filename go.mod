@@ -13,5 +13,5 @@ require (
 	github.com/vmware-tanzu/carvel-vendir v0.22.0
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
 	k8s.io/apimachinery v0.22.2
-	sigs.k8s.io/yaml v1.2.0
+	sigs.k8s.io/yaml v1.3.0
 )
