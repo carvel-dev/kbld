@@ -61,8 +61,6 @@ github.com/json-iterator/go
 # github.com/k14s/imgpkg v0.17.0
 ## explicit
 github.com/k14s/imgpkg/pkg/imgpkg/lockconfig
-# github.com/k14s/semver/v4 v4.0.1-0.20210701191048-266d47ac6115
-github.com/k14s/semver/v4
 # github.com/kisielk/errcheck v1.6.0
 ## explicit
 github.com/kisielk/errcheck
@@ -92,7 +90,7 @@ github.com/spf13/pflag
 # github.com/vito/go-interact v0.0.0-20171111012221-fa338ed9e9ec
 github.com/vito/go-interact/interact
 github.com/vito/go-interact/interact/terminal
-# github.com/vmware-tanzu/carvel-vendir v0.22.0
+# github.com/vmware-tanzu/carvel-vendir v0.23.0
 ## explicit
 github.com/vmware-tanzu/carvel-vendir/pkg/vendir/versions/v1alpha1
 # golang.org/x/crypto v0.0.0-20210616213533-5ff15b29337e
