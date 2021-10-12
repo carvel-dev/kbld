@@ -17,7 +17,7 @@ on:
 jobs:
   test-all:
     name: Test GH
-    runs-on: macos-latest
+    runs-on: macos-10.15
     environment: DockerHub E2E
     steps:
     - name: Set up Go 1.x
