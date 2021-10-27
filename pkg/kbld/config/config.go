@@ -8,9 +8,9 @@ import (
 	"io/ioutil"
 
 	semver "github.com/hashicorp/go-version"
-	"github.com/k14s/imgpkg/pkg/imgpkg/lockconfig"
 	ctlres "github.com/k14s/kbld/pkg/kbld/resources"
 	"github.com/k14s/kbld/pkg/kbld/version"
+	"github.com/vmware-tanzu/carvel-imgpkg/pkg/imgpkg/lockconfig"
 	versions "github.com/vmware-tanzu/carvel-vendir/pkg/vendir/versions/v1alpha1"
 	"sigs.k8s.io/yaml"
 )

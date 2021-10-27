@@ -6,8 +6,8 @@ package config
 import (
 	"reflect"
 
-	"github.com/k14s/imgpkg/pkg/imgpkg/lockconfig"
 	ctlres "github.com/k14s/kbld/pkg/kbld/resources"
+	"github.com/vmware-tanzu/carvel-imgpkg/pkg/imgpkg/lockconfig"
 )
 
 type Conf struct {
