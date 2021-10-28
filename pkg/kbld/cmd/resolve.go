@@ -11,7 +11,6 @@ import (
 	"strings"
 
 	"github.com/cppforlife/go-cli-ui/ui"
-	"github.com/k14s/imgpkg/pkg/imgpkg/lockconfig"
 	ctlconf "github.com/k14s/kbld/pkg/kbld/config"
 	ctlimg "github.com/k14s/kbld/pkg/kbld/image"
 	ctllog "github.com/k14s/kbld/pkg/kbld/logger"
@@ -20,6 +19,7 @@ import (
 	ctlser "github.com/k14s/kbld/pkg/kbld/search"
 	"github.com/k14s/kbld/pkg/kbld/version"
 	"github.com/spf13/cobra"
+	"github.com/vmware-tanzu/carvel-imgpkg/pkg/imgpkg/lockconfig"
 	"sigs.k8s.io/yaml"
 )
 

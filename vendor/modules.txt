@@ -20,7 +20,7 @@ github.com/docker/docker/pkg/homedir
 # github.com/docker/docker-credential-helpers v0.6.3
 github.com/docker/docker-credential-helpers/client
 github.com/docker/docker-credential-helpers/credentials
-# github.com/go-logr/logr v1.1.0
+# github.com/go-logr/logr v1.2.0
 github.com/go-logr/logr
 # github.com/gogo/protobuf v1.3.2
 github.com/gogo/protobuf/proto
@@ -60,9 +60,6 @@ github.com/inconshreveable/mousetrap
 ## explicit
 # github.com/json-iterator/go v1.1.11
 github.com/json-iterator/go
-# github.com/k14s/imgpkg v0.20.0
-## explicit
-github.com/k14s/imgpkg/pkg/imgpkg/lockconfig
 # github.com/k14s/semver/v4 v4.0.1-0.20210701191048-266d47ac6115
 github.com/k14s/semver/v4
 # github.com/kisielk/errcheck v1.6.0
@@ -94,6 +91,9 @@ github.com/spf13/pflag
 # github.com/vito/go-interact v0.0.0-20171111012221-fa338ed9e9ec
 github.com/vito/go-interact/interact
 github.com/vito/go-interact/interact/terminal
+# github.com/vmware-tanzu/carvel-imgpkg v0.22.0
+## explicit
+github.com/vmware-tanzu/carvel-imgpkg/pkg/imgpkg/lockconfig
 # github.com/vmware-tanzu/carvel-vendir v0.22.0
 ## explicit
 github.com/vmware-tanzu/carvel-vendir/pkg/vendir/versions/v1alpha1
@@ -170,7 +170,7 @@ k8s.io/apimachinery/third_party/forked/golang/reflect
 ## explicit
 # k8s.io/gengo v0.0.0-20201113003025-83324d819ded
 ## explicit
-# k8s.io/klog/v2 v2.20.0
+# k8s.io/klog/v2 v2.30.0
 k8s.io/klog/v2
 # sigs.k8s.io/structured-merge-diff/v4 v4.1.2
 sigs.k8s.io/structured-merge-diff/v4/value
