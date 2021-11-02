@@ -779,8 +779,8 @@ github.com/vito/go-interact v0.0.0-20171111012221-fa338ed9e9ec h1:Klu98tQ9Z1t23g
 github.com/vito/go-interact v0.0.0-20171111012221-fa338ed9e9ec/go.mod h1:wPlfmglZmRWMYv/qJy3P+fK/UnoQB5ISk4txfNd9tDo=
 github.com/vmware-tanzu/carvel-imgpkg v0.22.0 h1:unQo7osSyZrkFt4HYsW/sjV0e6CyT1mxk7NWrekmTh0=
 github.com/vmware-tanzu/carvel-imgpkg v0.22.0/go.mod h1:Mfznnn1cduk7ibLv9qjbFA5+6RHWk00zJomaRcWK//s=
-github.com/vmware-tanzu/carvel-vendir v0.22.0 h1:BZJ0IECAWvL4QLxWLgqbfEYRgtui62gXm82zoALWTbQ=
-github.com/vmware-tanzu/carvel-vendir v0.22.0/go.mod h1:vCzgI/0AqEYKkYN2kexIB1jypItz60sAqvkF7NbqvGw=
+github.com/vmware-tanzu/carvel-vendir v0.23.0 h1:7tn0D14nxpYQS4SPRqOGp0ePKAgikYw786YtqmRWJas=
+github.com/vmware-tanzu/carvel-vendir v0.23.0/go.mod h1:l35I00eXhYiIaZdOPeGX/zrj0WGfimSSqj81PrxGpAw=
 github.com/vmware/govmomi v0.20.3/go.mod h1:URlwyTFZX72RmxtxuaFL2Uj3fD1JTvZdx59bHWk6aFU=
 github.com/willf/bitset v1.1.11-0.20200630133818-d5bec3311243/go.mod h1:RjeCKbqT1RxIR/KWY6phxZiaY1IyutSBfGjNPySAYV4=
 github.com/willf/bitset v1.1.11/go.mod h1:83CECat5yLh5zVOf4P1ErAgKA5UDvKtgyUABdr3+MjI=
