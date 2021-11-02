@@ -49,7 +49,7 @@ jobs:
 
         wget -O- -nv https://github.com/kubernetes/minikube/releases/latest/download/minikube-darwin-amd64 > /tmp/bin/minikube
         chmod +x /tmp/bin/minikube
-        minikube start --driver=virtualbox --insecure-registry=192.168.0.0/16
+        minikube start --driver=virtualbox --insecure-registry=192.168.0.0/16 --host-only-cidr "192.168.59.1/24"
         eval $(minikube docker-env --shell=bash)
 
         # when this workflow runs of a pull request based on a fork, secrets are unavailable
