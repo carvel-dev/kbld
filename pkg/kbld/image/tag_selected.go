@@ -9,17 +9,18 @@ import (
 	regname "github.com/google/go-containerregistry/pkg/name"
 	ctlconf "github.com/k14s/kbld/pkg/kbld/config"
 	ctlreg "github.com/k14s/kbld/pkg/kbld/registry"
-	versions "github.com/vmware-tanzu/carvel-vendir/pkg/vendir/versions/v1alpha1"
+	"github.com/vmware-tanzu/carvel-vendir/pkg/vendir/versions"
+	"github.com/vmware-tanzu/carvel-vendir/pkg/vendir/versions/v1alpha1"
 )
 
 // TagSelectedImage represents an image that will be resolved into url+digest
 type TagSelectedImage struct {
 	url       string
-	selection *versions.VersionSelection
+	selection *v1alpha1.VersionSelection
 	registry  ctlreg.Registry
 }
 
-func NewTagSelectedImage(url string, selection *versions.VersionSelection,
+func NewTagSelectedImage(url string, selection *v1alpha1.VersionSelection,
 	registry ctlreg.Registry) TagSelectedImage {
 
 	return TagSelectedImage{url, selection, registry}
