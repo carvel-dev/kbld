@@ -89,7 +89,7 @@ github.com/spf13/pflag
 # github.com/vito/go-interact v0.0.0-20171111012221-fa338ed9e9ec
 github.com/vito/go-interact/interact
 github.com/vito/go-interact/interact/terminal
-# github.com/vmware-tanzu/carvel-imgpkg v0.22.0
+# github.com/vmware-tanzu/carvel-imgpkg v0.23.1
 ## explicit
 github.com/vmware-tanzu/carvel-imgpkg/pkg/imgpkg/lockconfig
 # github.com/vmware-tanzu/carvel-vendir v0.23.0
