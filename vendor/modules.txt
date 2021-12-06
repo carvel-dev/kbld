@@ -8,16 +8,16 @@ github.com/cppforlife/color
 github.com/cppforlife/go-cli-ui/errors
 github.com/cppforlife/go-cli-ui/ui
 github.com/cppforlife/go-cli-ui/ui/table
-# github.com/docker/cli v20.10.7+incompatible
+# github.com/docker/cli v20.10.10+incompatible
 github.com/docker/cli/cli/config
 github.com/docker/cli/cli/config/configfile
 github.com/docker/cli/cli/config/credentials
 github.com/docker/cli/cli/config/types
 # github.com/docker/distribution v2.7.1+incompatible
 github.com/docker/distribution/registry/client/auth/challenge
-# github.com/docker/docker v20.10.7+incompatible
+# github.com/docker/docker v20.10.10+incompatible
 github.com/docker/docker/pkg/homedir
-# github.com/docker/docker-credential-helpers v0.6.3
+# github.com/docker/docker-credential-helpers v0.6.4
 github.com/docker/docker-credential-helpers/client
 github.com/docker/docker-credential-helpers/credentials
 # github.com/go-logr/logr v1.2.0
@@ -31,7 +31,7 @@ github.com/google/go-cmp/cmp/internal/diff
 github.com/google/go-cmp/cmp/internal/flags
 github.com/google/go-cmp/cmp/internal/function
 github.com/google/go-cmp/cmp/internal/value
-# github.com/google/go-containerregistry v0.6.0
+# github.com/google/go-containerregistry v0.7.0
 ## explicit
 github.com/google/go-containerregistry/internal/and
 github.com/google/go-containerregistry/internal/gzip
@@ -74,7 +74,7 @@ github.com/modern-go/concurrent
 github.com/modern-go/reflect2
 # github.com/opencontainers/go-digest v1.0.0
 github.com/opencontainers/go-digest
-# github.com/opencontainers/image-spec v1.0.1
+# github.com/opencontainers/image-spec v1.0.2-0.20210730191737-8e42a01fb1b7
 github.com/opencontainers/image-spec/specs-go
 github.com/opencontainers/image-spec/specs-go/v1
 # github.com/pkg/errors v0.9.1
@@ -100,7 +100,7 @@ github.com/vmware-tanzu/carvel-vendir/pkg/vendir/versions/v1alpha1
 golang.org/x/crypto/ssh/terminal
 # golang.org/x/mod v0.4.2
 golang.org/x/mod/semver
-# golang.org/x/net v0.0.0-20210525063256-abc453219eb5
+# golang.org/x/net v0.0.0-20211111160137-58aab5ef257a
 golang.org/x/net/http/httpguts
 golang.org/x/net/http2
 golang.org/x/net/http2/hpack
@@ -108,7 +108,7 @@ golang.org/x/net/idna
 # golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
 ## explicit
 golang.org/x/sync/errgroup
-# golang.org/x/sys v0.0.0-20210630005230-0f9fa26af87c
+# golang.org/x/sys v0.0.0-20211110154304-99a53858aa08
 golang.org/x/sys/execabs
 golang.org/x/sys/internal/unsafeheader
 golang.org/x/sys/plan9
@@ -121,7 +121,7 @@ golang.org/x/text/secure/bidirule
 golang.org/x/text/transform
 golang.org/x/text/unicode/bidi
 golang.org/x/text/unicode/norm
-# golang.org/x/tools v0.1.2
+# golang.org/x/tools v0.1.5
 golang.org/x/tools/go/gcexportdata
 golang.org/x/tools/go/internal/gcimporter
 golang.org/x/tools/go/internal/packagesdriver
