@@ -74,7 +74,7 @@ github.com/json-iterator/go
 # github.com/k14s/semver/v4 v4.0.1-0.20210701191048-266d47ac6115
 ## explicit; go 1.14
 github.com/k14s/semver/v4
-# github.com/kisielk/errcheck v1.5.0
+# github.com/kisielk/errcheck v1.6.0
 ## explicit; go 1.14
 github.com/kisielk/errcheck
 github.com/kisielk/errcheck/errcheck

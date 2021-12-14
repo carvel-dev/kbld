@@ -7,7 +7,7 @@ require (
 	github.com/cppforlife/go-cli-ui v0.0.0-20200716203538-1e47f820817f
 	github.com/google/go-containerregistry v0.7.0
 	github.com/hashicorp/go-version v1.3.0
-	github.com/kisielk/errcheck v1.5.0
+	github.com/kisielk/errcheck v1.6.0
 	github.com/spf13/cobra v1.2.1
 	github.com/vmware-tanzu/carvel-imgpkg v0.23.1
 	github.com/vmware-tanzu/carvel-vendir v0.23.0
