@@ -9,8 +9,8 @@ import (
 
 	regv1 "github.com/google/go-containerregistry/pkg/v1"
 	"github.com/google/go-containerregistry/pkg/v1/types"
-	"github.com/k14s/kbld/pkg/kbld/imageutils/gzip"
-	"github.com/k14s/kbld/pkg/kbld/imageutils/verify"
+	"github.com/vmware-tanzu/carvel-kbld/pkg/kbld/imageutils/gzip"
+	"github.com/vmware-tanzu/carvel-kbld/pkg/kbld/imageutils/verify"
 )
 
 type DescribedLayer struct {

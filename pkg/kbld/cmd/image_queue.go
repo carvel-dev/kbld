@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"sync"
 
-	ctlimg "github.com/k14s/kbld/pkg/kbld/image"
+	ctlimg "github.com/vmware-tanzu/carvel-kbld/pkg/kbld/image"
 )
 
 type ImageQueue struct {

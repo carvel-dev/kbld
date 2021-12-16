@@ -6,8 +6,8 @@ package image_test
 import (
 	"testing"
 
-	ctlconf "github.com/k14s/kbld/pkg/kbld/config"
-	ctlimg "github.com/k14s/kbld/pkg/kbld/image"
+	ctlconf "github.com/vmware-tanzu/carvel-kbld/pkg/kbld/config"
+	ctlimg "github.com/vmware-tanzu/carvel-kbld/pkg/kbld/image"
 )
 
 func TestMatcherMatches(t *testing.T) {

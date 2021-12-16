@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	regname "github.com/google/go-containerregistry/pkg/name"
-	ctlconf "github.com/k14s/kbld/pkg/kbld/config"
+	ctlconf "github.com/vmware-tanzu/carvel-kbld/pkg/kbld/config"
 )
 
 const digestSep = "@"

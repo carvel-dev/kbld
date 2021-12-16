@@ -15,7 +15,7 @@ import (
 	regv1 "github.com/google/go-containerregistry/pkg/v1"
 	regtran "github.com/google/go-containerregistry/pkg/v1/remote/transport"
 	regtypes "github.com/google/go-containerregistry/pkg/v1/types"
-	"github.com/k14s/kbld/pkg/kbld/util"
+	"github.com/vmware-tanzu/carvel-kbld/pkg/kbld/util"
 	"golang.org/x/sync/errgroup"
 )
 

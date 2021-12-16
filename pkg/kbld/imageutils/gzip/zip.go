@@ -24,7 +24,7 @@ import (
 	"compress/gzip"
 	"io"
 
-	"github.com/k14s/kbld/pkg/kbld/imageutils/and"
+	"github.com/vmware-tanzu/carvel-kbld/pkg/kbld/imageutils/and"
 )
 
 var gzipMagicHeader = []byte{'\x1f', '\x8b'}

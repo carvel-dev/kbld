@@ -21,7 +21,7 @@ builds:
 
     ldflags:
       - -buildid=
-      - -X github.com/k14s/kbld/pkg/kbld/version.Version={{ .Version }}
+      - -X github.com/vmware-tanzu/carvel-kbld/pkg/kbld/version.Version={{ .Version }}
 
 archives:
   - format: binary

@@ -6,7 +6,7 @@ package imagetar
 import (
 	"io/ioutil"
 
-	"github.com/k14s/kbld/pkg/kbld/imagedesc"
+	"github.com/vmware-tanzu/carvel-kbld/pkg/kbld/imagedesc"
 )
 
 type TarReader struct {

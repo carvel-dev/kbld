@@ -9,13 +9,13 @@ import (
 
 	"github.com/cppforlife/go-cli-ui/ui"
 	regname "github.com/google/go-containerregistry/pkg/name"
-	ctlconf "github.com/k14s/kbld/pkg/kbld/config"
-	ctllog "github.com/k14s/kbld/pkg/kbld/logger"
-	ctlreg "github.com/k14s/kbld/pkg/kbld/registry"
-	ctlres "github.com/k14s/kbld/pkg/kbld/resources"
-	ctlser "github.com/k14s/kbld/pkg/kbld/search"
-	"github.com/k14s/kbld/pkg/kbld/version"
 	"github.com/spf13/cobra"
+	ctlconf "github.com/vmware-tanzu/carvel-kbld/pkg/kbld/config"
+	ctllog "github.com/vmware-tanzu/carvel-kbld/pkg/kbld/logger"
+	ctlreg "github.com/vmware-tanzu/carvel-kbld/pkg/kbld/registry"
+	ctlres "github.com/vmware-tanzu/carvel-kbld/pkg/kbld/resources"
+	ctlser "github.com/vmware-tanzu/carvel-kbld/pkg/kbld/search"
+	"github.com/vmware-tanzu/carvel-kbld/pkg/kbld/version"
 	"sigs.k8s.io/yaml"
 )
 

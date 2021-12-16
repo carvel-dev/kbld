@@ -4,8 +4,8 @@
 package cmd
 
 import (
-	ctlreg "github.com/k14s/kbld/pkg/kbld/registry"
 	"github.com/spf13/cobra"
+	ctlreg "github.com/vmware-tanzu/carvel-kbld/pkg/kbld/registry"
 )
 
 type RegistryFlags struct {

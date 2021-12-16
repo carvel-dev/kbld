@@ -9,8 +9,8 @@ import (
 	"sort"
 	"testing"
 
-	ctlconf "github.com/k14s/kbld/pkg/kbld/config"
-	ctlser "github.com/k14s/kbld/pkg/kbld/search"
+	ctlconf "github.com/vmware-tanzu/carvel-kbld/pkg/kbld/config"
+	ctlser "github.com/vmware-tanzu/carvel-kbld/pkg/kbld/search"
 )
 
 func TestImageRefsMatches(t *testing.T) {

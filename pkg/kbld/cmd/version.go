@@ -7,8 +7,8 @@ import (
 	"fmt"
 
 	"github.com/cppforlife/go-cli-ui/ui"
-	"github.com/k14s/kbld/pkg/kbld/version"
 	"github.com/spf13/cobra"
+	"github.com/vmware-tanzu/carvel-kbld/pkg/kbld/version"
 )
 
 type VersionOptions struct {
