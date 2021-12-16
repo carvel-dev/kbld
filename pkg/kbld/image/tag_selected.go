@@ -7,8 +7,8 @@ import (
 	"fmt"
 
 	regname "github.com/google/go-containerregistry/pkg/name"
-	ctlconf "github.com/k14s/kbld/pkg/kbld/config"
-	ctlreg "github.com/k14s/kbld/pkg/kbld/registry"
+	ctlconf "github.com/vmware-tanzu/carvel-kbld/pkg/kbld/config"
+	ctlreg "github.com/vmware-tanzu/carvel-kbld/pkg/kbld/registry"
 	"github.com/vmware-tanzu/carvel-vendir/pkg/vendir/versions"
 	"github.com/vmware-tanzu/carvel-vendir/pkg/vendir/versions/v1alpha1"
 )

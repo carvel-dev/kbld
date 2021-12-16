@@ -12,7 +12,7 @@ import (
 
 	uierrs "github.com/cppforlife/go-cli-ui/errors"
 	"github.com/cppforlife/go-cli-ui/ui"
-	"github.com/k14s/kbld/pkg/kbld/cmd"
+	"github.com/vmware-tanzu/carvel-kbld/pkg/kbld/cmd"
 )
 
 func main() {

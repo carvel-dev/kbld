@@ -12,7 +12,7 @@ import (
 	"strings"
 	"testing"
 
-	ctlimg "github.com/k14s/kbld/pkg/kbld/image"
+	ctlimg "github.com/vmware-tanzu/carvel-kbld/pkg/kbld/image"
 )
 
 func TestGitRepoValidNonEmptyRepo(t *testing.T) {

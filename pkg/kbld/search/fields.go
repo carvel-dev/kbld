@@ -4,8 +4,8 @@
 package search
 
 import (
-	ctlconf "github.com/k14s/kbld/pkg/kbld/config"
-	ctlres "github.com/k14s/kbld/pkg/kbld/resources"
+	ctlconf "github.com/vmware-tanzu/carvel-kbld/pkg/kbld/config"
+	ctlres "github.com/vmware-tanzu/carvel-kbld/pkg/kbld/resources"
 )
 
 type Fields struct {

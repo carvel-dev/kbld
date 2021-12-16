@@ -6,14 +6,14 @@ package image
 import (
 	"fmt"
 
-	ctlbbz "github.com/k14s/kbld/pkg/kbld/builder/bazel"
-	ctlbdk "github.com/k14s/kbld/pkg/kbld/builder/docker"
-	ctlbko "github.com/k14s/kbld/pkg/kbld/builder/ko"
-	ctlbkb "github.com/k14s/kbld/pkg/kbld/builder/kubectlbuildkit"
-	ctlbpk "github.com/k14s/kbld/pkg/kbld/builder/pack"
-	ctlconf "github.com/k14s/kbld/pkg/kbld/config"
-	ctllog "github.com/k14s/kbld/pkg/kbld/logger"
-	ctlreg "github.com/k14s/kbld/pkg/kbld/registry"
+	ctlbbz "github.com/vmware-tanzu/carvel-kbld/pkg/kbld/builder/bazel"
+	ctlbdk "github.com/vmware-tanzu/carvel-kbld/pkg/kbld/builder/docker"
+	ctlbko "github.com/vmware-tanzu/carvel-kbld/pkg/kbld/builder/ko"
+	ctlbkb "github.com/vmware-tanzu/carvel-kbld/pkg/kbld/builder/kubectlbuildkit"
+	ctlbpk "github.com/vmware-tanzu/carvel-kbld/pkg/kbld/builder/pack"
+	ctlconf "github.com/vmware-tanzu/carvel-kbld/pkg/kbld/config"
+	ctllog "github.com/vmware-tanzu/carvel-kbld/pkg/kbld/logger"
+	ctlreg "github.com/vmware-tanzu/carvel-kbld/pkg/kbld/registry"
 )
 
 type Image interface {

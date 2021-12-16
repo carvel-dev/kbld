@@ -9,9 +9,9 @@ import (
 	"os"
 
 	regname "github.com/google/go-containerregistry/pkg/name"
-	"github.com/k14s/kbld/pkg/kbld/imagetar"
-	ctllog "github.com/k14s/kbld/pkg/kbld/logger"
-	ctlreg "github.com/k14s/kbld/pkg/kbld/registry"
+	"github.com/vmware-tanzu/carvel-kbld/pkg/kbld/imagetar"
+	ctllog "github.com/vmware-tanzu/carvel-kbld/pkg/kbld/logger"
+	ctlreg "github.com/vmware-tanzu/carvel-kbld/pkg/kbld/registry"
 )
 
 type TarImageSet struct {

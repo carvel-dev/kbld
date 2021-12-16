@@ -7,11 +7,11 @@ import (
 	"fmt"
 
 	regname "github.com/google/go-containerregistry/pkg/name"
-	ctlimg "github.com/k14s/kbld/pkg/kbld/image"
-	"github.com/k14s/kbld/pkg/kbld/imagedesc"
-	ctllog "github.com/k14s/kbld/pkg/kbld/logger"
-	ctlreg "github.com/k14s/kbld/pkg/kbld/registry"
-	"github.com/k14s/kbld/pkg/kbld/util"
+	ctlimg "github.com/vmware-tanzu/carvel-kbld/pkg/kbld/image"
+	"github.com/vmware-tanzu/carvel-kbld/pkg/kbld/imagedesc"
+	ctllog "github.com/vmware-tanzu/carvel-kbld/pkg/kbld/logger"
+	ctlreg "github.com/vmware-tanzu/carvel-kbld/pkg/kbld/registry"
+	"github.com/vmware-tanzu/carvel-kbld/pkg/kbld/util"
 )
 
 type ImageSet struct {

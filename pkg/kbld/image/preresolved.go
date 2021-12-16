@@ -4,7 +4,7 @@
 package image
 
 import (
-	ctlconf "github.com/k14s/kbld/pkg/kbld/config"
+	ctlconf "github.com/vmware-tanzu/carvel-kbld/pkg/kbld/config"
 )
 
 type PreresolvedImage struct {

@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"regexp"
 
-	ctlconf "github.com/k14s/kbld/pkg/kbld/config"
+	ctlconf "github.com/vmware-tanzu/carvel-kbld/pkg/kbld/config"
 )
 
 type Matcher struct {

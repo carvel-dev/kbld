@@ -1,7 +1,7 @@
 os.RemoveAll
-(*github.com/k14s/kbld/pkg/kbld/logger.LoggerPrefixWriter).Write
-(*github.com/k14s/kbld/pkg/kbld/logger.LoggerPrefixWriter).WriteStr
-(github.com/k14s/kbld/pkg/kbld/imagetar.Logger).WriteStr
+(*github.com/vmware-tanzu/carvel-kbld/pkg/kbld/logger.LoggerPrefixWriter).Write
+(*github.com/vmware-tanzu/carvel-kbld/pkg/kbld/logger.LoggerPrefixWriter).WriteStr
+(github.com/vmware-tanzu/carvel-kbld/pkg/kbld/imagetar.Logger).WriteStr
 (io.Closer).Close
 (*archive/tar.Writer).Close
 fmt.Fprintf

@@ -10,9 +10,9 @@ import (
 	"os/exec"
 	"strings"
 
-	ctlbdk "github.com/k14s/kbld/pkg/kbld/builder/docker"
-	"github.com/k14s/kbld/pkg/kbld/config"
-	ctllog "github.com/k14s/kbld/pkg/kbld/logger"
+	ctlbdk "github.com/vmware-tanzu/carvel-kbld/pkg/kbld/builder/docker"
+	"github.com/vmware-tanzu/carvel-kbld/pkg/kbld/config"
+	ctllog "github.com/vmware-tanzu/carvel-kbld/pkg/kbld/logger"
 )
 
 type Ko struct {

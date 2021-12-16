@@ -13,8 +13,8 @@ import (
 	"strings"
 
 	regname "github.com/google/go-containerregistry/pkg/name"
-	ctlb "github.com/k14s/kbld/pkg/kbld/builder"
-	ctllog "github.com/k14s/kbld/pkg/kbld/logger"
+	ctlb "github.com/vmware-tanzu/carvel-kbld/pkg/kbld/builder"
+	ctllog "github.com/vmware-tanzu/carvel-kbld/pkg/kbld/logger"
 )
 
 type Docker struct {

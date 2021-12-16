@@ -10,8 +10,8 @@ import (
 	"os/exec"
 	"regexp"
 
-	ctlbdk "github.com/k14s/kbld/pkg/kbld/builder/docker"
-	ctllog "github.com/k14s/kbld/pkg/kbld/logger"
+	ctlbdk "github.com/vmware-tanzu/carvel-kbld/pkg/kbld/builder/docker"
+	ctllog "github.com/vmware-tanzu/carvel-kbld/pkg/kbld/logger"
 )
 
 var (
