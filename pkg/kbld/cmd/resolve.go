@@ -26,14 +26,15 @@ import (
 type ResolveOptions struct {
 	ui ui.UI
 
-	FileFlags        FileFlags
-	RegistryFlags    RegistryFlags
-	AllowedToBuild   bool
-	BuildConcurrency int
-	ImagesAnnotation bool
-	ImageMapFile     string
-	LockOutput       string
-	ImgpkgLockOutput string
+	FileFlags         FileFlags
+	RegistryFlags     RegistryFlags
+	AllowedToBuild    bool
+	BuildConcurrency  int
+	ImagesAnnotation  bool
+	ImageMapFile      string
+	LockOutput        string
+	ImgpkgLockOutput  string
+	UnresolvedInspect bool
 }
 
 func NewResolveOptions(ui ui.UI) *ResolveOptions {
@@ -54,6 +55,7 @@ func NewResolveCmd(o *ResolveOptions) *cobra.Command {
 	cmd.Flags().StringVar(&o.ImageMapFile, "image-map-file", "", "Set image map file (/cnab/app/relocation-mapping.json in CNAB)")
 	cmd.Flags().StringVar(&o.LockOutput, "lock-output", "", "File path to emit configuration with resolved image references")
 	cmd.Flags().StringVar(&o.ImgpkgLockOutput, "imgpkg-lock-output", "", "File path to emit images lockfile with resolved image references")
+	cmd.Flags().BoolVar(&o.UnresolvedInspect, "unresolved-inspect", false, "List image references found in inputs")
 	return cmd
 }
 
@@ -82,7 +84,21 @@ func (o *ResolveOptions) Run() error {
 	opts := ctlimg.FactoryOpts{Conf: conf, AllowedToBuild: o.AllowedToBuild}
 	imgFactory := ctlimg.NewFactory(opts, registry, logger)
 
-	resolvedImages, err := o.resolveImages(nonConfigRs, conf, imgFactory)
+	imageURLs, err := o.collectImageReferences(nonConfigRs, conf)
+	if err != nil {
+		return err
+	}
+
+	if o.UnresolvedInspect {
+		output, err := imageURLs.Bytes()
+		if err != nil {
+			return err
+		}
+		o.ui.PrintBlock(output)
+		return nil
+	}
+
+	resolvedImages, err := o.resolveImages(imageURLs, imgFactory)
 	if err != nil {
 		return err
 	}
@@ -111,9 +127,8 @@ func (o *ResolveOptions) Run() error {
 	return nil
 }
 
-func (o *ResolveOptions) resolveImages(nonConfigRs []ctlres.Resource,
-	conf ctlconf.Conf, imgFactory ctlimg.Factory) (*ProcessedImages, error) {
-
+func (o *ResolveOptions) collectImageReferences(nonConfigRs []ctlres.Resource,
+	conf ctlconf.Conf) (*UnprocessedImageURLs, error) {
 	imageURLs := NewUnprocessedImageURLs()
 
 	for _, res := range nonConfigRs {
@@ -125,6 +140,10 @@ func (o *ResolveOptions) resolveImages(nonConfigRs []ctlres.Resource,
 		})
 	}
 
+	return imageURLs, nil
+}
+
+func (o *ResolveOptions) resolveImages(imageURLs *UnprocessedImageURLs, imgFactory ctlimg.Factory) (*ProcessedImages, error) {
 	queue := NewImageQueue(imgFactory)
 
 	resolvedImages, err := queue.Run(imageURLs, o.BuildConcurrency)
