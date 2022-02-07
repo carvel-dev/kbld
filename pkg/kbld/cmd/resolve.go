@@ -66,56 +66,9 @@ func (o *ResolveOptions) Run() error {
 	logger := ctllog.NewLogger(os.Stderr)
 	prefixedLogger := logger.NewPrefixedWriter("resolve | ")
 
-	nonConfigRs, conf, err := o.FileFlags.ResourcesAndConfig()
+	resBss, err := o.ResolveResources(&logger, prefixedLogger)
 	if err != nil {
 		return err
-	}
-
-	conf, err = o.withImageMapConf(conf)
-	if err != nil {
-		return err
-	}
-
-	registry, err := ctlreg.NewRegistry(o.RegistryFlags.AsRegistryOpts())
-	if err != nil {
-		return err
-	}
-
-	opts := ctlimg.FactoryOpts{Conf: conf, AllowedToBuild: o.AllowedToBuild}
-	imgFactory := ctlimg.NewFactory(opts, registry, logger)
-
-	imageURLs, err := o.collectImageReferences(nonConfigRs, conf)
-	if err != nil {
-		return err
-	}
-
-	if o.UnresolvedInspect {
-		output, err := imageURLs.Bytes()
-		if err != nil {
-			return err
-		}
-		o.ui.PrintBlock(output)
-		return nil
-	}
-
-	resolvedImages, err := o.resolveImages(imageURLs, imgFactory)
-	if err != nil {
-		return err
-	}
-
-	// Record final image transformation
-	for _, pair := range resolvedImages.All() {
-		prefixedLogger.WriteStr("final: %s -> %s\n", pair.UnprocessedImageURL.URL, pair.Image.URL)
-	}
-
-	err = o.emitLockOutput(conf, resolvedImages)
-	if err != nil {
-		return err
-	}
-
-	resBss, err := o.updateRefsInResources(nonConfigRs, conf, resolvedImages, imgFactory)
-	if err != nil {
-		return fmt.Errorf("Updating resource references: %s", err)
 	}
 
 	// Print all resources as one YAML stream
@@ -125,6 +78,62 @@ func (o *ResolveOptions) Run() error {
 	}
 
 	return nil
+}
+
+func (o *ResolveOptions) ResolveResources(logger *ctllog.Logger, pLogger *ctllog.PrefixWriter) ([][]byte, error) {
+	nonConfigRs, conf, err := o.FileFlags.ResourcesAndConfig()
+	if err != nil {
+		return nil, err
+	}
+
+	conf, err = o.withImageMapConf(conf)
+	if err != nil {
+		return nil, err
+	}
+
+	registry, err := ctlreg.NewRegistry(o.RegistryFlags.AsRegistryOpts())
+	if err != nil {
+		return nil, err
+	}
+
+	opts := ctlimg.FactoryOpts{Conf: conf, AllowedToBuild: o.AllowedToBuild}
+	imgFactory := ctlimg.NewFactory(opts, registry, *logger)
+
+	imageURLs, err := o.collectImageReferences(nonConfigRs, conf)
+	if err != nil {
+		return nil, err
+	}
+
+	if o.UnresolvedInspect {
+		output, err := imageURLs.Bytes()
+		if err != nil {
+			return nil, err
+		}
+		o.ui.PrintBlock(output)
+		return nil, nil
+	}
+
+	resolvedImages, err := o.resolveImages(imageURLs, imgFactory)
+	if err != nil {
+		return nil, err
+	}
+
+	// Record final image transformation
+	for _, pair := range resolvedImages.All() {
+		pLogger.WriteStr("final: %s -> %s\n", pair.UnprocessedImageURL.URL, pair.Image.URL)
+	}
+
+	err = o.emitLockOutput(conf, resolvedImages)
+	if err != nil {
+		return nil, err
+	}
+
+	resBss, err := o.updateRefsInResources(nonConfigRs, conf, resolvedImages, imgFactory)
+	if err != nil {
+		return nil, fmt.Errorf("Updating resource references: %s", err)
+	}
+
+	return resBss, nil
 }
 
 func (o *ResolveOptions) collectImageReferences(nonConfigRs []ctlres.Resource,
