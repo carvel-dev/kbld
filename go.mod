@@ -9,7 +9,7 @@ require (
 	github.com/hashicorp/go-version v1.4.0
 	github.com/kisielk/errcheck v1.6.0
 	github.com/spf13/cobra v1.3.0
-	github.com/vmware-tanzu/carvel-imgpkg v0.24.0
+	github.com/vmware-tanzu/carvel-imgpkg v0.25.0
 	github.com/vmware-tanzu/carvel-vendir v0.24.0
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
 	k8s.io/apimachinery v0.23.4
@@ -51,7 +51,7 @@ require (
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
-	k8s.io/klog/v2 v2.30.0 // indirect
+	k8s.io/klog/v2 v2.40.1 // indirect
 	k8s.io/utils v0.0.0-20211116205334-6203023598ed // indirect
 	sigs.k8s.io/json v0.0.0-20211020170558-c049b76a60c6 // indirect
 	sigs.k8s.io/structured-merge-diff/v4 v4.2.1 // indirect
