@@ -115,7 +115,7 @@ github.com/spf13/pflag
 ## explicit
 github.com/vito/go-interact/interact
 github.com/vito/go-interact/interact/terminal
-# github.com/vmware-tanzu/carvel-imgpkg v0.25.0
+# github.com/vmware-tanzu/carvel-imgpkg v0.27.0
 ## explicit; go 1.17
 github.com/vmware-tanzu/carvel-imgpkg/pkg/imgpkg/lockconfig
 # github.com/vmware-tanzu/carvel-vendir v0.26.0
