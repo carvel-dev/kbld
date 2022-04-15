@@ -138,11 +138,14 @@ func (i BuiltImage) sources() ([]ctlconf.Origin, error) {
 			return nil, err
 		}
 
-		git := ctlconf.OriginGit{SHA: sha}
-
-		git.RemoteURL, err = gitRepo.RemoteURL()
+		unredactedURL, err := gitRepo.RemoteURL()
 		if err != nil {
 			return nil, err
+		}
+
+		git := ctlconf.OriginGit{
+			SHA:       sha,
+			RemoteURL: GitRedactedRemoteURL(unredactedURL),
 		}
 
 		git.Dirty, err = gitRepo.IsDirty()
