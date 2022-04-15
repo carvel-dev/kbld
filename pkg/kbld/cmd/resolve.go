@@ -31,6 +31,7 @@ type ResolveOptions struct {
 	AllowedToBuild    bool
 	BuildConcurrency  int
 	ImagesAnnotation  bool
+	OriginsAnnotation bool
 	ImageMapFile      string
 	LockOutput        string
 	ImgpkgLockOutput  string
@@ -52,6 +53,7 @@ func NewResolveCmd(o *ResolveOptions) *cobra.Command {
 	cmd.Flags().BoolVar(&o.AllowedToBuild, "build", true, "Allow building of images")
 	cmd.Flags().IntVar(&o.BuildConcurrency, "build-concurrency", 4, "Set maximum number of concurrent builds")
 	cmd.Flags().BoolVar(&o.ImagesAnnotation, "images-annotation", true, "Annotate resources with images annotation")
+	cmd.Flags().BoolVar(&o.OriginsAnnotation, "origins-annotation", true, "Include origins annotation")
 	cmd.Flags().StringVar(&o.ImageMapFile, "image-map-file", "", "Set image map file (/cnab/app/relocation-mapping.json in CNAB)")
 	cmd.Flags().StringVar(&o.LockOutput, "lock-output", "", "File path to emit configuration with resolved image references")
 	cmd.Flags().StringVar(&o.ImgpkgLockOutput, "imgpkg-lock-output", "", "File path to emit images lockfile with resolved image references")
@@ -290,7 +292,7 @@ func (o *ResolveOptions) imgpkgLockAnnotations(i ProcessedImageItem) map[string]
 	anns := map[string]string{
 		ctlconf.ImagesLockKbldID: i.UnprocessedImageURL.URL,
 	}
-	if len(i.Origins) > 0 {
+	if o.OriginsAnnotation && len(i.Origins) > 0 {
 		bs, err := yaml.Marshal(i.Origins)
 		if err != nil {
 			return anns
