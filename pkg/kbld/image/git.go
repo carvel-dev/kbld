@@ -94,3 +94,19 @@ func (r GitRepo) runCmd(args []string) (string, string, error) {
 
 	return stdoutBuf.String(), stderrBuf.String(), err
 }
+
+// GitRedactedRemoteURL redacts any user/password information in the URL
+func GitRedactedRemoteURL(url string) string {
+	pieces := strings.SplitN(url, "@", 2)
+	if len(pieces) == 1 {
+		return url
+	}
+	if pieces[0] == "git" {
+		return url
+	}
+	frontPieces := strings.SplitN(pieces[0], "://", 2)
+	if len(frontPieces) > 1 {
+		return strings.Join(append([]string{frontPieces[0] + "://_redacted_"}, pieces[1:]...), "@")
+	}
+	return strings.Join(append([]string{"_redacted_"}, pieces[1:]...), "@")
+}

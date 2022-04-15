@@ -285,3 +285,21 @@ func runCmd(t *testing.T, cmdName string, args []string, dir string) string {
 
 	return stdoutBuf.String()
 }
+
+func TestGitRedactedRemoteURL(t *testing.T) {
+	cases := map[string]string{
+		"http://something@github.com/my-org/my-repo.git":      "http://_redacted_@github.com/my-org/my-repo.git",
+		"https://something@github.com/my-org/my-repo.git":     "https://_redacted_@github.com/my-org/my-repo.git",
+		"https://user:password@github.com/my-org/my-repo.git": "https://_redacted_@github.com/my-org/my-repo.git",
+		"ssh://user@host.xz/path/to/repo.git/":                "ssh://_redacted_@host.xz/path/to/repo.git/",
+		"git@github.com:my-org/my-repo.git":                   "git@github.com:my-org/my-repo.git",
+		"github.com:my-org/my-repo.git":                       "github.com:my-org/my-repo.git",
+		"user@host.xz/path/to/repo.git/":                      "_redacted_@host.xz/path/to/repo.git/",
+	}
+	for input, expected := range cases {
+		actual := ctlimg.GitRedactedRemoteURL(input)
+		if actual != expected {
+			t.Fatalf("Expected '%s' to equal '%s' but was '%s'", input, expected, actual)
+		}
+	}
+}
