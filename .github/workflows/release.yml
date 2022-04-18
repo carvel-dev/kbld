@@ -81,7 +81,9 @@ jobs:
             return `${checksums['kbld-darwin-amd64']}  ./kbld-darwin-amd64
             ${checksums['kbld-darwin-arm64']}  ./kbld-darwin-arm64
             ${checksums['kbld-linux-amd64']}  ./kbld-linux-amd64
-            ${checksums['kbld-windows-amd64.exe']}  ./kbld-windows-amd64.exe`
+            ${checksums['kbld-linux-arm64']}  ./kbld-linux-arm64
+            ${checksums['kbld-windows-amd64.exe']}  ./kbld-windows-amd64.exe
+            ${checksums['kbld-windows-arm64.exe']}  ./kbld-windows-arm64.exe`
 
       - name: verify uploaded artifacts
         if: startsWith(github.ref, 'refs/tags/')
