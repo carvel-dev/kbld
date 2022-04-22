@@ -122,7 +122,7 @@ github.com/vmware-tanzu/carvel-imgpkg/pkg/imgpkg/lockconfig
 ## explicit; go 1.17
 github.com/vmware-tanzu/carvel-vendir/pkg/vendir/versions
 github.com/vmware-tanzu/carvel-vendir/pkg/vendir/versions/v1alpha1
-# golang.org/x/crypto v0.0.0-20211108221036-ceb1ce70b4fa
+# golang.org/x/crypto v0.0.0-20220411220226-7b82a4e95df4
 ## explicit; go 1.17
 golang.org/x/crypto/ssh/terminal
 # golang.org/x/mod v0.5.0
