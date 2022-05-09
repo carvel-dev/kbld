@@ -6,6 +6,6 @@ git --version || (echo "Missing git binary (used by tests)" && exit 1)
 
 go clean -testcache
 
-go test ./pkg/... -test.v $@
+go test ./... -test.v $@
 
 echo UNIT SUCCESS
