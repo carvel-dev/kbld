@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kbld-simple-app-build-and-push-docker-buildx
+spec:
+  selector:
+    matchLabels:
+      app: kbld-simple-app-build-and-push-docker-buildx
+  template:
+    metadata:
+      labels:
+        app: kbld-simple-app-build-and-push-docker-buildx
+    spec:
+      containers:
+      - name: my-app
+        image: simple-app
+---
+apiVersion: kbld.k14s.io/v1alpha1
+kind: Config
+sources:
+- image: simple-app
+  path: test/e2e/assets/simple-app
+  docker:
+    buildx:
+      rawOptions: ["--platform=linux/amd64,linux/arm64,linux/arm/v7"]
+# docker buildx only is able to build multi platform images
+# if destination for registry is specified
+# (single platform images can be built without destination)
+destinations:
+- image: simple-app
+  newImage: docker.io/k14stest/kbld-simple-app2

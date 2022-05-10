@@ -53,13 +53,14 @@ func (f Factory) New(url string) Image {
 		imgDstConf := f.optionalPushConf(url)
 
 		docker := ctlbdk.NewDocker(f.logger)
+		dockerBuildx := ctlbdk.NewDockerBuildx(docker, f.logger)
 		pack := ctlbpk.NewPack(docker, f.logger)
 		kubectlBuildkit := ctlbkb.NewKubectlBuildkit(f.logger)
 		ko := ctlbko.NewKo(f.logger)
 		bazel := ctlbbz.NewBazel(docker, f.logger)
 
 		builtImg := NewBuiltImage(url, srcConf, imgDstConf,
-			docker, pack, kubectlBuildkit, ko, bazel)
+			docker, dockerBuildx, pack, kubectlBuildkit, ko, bazel)
 
 		if imgDstConf != nil {
 			return NewTaggedImage(builtImg, *imgDstConf, f.registry)
