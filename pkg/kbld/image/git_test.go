@@ -79,8 +79,8 @@ func TestGitRepoValidNotOnBranch(t *testing.T) {
 	defer os.RemoveAll(dir)
 
 	runCmd(t, "git", []string{"init", "."}, dir)
-	runCmd(t, "git", []string{"commit", "-am", "msg1", "--allow-empty"}, dir)
-	runCmd(t, "git", []string{"commit", "-am", "msg2", "--allow-empty"}, dir)
+	runCmd(t, "git", []string{"commit", "--no-gpg-sign", "-am", "msg1", "--allow-empty"}, dir)
+	runCmd(t, "git", []string{"commit", "--no-gpg-sign", "-am", "msg2", "--allow-empty"}, dir)
 	runCmd(t, "git", []string{"checkout", "HEAD~1"}, dir)
 
 	gitRepo := ctlimg.NewGitRepo(dir)
@@ -114,7 +114,7 @@ func TestGitRepoValidSubDir(t *testing.T) {
 	defer os.RemoveAll(dir)
 
 	runCmd(t, "git", []string{"init", "."}, dir)
-	runCmd(t, "git", []string{"commit", "-am", "msg1", "--allow-empty"}, dir)
+	runCmd(t, "git", []string{"commit", "--no-gpg-sign", "-am", "msg1", "--allow-empty"}, dir)
 
 	subDir := filepath.Join(dir, "sub-dir")
 	err = os.Mkdir(subDir, os.ModePerm)
@@ -225,7 +225,7 @@ func TestGitRepoHeadSHA(t *testing.T) {
 		t.Fatalf("Expected sha to be unknown")
 	}
 
-	runCmd(t, "git", []string{"commit", "-am", "msg1", "--allow-empty"}, dir)
+	runCmd(t, "git", []string{"commit", "--no-gpg-sign", "-am", "msg1", "--allow-empty"}, dir)
 	expectedSHAShort := runCmd(t, "git", []string{"log", "-1", "--oneline"}, dir)[0:7]
 
 	sha, err = gitRepo.HeadSHA()
@@ -246,7 +246,7 @@ func TestGitRepoIsDirty(t *testing.T) {
 	defer os.RemoveAll(dir)
 
 	runCmd(t, "git", []string{"init", "."}, dir)
-	runCmd(t, "git", []string{"commit", "-am", "msg1", "--allow-empty"}, dir)
+	runCmd(t, "git", []string{"commit", "--no-gpg-sign", "-am", "msg1", "--allow-empty"}, dir)
 
 	gitRepo := ctlimg.NewGitRepo(dir)
 
