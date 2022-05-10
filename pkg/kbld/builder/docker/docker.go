@@ -1,7 +1,7 @@
 // Copyright 2020 VMware, Inc.
 // SPDX-License-Identifier: Apache-2.0
 
-package image
+package docker
 
 import (
 	"bytes"
@@ -116,7 +116,7 @@ func (d Docker) Build(image, directory string, opts DockerBuildOpts) (DockerTmpR
 		}
 	}
 
-	inspectData, err := d.inspect(tmpRef.AsString())
+	inspectData, err := d.Inspect(tmpRef.AsString())
 	if err != nil {
 		prefixedLogger.Write([]byte(fmt.Sprintf("inspect error: %s\n", err)))
 		return DockerTmpRef{}, err
@@ -200,7 +200,7 @@ func (d Docker) Push(tmpRef DockerTmpRef, imageDst string) (DockerImageDigest, e
 	prefixedLogger.Write([]byte(fmt.Sprintf("starting push (using Docker): %s -> %s\n", tmpRef.AsString(), imageDst)))
 	defer prefixedLogger.Write([]byte("finished push (using Docker)\n"))
 
-	prevInspectData, err := d.inspect(tmpRef.AsString())
+	prevInspectData, err := d.Inspect(tmpRef.AsString())
 	if err != nil {
 		prefixedLogger.Write([]byte(fmt.Sprintf("inspect error: %s\n", err)))
 		return DockerImageDigest{}, err
@@ -234,7 +234,7 @@ func (d Docker) Push(tmpRef DockerTmpRef, imageDst string) (DockerImageDigest, e
 		}
 	}
 
-	currInspectData, err := d.inspect(imageDst)
+	currInspectData, err := d.Inspect(imageDst)
 	if err != nil {
 		prefixedLogger.Write([]byte(fmt.Sprintf("inspect error: %s\n", err)))
 		return DockerImageDigest{}, err
@@ -301,7 +301,7 @@ type dockerInspectData struct {
 	RepoDigests []string
 }
 
-func (d Docker) inspect(ref string) (dockerInspectData, error) {
+func (d Docker) Inspect(ref string) (dockerInspectData, error) {
 	var stdoutBuf, stderrBuf bytes.Buffer
 
 	cmd := exec.Command("docker", "inspect", ref)

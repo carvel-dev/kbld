@@ -4,7 +4,8 @@
 package config
 
 type SourceDockerOpts struct {
-	Build SourceDockerBuildOpts
+	Build  SourceDockerBuildOpts
+	Buildx *SourceDockerBuildxOpts
 }
 
 type SourceDockerBuildOpts struct {
@@ -13,5 +14,13 @@ type SourceDockerBuildOpts struct {
 	NoCache    *bool `json:"noCache"`
 	File       *string
 	Buildkit   *bool
+	RawOptions *[]string `json:"rawOptions"`
+}
+
+type SourceDockerBuildxOpts struct {
+	Target     *string
+	Pull       *bool
+	NoCache    *bool `json:"noCache"`
+	File       *string
 	RawOptions *[]string `json:"rawOptions"`
 }
