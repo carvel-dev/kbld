@@ -7,7 +7,7 @@ VERSION="${1:-$LATEST_GIT_TAG}"
 
 # makes builds reproducible
 export CGO_ENABLED=0
-LDFLAGS="-X github.com/vmware-tanzu/carvel-kbld/pkg/kbld/version.Version=$VERSION -buildid="
+LDFLAGS="-X github.com/vmware-tanzu/carvel-kbld/pkg/kbld/version.Version=$VERSION"
 
 go fmt ./cmd/... ./pkg/... ./test/...
 go mod vendor
