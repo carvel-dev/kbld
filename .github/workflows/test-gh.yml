@@ -29,6 +29,8 @@ jobs:
       with:
         path: src/github.com/${{ github.repository }}
         fetch-depth: 0
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
     - name: Run Tests
       env:
         DOCKERHUB_USERNAME: k8slt
