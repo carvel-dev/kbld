@@ -17,7 +17,6 @@ on:
 jobs:
   test-all:
     name: Test GH
-    runs-on: macos-10.15
     environment: DockerHub E2E
     steps:
     - name: Set up Go 1.x
@@ -29,8 +28,6 @@ jobs:
       with:
         path: src/github.com/${{ github.repository }}
         fetch-depth: 0
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v2
     - name: Run Tests
       env:
         DOCKERHUB_USERNAME: k8slt
