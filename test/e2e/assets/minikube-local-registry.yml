@@ -1,3 +1,5 @@
+#@ load("@ytt:data", "data")
+
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -40,12 +42,19 @@ spec:
     ports:
     - containerPort: 5000
     volumeMounts:
-    - mountPath: /etc/docker/registry
-      name: config
+    - name: config
+      mountPath: /etc/docker/registry
+      readOnly: true
+    - name: tls-cert
+      mountPath: /etc/docker/registry-tls
+      readOnly: true
   volumes:
   - name: config
     configMap:
       name: registry-config
+  - name: tls-cert
+    secret:
+      secretName: registry-tls-cert
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -69,15 +78,35 @@ data:
       addr: :5000
       headers:
         X-Content-Type-Options: [nosniff]
+      tls:
+        certificate: /etc/docker/registry-tls/crt.pem
+        key: /etc/docker/registry-tls/key.pem
     health:
       storagedriver:
         enabled: true
         interval: 10s
         threshold: 3
-
     # Custom: allows for foreign layers to be allowed in
     validation:
       manifests:
         urls:
           allow:
             - ^https?://
+---
+apiVersion: secretgen.k14s.io/v1alpha1
+kind: Certificate
+metadata:
+  name: registry-ca-cert
+spec:
+  isCA: true
+---
+apiVersion: secretgen.k14s.io/v1alpha1
+kind: Certificate
+metadata:
+  name: registry-tls-cert
+spec:
+  caRef:
+    name: registry-ca-cert
+  alternativeNames:
+  - unused-domain.com #! non-ip domain to make generation happy
+  - #@ data.values.registry_alt_name

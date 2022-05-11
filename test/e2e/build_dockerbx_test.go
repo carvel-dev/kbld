@@ -13,7 +13,7 @@ import (
 
 func TestDockerBuildxBuildSuccessful(t *testing.T) {
 	env := BuildEnv(t)
-	kbld := Kbld{t, env.Namespace, env.KbldBinaryPath, Logger{}}
+	kbld := Kbld{t, env.KbldBinaryPath, Logger{}}
 
 	input := env.WithRegistries(`
 kind: Object
@@ -56,7 +56,7 @@ spec:
 
 func TestDockerBuildxBuildAndPushSuccessful(t *testing.T) {
 	env := BuildEnv(t)
-	kbld := Kbld{t, env.Namespace, env.KbldBinaryPath, Logger{}}
+	kbld := Kbld{t, env.KbldBinaryPath, Logger{}}
 
 	input := env.WithRegistries(`
 kind: Object

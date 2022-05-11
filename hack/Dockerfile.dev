@@ -3,6 +3,10 @@ FROM golang:1.18
 RUN apt-get update -y
 RUN apt-get install wget docker.io apt-transport-https ca-certificates gnupg python -y
 
+RUN mkdir -p ~/.docker/cli-plugins/
+RUN wget -O- https://github.com/docker/buildx/releases/download/v0.8.2/buildx-v0.8.2.linux-amd64 > ~/.docker/cli-plugins/docker-buildx
+RUN chmod +x ~/.docker/cli-plugins/docker-buildx
+
 RUN wget https://github.com/buildpacks/pack/releases/download/v0.8.1/pack-v0.8.1-linux.tgz
 RUN tar -C /usr/local/bin/ -xvf pack-v0.8.1-linux.tgz
 
@@ -18,6 +22,10 @@ RUN chmod +x /usr/local/bin/bazel-4.2.0-linux-x86_64 && /usr/local/bin/bazel-4.2
 RUN wget "https://github.com/vmware-tanzu/carvel-kapp/releases/download/v0.48.0/kapp-linux-amd64" -P /usr/local/bin/
 RUN chmod +x /usr/local/bin/kapp-linux-amd64
 RUN mv /usr/local/bin/kapp-linux-amd64 /usr/local/bin/kapp
+
+RUN wget "https://github.com/vmware-tanzu/carvel-ytt/releases/download/v0.41.1/ytt-linux-amd64" -P /usr/local/bin/
+RUN chmod +x /usr/local/bin/ytt-linux-amd64
+RUN mv /usr/local/bin/ytt-linux-amd64 /usr/local/bin/ytt
 
 RUN echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
 RUN curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key --keyring /usr/share/keyrings/cloud.google.gpg add -
