@@ -14,7 +14,7 @@ go mod tidy
 
 # makes builds reproducible
 export CGO_ENABLED=0
-LDFLAGS="-X github.com/vmware-tanzu/carvel-kbld/pkg/kbld/version.Version=$VERSION -buildid="
+LDFLAGS="-X github.com/vmware-tanzu/carvel-kbld/pkg/kbld/version.Version=$VERSION"
 
 GOOS=darwin GOARCH=amd64 go build -ldflags="$LDFLAGS" -trimpath -o kbld-darwin-amd64 ./cmd/kbld/...
 GOOS=darwin GOARCH=arm64 go build -ldflags="$LDFLAGS" -trimpath -o kbld-darwin-arm64 ./cmd/kbld/...
