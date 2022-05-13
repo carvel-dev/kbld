@@ -29,6 +29,11 @@ jobs:
       with:
         path: src/github.com/${{ github.repository }}
         fetch-depth: 0
+    - name: Install Carvel Tools
+      uses: vmware-tanzu/carvel-setup-action@v1
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        only: ytt, kapp
     - name: Run Tests
       env:
         DOCKERHUB_USERNAME: k8slt
@@ -36,23 +41,10 @@ jobs:
       run: |
         set -e -x
 
-        mkdir -p ~/.docker/machine/cache
-        wget -O- -nv https://github.com/boot2docker/boot2docker/releases/download/v19.03.12/boot2docker.iso > ~/.docker/machine/cache/boot2docker.iso
+        minikube start --driver=docker --wait=all
+        eval $(minikube docker-env --shell=bash)
 
-        brew install docker docker-machine
-
-        # Install ytt, kapp for build and tests
-        mkdir -p /tmp/bin
-        export PATH=/tmp/bin:$PATH
-
-        wget -O- -nv https://k14s.io/install.sh | K14SIO_INSTALL_BIN_DIR=/tmp/bin bash
-
-        #wget -O- -nv https://github.com/kubernetes/minikube/releases/latest/download/minikube-linux-amd64 > /tmp/bin/minikube
-        #chmod +x /tmp/bin/minikube
-        #minikube start --driver=virtualbox --insecure-registry=192.168.0.0/16 --host-only-cidr "192.168.59.1/24"
-
-        # for docker buildx builder
-        docker buildx create --use
+        docker buildx create --use --driver=kubernetes
 
         # when this workflow runs of a pull request based on a fork, secrets are unavailable
         # https://docs.github.com/en/actions/reference/encrypted-secrets#using-encrypted-secrets-in-a-workflow
