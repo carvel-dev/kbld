@@ -65,8 +65,8 @@ jobs:
         #   echo "No DockerHub Access Token set; skipping Docker authentication. There may be rate limit errors."
         # fi
 
-        # Ensure that there is no existing kbld installed
-        rm -f /tmp/bin/kbld
+        mkdir -p /tmp/bin
+        export PATH=/tmp/bin:$PATH
 
         wget -O- -nv https://github.com/vmware-tanzu/buildkit-cli-for-kubectl/releases/download/v0.1.0/linux-refs.tags.v0.1.0.tgz > /tmp/kb-cli.tgz
         tar xzvf /tmp/kb-cli.tgz -C /tmp/bin
