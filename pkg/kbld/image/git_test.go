@@ -24,8 +24,6 @@ func TestMain(m *testing.M) {
 		log.Fatalf("err creating tmpDir: %v", err)
 	}
 	defer os.RemoveAll(tmpDir)
-	os.Setenv("GIT_CONFIG_GLOBAL", tmpDir)
-	os.Setenv("GIT_CONFIG_SYSTEM", tmpDir)
 	os.Setenv("HOME", tmpDir)
 	os.Setenv("XDG_CONFIG_HOME", tmpDir)
 	gitConfig, err := os.Create(path.Join(tmpDir, ".gitconfig"))
