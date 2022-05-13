@@ -23,7 +23,7 @@ func NewKo(logger ctllog.Logger) Ko {
 	return Ko{logger: logger}
 }
 
-func (k *Ko) Build(image, directory string, opts config.SourceKoBuildOpts) (ctlbdk.DockerTmpRef, error) {
+func (k *Ko) Build(image, directory string, opts config.SourceKoBuildOpts) (ctlbdk.TmpRef, error) {
 	prefixedLogger := k.logger.NewPrefixedWriter(image + " | ")
 
 	prefixedLogger.Write([]byte(fmt.Sprintf("starting build (using ko): %s\n", directory)))
@@ -45,8 +45,8 @@ func (k *Ko) Build(image, directory string, opts config.SourceKoBuildOpts) (ctlb
 	err := cmd.Run()
 	if err != nil {
 		prefixedLogger.Write([]byte(fmt.Sprintf("error: %s\n", err)))
-		return ctlbdk.DockerTmpRef{}, err
+		return ctlbdk.TmpRef{}, err
 	}
 
-	return ctlbdk.NewDockerTmpRef(strings.Trim(stdoutBuf.String(), "\n")), nil
+	return ctlbdk.NewTmpRef(strings.Trim(stdoutBuf.String(), "\n")), nil
 }

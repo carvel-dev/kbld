@@ -21,7 +21,7 @@ type Docker struct {
 	logger ctllog.Logger
 }
 
-type DockerBuildOpts struct {
+type BuildOpts struct {
 	// https://docs.docker.com/engine/reference/commandline/build/
 	Target     *string
 	Pull       *bool
@@ -31,40 +31,40 @@ type DockerBuildOpts struct {
 	RawOptions *[]string
 }
 
-type DockerTmpRef struct {
+type TmpRef struct {
 	val string
 }
 
-func NewDockerTmpRef(val string) DockerTmpRef {
-	return DockerTmpRef{val}
+func NewTmpRef(val string) TmpRef {
+	return TmpRef{val}
 }
 
-func (r DockerTmpRef) AsString() string { return r.val }
+func (r TmpRef) AsString() string { return r.val }
 
-type DockerImageDigest struct {
+type ImageDigest struct {
 	val string
 }
 
-func (r DockerImageDigest) AsString() string { return r.val }
+func (r ImageDigest) AsString() string { return r.val }
 
-func NewDocker(logger ctllog.Logger) Docker {
+func New(logger ctllog.Logger) Docker {
 	return Docker{logger}
 }
 
-func (d Docker) Build(image, directory string, opts DockerBuildOpts) (DockerTmpRef, error) {
+func (d Docker) Build(image, directory string, opts BuildOpts) (TmpRef, error) {
 	err := d.ensureDirectory(directory)
 	if err != nil {
-		return DockerTmpRef{}, err
+		return TmpRef{}, err
 	}
 
 	tb := ctlb.TagBuilder{}
 
 	randPrefix50, err := tb.RandomStr50()
 	if err != nil {
-		return DockerTmpRef{}, fmt.Errorf("Generating tmp image suffix: %s", err)
+		return TmpRef{}, fmt.Errorf("Generating tmp image suffix: %s", err)
 	}
 
-	tmpRef := DockerTmpRef{"kbld:" + tb.CheckTagLen128(fmt.Sprintf(
+	tmpRef := TmpRef{"kbld:" + tb.CheckTagLen128(fmt.Sprintf(
 		"%s-%s",
 		randPrefix50,
 		tb.TrimStr(tb.CleanStr(image), 50),
@@ -112,28 +112,28 @@ func (d Docker) Build(image, directory string, opts DockerBuildOpts) (DockerTmpR
 		err := cmd.Run()
 		if err != nil {
 			prefixedLogger.Write([]byte(fmt.Sprintf("error: %s\n", err)))
-			return DockerTmpRef{}, err
+			return TmpRef{}, err
 		}
 	}
 
 	inspectData, err := d.Inspect(tmpRef.AsString())
 	if err != nil {
 		prefixedLogger.Write([]byte(fmt.Sprintf("inspect error: %s\n", err)))
-		return DockerTmpRef{}, err
+		return TmpRef{}, err
 	}
 
 	return d.RetagStable(tmpRef, image, inspectData.ID, prefixedLogger)
 }
 
-func (d Docker) RetagStable(tmpRef DockerTmpRef, image, imageID string,
-	prefixedLogger *ctllog.PrefixWriter) (DockerTmpRef, error) {
+func (d Docker) RetagStable(tmpRef TmpRef, image, imageID string,
+	prefixedLogger *ctllog.PrefixWriter) (TmpRef, error) {
 
 	tb := ctlb.TagBuilder{}
 
 	// Retag image with its sha256 to produce exact image ref if nothing has changed.
 	// Seems that Docker doesn't like `kbld@sha256:...` format for local images.
 	// Image hint at the beginning for easier sorting.
-	stableTmpRef := DockerTmpRef{"kbld:" + tb.CheckTagLen128(fmt.Sprintf(
+	stableTmpRef := TmpRef{"kbld:" + tb.CheckTagLen128(fmt.Sprintf(
 		"%s-%s",
 		tb.TrimStr(tb.CleanStr(image), 50),
 		tb.CheckLen(tb.CleanStr(imageID), 72),
@@ -149,7 +149,7 @@ func (d Docker) RetagStable(tmpRef DockerTmpRef, image, imageID string,
 		err := cmd.Run()
 		if err != nil {
 			prefixedLogger.Write([]byte(fmt.Sprintf("tag error: %s\n", err)))
-			return DockerTmpRef{}, err
+			return TmpRef{}, err
 		}
 	}
 
@@ -165,14 +165,14 @@ func (d Docker) RetagStable(tmpRef DockerTmpRef, image, imageID string,
 		err := cmd.Run()
 		if err != nil {
 			prefixedLogger.Write([]byte(fmt.Sprintf("untag error: %s\n", err)))
-			return DockerTmpRef{}, err
+			return TmpRef{}, err
 		}
 	}
 
 	return stableTmpRef, nil
 }
 
-func (d Docker) Push(tmpRef DockerTmpRef, imageDst string) (DockerImageDigest, error) {
+func (d Docker) Push(tmpRef TmpRef, imageDst string) (ImageDigest, error) {
 	prefixedLogger := d.logger.NewPrefixedWriter(imageDst + " | ")
 
 	tb := ctlb.TagBuilder{}
@@ -184,14 +184,14 @@ func (d Docker) Push(tmpRef DockerTmpRef, imageDst string) (DockerImageDigest, e
 	if err == nil {
 		randSuffix, err := tb.RandomStr50()
 		if err != nil {
-			return DockerImageDigest{}, fmt.Errorf("Generating image dst suffix: %s", err)
+			return ImageDigest{}, fmt.Errorf("Generating image dst suffix: %s", err)
 		}
 
 		imageDstTag := fmt.Sprintf("kbld-%s", randSuffix)
 
 		imageDstTagged, err = regname.NewTag(imageDst+":"+imageDstTag, regname.WeakValidation)
 		if err != nil {
-			return DockerImageDigest{}, fmt.Errorf("Generating image dst tag '%s': %s", imageDst, err)
+			return ImageDigest{}, fmt.Errorf("Generating image dst tag '%s': %s", imageDst, err)
 		}
 	}
 
@@ -203,7 +203,7 @@ func (d Docker) Push(tmpRef DockerTmpRef, imageDst string) (DockerImageDigest, e
 	prevInspectData, err := d.Inspect(tmpRef.AsString())
 	if err != nil {
 		prefixedLogger.Write([]byte(fmt.Sprintf("inspect error: %s\n", err)))
-		return DockerImageDigest{}, err
+		return ImageDigest{}, err
 	}
 
 	{
@@ -216,7 +216,7 @@ func (d Docker) Push(tmpRef DockerTmpRef, imageDst string) (DockerImageDigest, e
 		err := cmd.Run()
 		if err != nil {
 			prefixedLogger.Write([]byte(fmt.Sprintf("tag error: %s\n", err)))
-			return DockerImageDigest{}, err
+			return ImageDigest{}, err
 		}
 	}
 
@@ -230,14 +230,14 @@ func (d Docker) Push(tmpRef DockerTmpRef, imageDst string) (DockerImageDigest, e
 		err := cmd.Run()
 		if err != nil {
 			prefixedLogger.Write([]byte(fmt.Sprintf("push error: %s\n", err)))
-			return DockerImageDigest{}, err
+			return ImageDigest{}, err
 		}
 	}
 
 	currInspectData, err := d.Inspect(imageDst)
 	if err != nil {
 		prefixedLogger.Write([]byte(fmt.Sprintf("inspect error: %s\n", err)))
-		return DockerImageDigest{}, err
+		return ImageDigest{}, err
 	}
 
 	// Try to detect if image we should be pushing isnt the one we ended up pushing
@@ -245,7 +245,7 @@ func (d Docker) Push(tmpRef DockerTmpRef, imageDst string) (DockerImageDigest, e
 	// may have retagged in the middle of the process.
 	if prevInspectData.ID != currInspectData.ID {
 		prefixedLogger.Write([]byte(fmt.Sprintf("push race error: %s\n", err)))
-		return DockerImageDigest{}, err
+		return ImageDigest{}, err
 	}
 
 	return d.determineRepoDigest(currInspectData, prefixedLogger)
@@ -266,12 +266,12 @@ func (d Docker) ensureDirectory(directory string) error {
 	return nil
 }
 
-func (d Docker) determineRepoDigest(inspectData dockerInspectData,
-	prefixedLogger *ctllog.PrefixWriter) (DockerImageDigest, error) {
+func (d Docker) determineRepoDigest(inspectData InspectData,
+	prefixedLogger *ctllog.PrefixWriter) (ImageDigest, error) {
 
 	if len(inspectData.RepoDigests) == 0 {
 		prefixedLogger.Write([]byte("missing repo digest\n"))
-		return DockerImageDigest{}, fmt.Errorf("Expected to find at least one repo digest")
+		return ImageDigest{}, fmt.Errorf("Expected to find at least one repo digest")
 	}
 
 	digestStrs := map[string]struct{}{}
@@ -279,29 +279,29 @@ func (d Docker) determineRepoDigest(inspectData dockerInspectData,
 	for _, rd := range inspectData.RepoDigests {
 		nameWithDigest, err := regname.NewDigest(rd, regname.WeakValidation)
 		if err != nil {
-			return DockerImageDigest{}, fmt.Errorf("Extracting reference digest from '%s': %s", rd, err)
+			return ImageDigest{}, fmt.Errorf("Extracting reference digest from '%s': %s", rd, err)
 		}
 		digestStrs[nameWithDigest.DigestStr()] = struct{}{}
 	}
 
 	if len(digestStrs) != 1 {
 		prefixedLogger.Write([]byte("repo digests mismatch\n"))
-		return DockerImageDigest{}, fmt.Errorf("Expected to find same repo digest, but found %#v", inspectData.RepoDigests)
+		return ImageDigest{}, fmt.Errorf("Expected to find same repo digest, but found %#v", inspectData.RepoDigests)
 	}
 
 	for digest := range digestStrs {
-		return DockerImageDigest{digest}, nil
+		return ImageDigest{digest}, nil
 	}
 
 	panic("unreachable")
 }
 
-type dockerInspectData struct {
+type InspectData struct {
 	ID          string
 	RepoDigests []string
 }
 
-func (d Docker) Inspect(ref string) (dockerInspectData, error) {
+func (d Docker) Inspect(ref string) (InspectData, error) {
 	var stdoutBuf, stderrBuf bytes.Buffer
 
 	cmd := exec.Command("docker", "inspect", ref)
@@ -310,18 +310,18 @@ func (d Docker) Inspect(ref string) (dockerInspectData, error) {
 
 	err := cmd.Run()
 	if err != nil {
-		return dockerInspectData{}, err
+		return InspectData{}, err
 	}
 
-	var data []dockerInspectData
+	var data []InspectData
 
 	err = json.Unmarshal(stdoutBuf.Bytes(), &data)
 	if err != nil {
-		return dockerInspectData{}, err
+		return InspectData{}, err
 	}
 
 	if len(data) != 1 {
-		return dockerInspectData{}, fmt.Errorf("Expected to find exactly one image, but found %d", len(data))
+		return InspectData{}, fmt.Errorf("Expected to find exactly one image, but found %d", len(data))
 	}
 
 	return data[0], nil
