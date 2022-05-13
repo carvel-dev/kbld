@@ -6,7 +6,6 @@
 package e2e
 
 import (
-	"fmt"
 	"regexp"
 	"strings"
 	"testing"
