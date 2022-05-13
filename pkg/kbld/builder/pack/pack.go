@@ -39,7 +39,7 @@ func NewPack(docker ctlbdk.Docker, logger ctllog.Logger) Pack {
 	return Pack{docker, logger}
 }
 
-func (d Pack) Build(image, directory string, opts PackBuildOpts) (ctlbdk.DockerTmpRef, error) {
+func (d Pack) Build(image, directory string, opts PackBuildOpts) (ctlbdk.TmpRef, error) {
 	prefixedLogger := d.logger.NewPrefixedWriter(image + " | ")
 
 	prefixedLogger.Write([]byte(fmt.Sprintf("starting build (using pack): %s\n", directory)))
@@ -54,7 +54,7 @@ func (d Pack) Build(image, directory string, opts PackBuildOpts) (ctlbdk.DockerT
 		cmdArgs := []string{"build", "--verbose", image, "--path", "."}
 
 		if opts.Builder == nil {
-			return ctlbdk.DockerTmpRef{}, fmt.Errorf("Expected builder to be specified, but was not")
+			return ctlbdk.TmpRef{}, fmt.Errorf("Expected builder to be specified, but was not")
 		}
 		cmdArgs = append(cmdArgs, "--builder", *opts.Builder)
 
@@ -78,20 +78,20 @@ func (d Pack) Build(image, directory string, opts PackBuildOpts) (ctlbdk.DockerT
 		err := cmd.Run()
 		if err != nil {
 			prefixedLogger.Write([]byte(fmt.Sprintf("error: %s\n", err)))
-			return ctlbdk.DockerTmpRef{}, err
+			return ctlbdk.TmpRef{}, err
 		}
 
 		matches := packImageID.FindStringSubmatch(stdoutBuf.String())
 		if len(matches) != 3 {
-			return ctlbdk.DockerTmpRef{}, fmt.Errorf("Expected to find image ID in pack output but did not")
+			return ctlbdk.TmpRef{}, fmt.Errorf("Expected to find image ID in pack output but did not")
 		}
 
 		imageID = "sha256:" + matches[2]
 	}
 
-	return d.docker.RetagStable(ctlbdk.NewDockerTmpRef(imageID), image, imageID, prefixedLogger)
+	return d.docker.RetagStable(ctlbdk.NewTmpRef(imageID), image, imageID, prefixedLogger)
 }
 
-func (d Pack) Push(tmpRef ctlbdk.DockerTmpRef, imageDst string) (ctlbdk.DockerImageDigest, error) {
+func (d Pack) Push(tmpRef ctlbdk.TmpRef, imageDst string) (ctlbdk.ImageDigest, error) {
 	return d.docker.Push(tmpRef, imageDst)
 }

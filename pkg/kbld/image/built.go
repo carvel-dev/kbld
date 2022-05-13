@@ -20,7 +20,7 @@ type BuiltImage struct {
 	imgDst      *ctlconf.ImageDestination
 
 	docker          ctlbdk.Docker
-	dockerBuildx    ctlbdk.DockerBuildx
+	dockerBuildx    ctlbdk.Buildx
 	pack            ctlbpk.Pack
 	kubectlBuildkit ctlbkb.KubectlBuildkit
 	ko              ctlbko.Ko
@@ -28,7 +28,7 @@ type BuiltImage struct {
 }
 
 func NewBuiltImage(url string, buildSource ctlconf.Source, imgDst *ctlconf.ImageDestination,
-	docker ctlbdk.Docker, dockerBuildx ctlbdk.DockerBuildx, pack ctlbpk.Pack,
+	docker ctlbdk.Docker, dockerBuildx ctlbdk.Buildx, pack ctlbpk.Pack,
 	kubectlBuildkit ctlbkb.KubectlBuildkit, ko ctlbko.Ko, bazel ctlbbz.Bazel) BuiltImage {
 
 	return BuiltImage{url, buildSource, imgDst, docker, dockerBuildx, pack, kubectlBuildkit, ko, bazel}
@@ -90,7 +90,7 @@ func (i BuiltImage) URL() (string, []ctlconf.Origin, error) {
 			i.buildSource.Docker = &ctlconf.SourceDockerOpts{}
 		}
 
-		opts := ctlbdk.DockerBuildOpts{
+		opts := ctlbdk.BuildOpts{
 			Target:     i.buildSource.Docker.Build.Target,
 			Pull:       i.buildSource.Docker.Build.Pull,
 			NoCache:    i.buildSource.Docker.Build.NoCache,
@@ -108,7 +108,7 @@ func (i BuiltImage) URL() (string, []ctlconf.Origin, error) {
 	}
 }
 
-func (i BuiltImage) optionalPushWithDocker(dockerTmpRef ctlbdk.DockerTmpRef, origins []ctlconf.Origin) (string, []ctlconf.Origin, error) {
+func (i BuiltImage) optionalPushWithDocker(dockerTmpRef ctlbdk.TmpRef, origins []ctlconf.Origin) (string, []ctlconf.Origin, error) {
 	if i.imgDst != nil {
 		digest, err := i.docker.Push(dockerTmpRef, i.imgDst.NewImage)
 		if err != nil {

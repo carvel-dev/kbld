@@ -79,18 +79,18 @@ var (
 	dockerBuildxPushErr    = "does not currently support exporting manifest lists"
 )
 
-type DockerBuildx struct {
+type Buildx struct {
 	docker Docker
 	logger ctllog.Logger
 }
 
-func NewDockerBuildx(docker Docker, logger ctllog.Logger) DockerBuildx {
-	return DockerBuildx{docker, logger}
+func NewBuildx(docker Docker, logger ctllog.Logger) Buildx {
+	return Buildx{docker, logger}
 }
 
 // BuildAndOptionallyPush either loads built image into Docker daemon
 // or pushes it to specified registry.
-func (d DockerBuildx) BuildAndOptionallyPush(
+func (d Buildx) BuildAndOptionallyPush(
 	image, directory string, imgDst *ctlconf.ImageDestination,
 	opts ctlconf.SourceDockerBuildxOpts) (string, error) {
 
@@ -179,7 +179,7 @@ func (d DockerBuildx) BuildAndOptionallyPush(
 		return "", err
 	}
 
-	tmpRef, err := d.docker.RetagStable(DockerTmpRef{tagRef}, image, inspectData.ID, prefixedLogger)
+	tmpRef, err := d.docker.RetagStable(TmpRef{tagRef}, image, inspectData.ID, prefixedLogger)
 	if err != nil {
 		return "", err
 	}
@@ -187,7 +187,7 @@ func (d DockerBuildx) BuildAndOptionallyPush(
 	return tmpRef.AsString(), nil
 }
 
-func (d DockerBuildx) tagRef(image string, imgDst *ctlconf.ImageDestination) (string, error) {
+func (d Buildx) tagRef(image string, imgDst *ctlconf.ImageDestination) (string, error) {
 	tb := ctlb.TagBuilder{}
 
 	randPrefix50, err := tb.RandomStr50()
@@ -215,7 +215,7 @@ func (d DockerBuildx) tagRef(image string, imgDst *ctlconf.ImageDestination) (st
 	return "kbld:" + tag, nil
 }
 
-func (d DockerBuildx) ensureDirectory(directory string) error {
+func (d Buildx) ensureDirectory(directory string) error {
 	stat, err := os.Stat(directory)
 	if err != nil {
 		return fmt.Errorf("Checking if path '%s' is a directory: %s", directory, err)
