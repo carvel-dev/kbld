@@ -22,15 +22,9 @@ if [ ! -z "$GITHUB_RUN_ID" ]; then
   sudo mkdir -p /etc/docker/certs.d/${KBLD_E2E_DOCKERHUB_HOSTNAME}
   sudo cp registry-ca-cert.crt /etc/docker/certs.d/${KBLD_E2E_DOCKERHUB_HOSTNAME}/ca.crt
 
-  # Buildkit needs to talk to above registry however
-  # it does not seem to properly auto-copy CA certificates
-  # so disable certificate verification
-  cat <<EOF >buildkitd.toml
-[registry."${KBLD_E2E_DOCKERHUB_HOSTNAME}"]
-  insecure = true
-EOF
+  sudo systemctl restart docker
   # Need to bootstrap to avoid race conditions to boot
-  docker buildx create minikube --use --driver=kubernetes --bootstrap --config buildkitd.toml
+  docker buildx create minikube --use --driver=kubernetes --bootstrap
 fi
 
 ./hack/test-all.sh $@
