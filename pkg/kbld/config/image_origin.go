@@ -37,7 +37,6 @@ type OriginTagged struct {
 
 type OriginPreresolved struct {
 	URL string `json:"url"`
-	Tag string `json:"tag,omitempty"`
 }
 
 func NewOriginsFromString(str string) ([]Origin, error) {
