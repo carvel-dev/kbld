@@ -3,7 +3,7 @@
 set -e -x -u
 
 export KBLD_E2E_DOCKERHUB_USERNAME=minikube-tests
-export KBLD_E2E_DOCKERHUB_HOSTNAME=$(minikube ip):30777
+export KBLD_E2E_DOCKERHUB_HOSTNAME=${KBLD_E2E_DOCKERHUB_HOSTNAME:-`minikube ip`}
 # uncomment to disable stress tests
 # export KBLD_E2E_SKIP_STRESS_TESTS=true
 
