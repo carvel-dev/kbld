@@ -13,7 +13,7 @@ import (
 
 func TestDockerBuildSuccessful(t *testing.T) {
 	env := BuildEnv(t)
-	kbld := Kbld{t, env.Namespace, env.KbldBinaryPath, Logger{}}
+	kbld := Kbld{t, env.KbldBinaryPath, Logger{}}
 
 	input := env.WithRegistries(`
 kind: Object
@@ -73,7 +73,7 @@ spec:
 
 func TestDockerBuildAndPushSuccessful(t *testing.T) {
 	env := BuildEnv(t)
-	kbld := Kbld{t, env.Namespace, env.KbldBinaryPath, Logger{}}
+	kbld := Kbld{t, env.KbldBinaryPath, Logger{}}
 
 	input := env.WithRegistries(`
 kind: Object
@@ -133,7 +133,7 @@ spec:
 // to avoid having tags that are too long.
 func TestDockerBuildSuccessfulWithImageRepo(t *testing.T) {
 	env := BuildEnv(t)
-	kbld := Kbld{t, env.Namespace, env.KbldBinaryPath, Logger{}}
+	kbld := Kbld{t, env.KbldBinaryPath, Logger{}}
 
 	input := env.WithRegistries(`
 kind: Object

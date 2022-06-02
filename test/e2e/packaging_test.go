@@ -17,7 +17,7 @@ import (
 
 func TestPkgUnpkgSuccessful(t *testing.T) {
 	env := BuildEnv(t)
-	kbld := Kbld{t, env.Namespace, env.KbldBinaryPath, Logger{}}
+	kbld := Kbld{t, env.KbldBinaryPath, Logger{}}
 
 	// redis:5.0.4
 	input := `
@@ -60,7 +60,7 @@ spec:
 
 func TestPkgUnpkgLockSuccessful(t *testing.T) {
 	env := BuildEnv(t)
-	kbld := Kbld{t, env.Namespace, env.KbldBinaryPath, Logger{}}
+	kbld := Kbld{t, env.KbldBinaryPath, Logger{}}
 
 	input := `
 apiVersion: kbld.k14s.io/v1alpha1
@@ -123,7 +123,7 @@ overrides:
 
 func TestPkgUnpkgSuccessfulWithForeignLayers(t *testing.T) {
 	env := BuildEnv(t)
-	kbld := Kbld{t, env.Namespace, env.KbldBinaryPath, Logger{}}
+	kbld := Kbld{t, env.KbldBinaryPath, Logger{}}
 
 	// Mongo has 2 foreign layers
 	input := `
@@ -168,7 +168,7 @@ func TestPkgUnpkgSuccessfulWithManyImages(t *testing.T) {
 		return
 	}
 
-	kbld := Kbld{t, env.Namespace, env.KbldBinaryPath, Logger{}}
+	kbld := Kbld{t, env.KbldBinaryPath, Logger{}}
 
 	input := `
 apiVersion: kbld.k14s.io/v1alpha1

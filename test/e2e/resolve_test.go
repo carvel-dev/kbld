@@ -14,7 +14,7 @@ import (
 
 func TestResolveSuccessful(t *testing.T) {
 	env := BuildEnv(t)
-	kbld := Kbld{t, env.Namespace, env.KbldBinaryPath, Logger{}}
+	kbld := Kbld{t, env.KbldBinaryPath, Logger{}}
 
 	input := `
 kind: Object
@@ -47,7 +47,7 @@ spec:
 
 func TestResolveSuccessfulWithAnnotations(t *testing.T) {
 	env := BuildEnv(t)
-	kbld := Kbld{t, env.Namespace, env.KbldBinaryPath, Logger{}}
+	kbld := Kbld{t, env.KbldBinaryPath, Logger{}}
 
 	// The repetition in this input is so it can test for:
 	// 1) resolving
@@ -95,7 +95,7 @@ spec:
 
 func TestSortAnnotations(t *testing.T) {
 	env := BuildEnv(t)
-	kbld := Kbld{t, env.Namespace, env.KbldBinaryPath, Logger{}}
+	kbld := Kbld{t, env.KbldBinaryPath, Logger{}}
 
 	input := `
 kind: Object
@@ -152,7 +152,7 @@ spec:
 
 func TestResolveInvalidDigest(t *testing.T) {
 	env := BuildEnv(t)
-	kbld := Kbld{t, env.Namespace, env.KbldBinaryPath, Logger{}}
+	kbld := Kbld{t, env.KbldBinaryPath, Logger{}}
 
 	input := `
 kind: Object
@@ -174,7 +174,7 @@ spec:
 
 func TestResolveUnknownImage(t *testing.T) {
 	env := BuildEnv(t)
-	kbld := Kbld{t, env.Namespace, env.KbldBinaryPath, Logger{}}
+	kbld := Kbld{t, env.KbldBinaryPath, Logger{}}
 
 	input := `
 kind: Object
@@ -196,7 +196,7 @@ spec:
 
 func TestResolveWithOverride(t *testing.T) {
 	env := BuildEnv(t)
-	kbld := Kbld{t, env.Namespace, env.KbldBinaryPath, Logger{}}
+	kbld := Kbld{t, env.KbldBinaryPath, Logger{}}
 
 	input := `
 kind: Object
@@ -232,7 +232,7 @@ spec:
 
 func TestResolveWithImageMap(t *testing.T) {
 	env := BuildEnv(t)
-	kbld := Kbld{t, env.Namespace, env.KbldBinaryPath, Logger{}}
+	kbld := Kbld{t, env.KbldBinaryPath, Logger{}}
 
 	input := `
 kind: Object
@@ -281,7 +281,7 @@ spec:
 
 func TestResolveWithImageKeys(t *testing.T) {
 	env := BuildEnv(t)
-	kbld := Kbld{t, env.Namespace, env.KbldBinaryPath, Logger{}}
+	kbld := Kbld{t, env.KbldBinaryPath, Logger{}}
 
 	input := `
 kind: Object
@@ -318,7 +318,7 @@ spec:
 
 func TestResolveWithOverrideMatchingImageRepo(t *testing.T) {
 	env := BuildEnv(t)
-	kbld := Kbld{t, env.Namespace, env.KbldBinaryPath, Logger{}}
+	kbld := Kbld{t, env.KbldBinaryPath, Logger{}}
 
 	input := `
 kind: Object
@@ -353,7 +353,7 @@ spec:
 
 func TestResolveSuccessfulWithSearchRules(t *testing.T) {
 	env := BuildEnv(t)
-	kbld := Kbld{t, env.Namespace, env.KbldBinaryPath, Logger{}}
+	kbld := Kbld{t, env.KbldBinaryPath, Logger{}}
 
 	input := `
 kind: Object
@@ -428,7 +428,7 @@ spec:
 
 func TestResolveSuccessfulWithDuplicateSearchRules(t *testing.T) {
 	env := BuildEnv(t)
-	kbld := Kbld{t, env.Namespace, env.KbldBinaryPath, Logger{}}
+	kbld := Kbld{t, env.KbldBinaryPath, Logger{}}
 
 	input := `
 kind: Object
@@ -461,7 +461,7 @@ spec:
 
 func TestResolveSuccessfulWithTagSelection(t *testing.T) {
 	env := BuildEnv(t)
-	kbld := Kbld{t, env.Namespace, env.KbldBinaryPath, Logger{}}
+	kbld := Kbld{t, env.KbldBinaryPath, Logger{}}
 
 	input := `
 kind: Object

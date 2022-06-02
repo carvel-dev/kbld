@@ -14,10 +14,9 @@ import (
 )
 
 type Kbld struct {
-	t         *testing.T
-	namespace string
-	kbldPath  string
-	l         Logger
+	t        *testing.T
+	kbldPath string
+	l        Logger
 }
 
 type RunOpts struct {

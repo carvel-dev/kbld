@@ -10,7 +10,6 @@ import (
 )
 
 type Env struct {
-	Namespace            string
 	DockerHubUsername    string
 	DockerHubHostname    string
 	SkipStressTests      bool
