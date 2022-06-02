@@ -3,7 +3,7 @@
 ## Prerequisites
 
 - [minikube](https://minikube.sigs.k8s.io/docs/)
-- [pack 0.8.1](https://github.com/buildpacks/pack)
+- [docker](https://www.docker.com/)
 
 ## Run Unit tests
 ```bash
@@ -24,9 +24,9 @@ minikube start --driver=virtualbox --insecure-registry=X.X.X.X/16 --host-only-ci
 # Make your env aware of the docker registry
 eval $(minikube docker-env)
 # Run all tests
-./hack/test-all-minikube-local-registry.sh
+./hack/test-all-locally.sh
 # or run single test
-./hack/test-all-minikube-local-registry.sh -run TestDockerBuildSuccessful
+./hack/test-all-locally.sh -run TestDockerBuildSuccessful
 ```
 
 ## Source Code Structure

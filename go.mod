@@ -9,6 +9,7 @@ require (
 	github.com/hashicorp/go-version v1.4.0
 	github.com/kisielk/errcheck v1.6.0
 	github.com/spf13/cobra v1.4.0
+	github.com/stretchr/testify v1.7.1
 	github.com/vmware-tanzu/carvel-imgpkg v0.28.0
 	github.com/vmware-tanzu/carvel-vendir v0.27.0
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
@@ -19,6 +20,7 @@ require (
 require (
 	github.com/cppforlife/color v1.9.1-0.20200716202919-6706ac40b835 // indirect
 	github.com/creack/pty v1.1.11 // indirect
+	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/docker/cli v20.10.10+incompatible // indirect
 	github.com/docker/distribution v2.7.1+incompatible // indirect
 	github.com/docker/docker v20.10.10+incompatible // indirect
@@ -37,6 +39,7 @@ require (
 	github.com/opencontainers/go-digest v1.0.0 // indirect
 	github.com/opencontainers/image-spec v1.0.2-0.20210730191737-8e42a01fb1b7 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
+	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/sirupsen/logrus v1.8.1 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/vito/go-interact v1.0.1 // indirect
@@ -49,6 +52,7 @@ require (
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
+	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
 	k8s.io/klog/v2 v2.60.1 // indirect
 	k8s.io/utils v0.0.0-20220210201930-3a6ce19ff2f9 // indirect
 	sigs.k8s.io/json v0.0.0-20211208200746-9f7c6b3444d2 // indirect
