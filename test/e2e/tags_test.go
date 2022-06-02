@@ -17,7 +17,7 @@ import (
 func TestAdditionalImageTags(t *testing.T) {
 	env := BuildEnv(t)
 	logger := Logger{}
-	kbld := Kbld{t, env.Namespace, env.KbldBinaryPath, logger}
+	kbld := Kbld{t, env.KbldBinaryPath, logger}
 
 	var published map[string]interface{}
 

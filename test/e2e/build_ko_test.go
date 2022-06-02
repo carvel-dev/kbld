@@ -13,7 +13,7 @@ import (
 
 func TestKoBuildAndPushSuccessful(t *testing.T) {
 	env := BuildEnv(t)
-	kbld := Kbld{t, env.Namespace, env.KbldBinaryPath, Logger{}}
+	kbld := Kbld{t, env.KbldBinaryPath, Logger{}}
 
 	input := env.WithRegistries(`
 kind: Object

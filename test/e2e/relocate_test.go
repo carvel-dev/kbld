@@ -15,7 +15,7 @@ import (
 
 func TestRelocateSuccessful(t *testing.T) {
 	env := BuildEnv(t)
-	kbld := Kbld{t, env.Namespace, env.KbldBinaryPath, Logger{}}
+	kbld := Kbld{t, env.KbldBinaryPath, Logger{}}
 
 	// redis:5.0.4
 	input := `
@@ -51,7 +51,7 @@ func TestRelocateSuccessfulWithManyImages(t *testing.T) {
 		return
 	}
 
-	kbld := Kbld{t, env.Namespace, env.KbldBinaryPath, Logger{}}
+	kbld := Kbld{t, env.KbldBinaryPath, Logger{}}
 
 	input := `
 kind: Object
@@ -125,7 +125,7 @@ spec:
 
 func TestRelocateLockSuccessful(t *testing.T) {
 	env := BuildEnv(t)
-	kbld := Kbld{t, env.Namespace, env.KbldBinaryPath, Logger{}}
+	kbld := Kbld{t, env.KbldBinaryPath, Logger{}}
 
 	input := `
 apiVersion: kbld.k14s.io/v1alpha1

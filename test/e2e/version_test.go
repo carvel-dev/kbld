@@ -12,7 +12,7 @@ import (
 
 func TestVersion(t *testing.T) {
 	env := BuildEnv(t)
-	kbld := Kbld{t, env.Namespace, env.KbldBinaryPath, Logger{}}
+	kbld := Kbld{t, env.KbldBinaryPath, Logger{}}
 
 	out, _ := kbld.RunWithOpts([]string{"version"}, RunOpts{})
 

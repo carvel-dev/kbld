@@ -101,7 +101,7 @@ kind: ImagesLock
 
 func TestLockOutputSuccessful(t *testing.T) {
 	env := BuildEnv(t)
-	kbld := Kbld{t, env.Namespace, env.KbldBinaryPath, Logger{}}
+	kbld := Kbld{t, env.KbldBinaryPath, Logger{}}
 
 	input := `
 images:
@@ -189,7 +189,7 @@ searchRules:
 
 func TestImgpkgLockOutputSuccessful(t *testing.T) {
 	env := BuildEnv(t)
-	kbld := Kbld{t, env.Namespace, env.KbldBinaryPath, Logger{}}
+	kbld := Kbld{t, env.KbldBinaryPath, Logger{}}
 
 	input := `
 images:
@@ -246,7 +246,7 @@ images:
 
 func TestImgpkgLockFileNotInOutput(t *testing.T) {
 	env := BuildEnv(t)
-	kbld := Kbld{t, env.Namespace, env.KbldBinaryPath, Logger{}}
+	kbld := Kbld{t, env.KbldBinaryPath, Logger{}}
 
 	input := imgLock
 	out, _ := kbld.RunWithOpts([]string{"-f", "-", "--images-annotation=false"}, RunOpts{
@@ -261,7 +261,7 @@ func TestImgpkgLockFileNotInOutput(t *testing.T) {
 
 func TestImgpkgLockFileInputSuccessful(t *testing.T) {
 	env := BuildEnv(t)
-	kbld := Kbld{t, env.Namespace, env.KbldBinaryPath, Logger{}}
+	kbld := Kbld{t, env.KbldBinaryPath, Logger{}}
 
 	input := `
 images:
@@ -303,7 +303,7 @@ metadata:
 
 func TestImgpkgLockFileOriginsSuccessful(t *testing.T) {
 	env := BuildEnv(t)
-	kbld := Kbld{t, env.Namespace, env.KbldBinaryPath, Logger{}}
+	kbld := Kbld{t, env.KbldBinaryPath, Logger{}}
 
 	input := `
 images:
@@ -362,7 +362,7 @@ metadata:
 
 func TestImgpkgLockOutputSuccessfulDigestedImageHasNoOrigins(t *testing.T) {
 	env := BuildEnv(t)
-	kbld := Kbld{t, env.Namespace, env.KbldBinaryPath, Logger{}}
+	kbld := Kbld{t, env.KbldBinaryPath, Logger{}}
 
 	input := `
 images:

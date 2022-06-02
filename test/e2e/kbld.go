@@ -1,5 +1,3 @@
-//go:build e2e
-
 // Copyright 2020 VMware, Inc.
 // SPDX-License-Identifier: Apache-2.0
 
@@ -16,10 +14,9 @@ import (
 )
 
 type Kbld struct {
-	t         *testing.T
-	namespace string
-	kbldPath  string
-	l         Logger
+	t        *testing.T
+	kbldPath string
+	l        Logger
 }
 
 type RunOpts struct {

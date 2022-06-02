@@ -15,7 +15,7 @@ import (
 
 func TestKubectlBuildkitBuildSuccessful(t *testing.T) {
 	env := BuildEnv(t)
-	kbld := Kbld{t, env.Namespace, env.KbldBinaryPath, Logger{}}
+	kbld := Kbld{t, env.KbldBinaryPath, Logger{}}
 	createBuilder(t)
 
 	input := env.WithRegistries(`
@@ -67,7 +67,7 @@ func TestKubectlBuildkitBuildAndPushSuccessful(t *testing.T) {
 
 	createBuilder(t)
 
-	kbld := Kbld{t, env.Namespace, env.KbldBinaryPath, Logger{}}
+	kbld := Kbld{t, env.KbldBinaryPath, Logger{}}
 
 	input := env.WithRegistries(`
 kind: Object
