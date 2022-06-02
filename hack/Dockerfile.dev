@@ -1,4 +1,4 @@
-FROM golang:1.17
+FROM golang:1.18
 
 RUN apt-get update -y
 RUN apt-get install wget docker.io apt-transport-https ca-certificates gnupg python -y
