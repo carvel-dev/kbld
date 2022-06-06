@@ -3,6 +3,10 @@ FROM golang:1.18
 RUN apt-get update -y
 RUN apt-get install wget docker.io apt-transport-https ca-certificates gnupg python -y
 
+RUN mkdir -p ~/.docker/cli-plugins/
+RUN wget -O- https://github.com/docker/buildx/releases/download/v0.8.2/buildx-v0.8.2.linux-amd64 > ~/.docker/cli-plugins/docker-buildx
+RUN chmod +x ~/.docker/cli-plugins/docker-buildx
+
 RUN wget https://github.com/buildpacks/pack/releases/download/v0.8.1/pack-v0.8.1-linux.tgz
 RUN tar -C /usr/local/bin/ -xvf pack-v0.8.1-linux.tgz
 
