@@ -19,6 +19,10 @@ RUN wget "https://github.com/vmware-tanzu/carvel-kapp/releases/download/v0.48.0/
 RUN chmod +x /usr/local/bin/kapp-linux-amd64
 RUN mv /usr/local/bin/kapp-linux-amd64 /usr/local/bin/kapp
 
+RUN wget "https://github.com/vmware-tanzu/carvel-ytt/releases/download/v0.41.1/ytt-linux-amd64" -P /usr/local/bin/
+RUN chmod +x /usr/local/bin/ytt-linux-amd64
+RUN mv /usr/local/bin/ytt-linux-amd64 /usr/local/bin/ytt
+
 RUN echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
 RUN curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key --keyring /usr/share/keyrings/cloud.google.gpg add -
 RUN apt-get update -y
