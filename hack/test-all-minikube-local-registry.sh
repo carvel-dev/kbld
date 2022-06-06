@@ -10,7 +10,7 @@ export KBLD_E2E_DOCKERHUB_HOSTNAME=${KBLD_E2E_DOCKERHUB_HOSTNAME:-`minikube ip`}
 # Install secretgen to generate registry certs
 kapp deploy -a sg -f https://github.com/vmware-tanzu/carvel-secretgen-controller/releases/download/v0.8.0/release.yml -y
 # Install local docker2 registry
-kapp deploy -a reg -f <(ytt -f test/e2e/assets/minikube-local-registry.yml -v registry_alt_name=$(minikube ip)) -y
+kapp deploy -a reg -f <(ytt -f test/e2e/assets/minikube-local-registry.yml -v registry_alt_name=$KBLD_E2E_DOCKERHUB_HOSTNAME) -y
 
 # Install registry ca cert on the host machine
 kubectl get secret registry-ca-cert -ojsonpath='{.data.crt\.pem}' | base64 --decode > registry-ca-cert.crt

@@ -41,9 +41,7 @@ docker run \
 -v ~/.config:/root/.config \
 -v ~/.minikube:"$HOME/.minikube" \
 -v ~/.kube:/root/.kube \
--v ~/.docker:/root/.docker \
 -v ${SCRIPT_DIR}/..:/go/src/kbld \
--v /var/run/docker.sock:/var/run/docker.sock \
 --workdir /go/src/kbld \
 -i -a STDOUT -a STDERR \
 --network host --rm \
