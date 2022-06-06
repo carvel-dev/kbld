@@ -18,8 +18,8 @@ cp registry-ca-cert.crt /usr/local/share/ca-certificates/
 update-ca-certificates
 
 # Docker needs its own CA cert configuration
-mkdir -p /etc/docker/certs.d/${KBLD_E2E_DOCKERHUB_HOSTNAME}
-cp registry-ca-cert.crt /etc/docker/certs.d/${KBLD_E2E_DOCKERHUB_HOSTNAME}/ca.crt
+mkdir -p /host-etc-docker/certs.d/${KBLD_E2E_DOCKERHUB_HOSTNAME}
+cp registry-ca-cert.crt /host-etc-docker/certs.d/${KBLD_E2E_DOCKERHUB_HOSTNAME}/ca.crt
 
 # Buildkit needs to talk to above registry however
 # it does not seem to properly auto-copy CA certificates

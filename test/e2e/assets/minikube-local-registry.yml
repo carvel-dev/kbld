@@ -108,4 +108,5 @@ spec:
   caRef:
     name: registry-ca-cert
   alternativeNames:
+  - unused-domain.com #! non-ip domain to make generation happy
   - #@ data.values.registry_alt_name
