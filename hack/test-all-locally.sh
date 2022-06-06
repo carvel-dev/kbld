@@ -42,7 +42,6 @@ docker run \
 -v ~/.minikube:"$HOME/.minikube" \
 -v ~/.kube:/root/.kube \
 -v ${SCRIPT_DIR}/..:/go/src/kbld \
-# expose Docker's etc/docker directory for test container to load in registry certs
 -v /etc/docker/:/host-etc-docker \
 --workdir /go/src/kbld \
 -i -a STDOUT -a STDERR \
