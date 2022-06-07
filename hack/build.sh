@@ -19,5 +19,6 @@ go build -ldflags="$LDFLAGS" -trimpath -o kbld ./cmd/kbld/...
 
 # compile tests, but do not run them: https://github.com/golang/go/issues/15513#issuecomment-839126426
 go test --exec=echo ./... >/dev/null
+go test -tags=e2e --exec=echo ./... >/dev/null
 
 echo "Success"

@@ -30,7 +30,7 @@ func NewBazel(docker ctlbdk.Docker, logger ctllog.Logger) Bazel {
 	return Bazel{docker: docker, logger: logger}
 }
 
-func (b *Bazel) Run(image, directory string, opts config.SourceBazelRunOpts) (ctlbdk.DockerTmpRef, error) {
+func (b *Bazel) Run(image, directory string, opts config.SourceBazelRunOpts) (ctlbdk.TmpRef, error) {
 	prefixedLogger := b.logger.NewPrefixedWriter(image + " | ")
 
 	prefixedLogger.Write([]byte(fmt.Sprintf("starting build (using bazel): %s\n", directory)))
@@ -43,7 +43,7 @@ func (b *Bazel) Run(image, directory string, opts config.SourceBazelRunOpts) (ct
 		cmdArgs := []string{"run"}
 
 		if opts.Target == nil {
-			return ctlbdk.DockerTmpRef{}, fmt.Errorf("Expected target to be specified, but was not")
+			return ctlbdk.TmpRef{}, fmt.Errorf("Expected target to be specified, but was not")
 		}
 
 		cmdArgs = append(cmdArgs, *opts.Target)
@@ -60,16 +60,16 @@ func (b *Bazel) Run(image, directory string, opts config.SourceBazelRunOpts) (ct
 		err := cmd.Run()
 		if err != nil {
 			prefixedLogger.Write([]byte(fmt.Sprintf("error: %s\n", err)))
-			return ctlbdk.DockerTmpRef{}, err
+			return ctlbdk.TmpRef{}, err
 		}
 
 		matches := bazelImageID.FindStringSubmatch(stdoutBuf.String())
 		if len(matches) != 3 {
-			return ctlbdk.DockerTmpRef{}, fmt.Errorf("Expected to find image ID in bazel output but did not")
+			return ctlbdk.TmpRef{}, fmt.Errorf("Expected to find image ID in bazel output but did not")
 		}
 
 		imageID = "sha256:" + matches[2]
 	}
 
-	return b.docker.RetagStable(ctlbdk.NewDockerTmpRef(imageID), image, imageID, prefixedLogger)
+	return b.docker.RetagStable(ctlbdk.NewTmpRef(imageID), image, imageID, prefixedLogger)
 }

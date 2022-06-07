@@ -20,6 +20,7 @@ type BuiltImage struct {
 	imgDst      *ctlconf.ImageDestination
 
 	docker          ctlbdk.Docker
+	dockerBuildx    ctlbdk.Buildx
 	pack            ctlbpk.Pack
 	kubectlBuildkit ctlbkb.KubectlBuildkit
 	ko              ctlbko.Ko
@@ -27,9 +28,10 @@ type BuiltImage struct {
 }
 
 func NewBuiltImage(url string, buildSource ctlconf.Source, imgDst *ctlconf.ImageDestination,
-	docker ctlbdk.Docker, pack ctlbpk.Pack, kubectlBuildkit ctlbkb.KubectlBuildkit, ko ctlbko.Ko, bazel ctlbbz.Bazel) BuiltImage {
+	docker ctlbdk.Docker, dockerBuildx ctlbdk.Buildx, pack ctlbpk.Pack,
+	kubectlBuildkit ctlbkb.KubectlBuildkit, ko ctlbko.Ko, bazel ctlbbz.Bazel) BuiltImage {
 
-	return BuiltImage{url, buildSource, imgDst, docker, pack, kubectlBuildkit, ko, bazel}
+	return BuiltImage{url, buildSource, imgDst, docker, dockerBuildx, pack, kubectlBuildkit, ko, bazel}
 }
 
 func (i BuiltImage) URL() (string, []ctlconf.Origin, error) {
@@ -77,12 +79,18 @@ func (i BuiltImage) URL() (string, []ctlconf.Origin, error) {
 
 		return i.optionalPushWithDocker(dockerTmpRef, origins)
 
+	case i.buildSource.Docker != nil && i.buildSource.Docker.Buildx != nil:
+		url, err := i.dockerBuildx.BuildAndOptionallyPush(
+			urlRepo, i.buildSource.Path, i.imgDst, *i.buildSource.Docker.Buildx)
+		return url, origins, err
+
+	// Fall back on Docker by default
 	default:
 		if i.buildSource.Docker == nil {
 			i.buildSource.Docker = &ctlconf.SourceDockerOpts{}
 		}
 
-		opts := ctlbdk.DockerBuildOpts{
+		opts := ctlbdk.BuildOpts{
 			Target:     i.buildSource.Docker.Build.Target,
 			Pull:       i.buildSource.Docker.Build.Pull,
 			NoCache:    i.buildSource.Docker.Build.NoCache,
@@ -100,7 +108,7 @@ func (i BuiltImage) URL() (string, []ctlconf.Origin, error) {
 	}
 }
 
-func (i BuiltImage) optionalPushWithDocker(dockerTmpRef ctlbdk.DockerTmpRef, origins []ctlconf.Origin) (string, []ctlconf.Origin, error) {
+func (i BuiltImage) optionalPushWithDocker(dockerTmpRef ctlbdk.TmpRef, origins []ctlconf.Origin) (string, []ctlconf.Origin, error) {
 	if i.imgDst != nil {
 		digest, err := i.docker.Push(dockerTmpRef, i.imgDst.NewImage)
 		if err != nil {
