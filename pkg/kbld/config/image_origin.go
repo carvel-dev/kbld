@@ -8,11 +8,12 @@ import (
 )
 
 type Origin struct {
-	Git         *OriginGit         `json:"git,omitempty"`
-	Local       *OriginLocal       `json:"local,omitempty"`
-	Resolved    *OriginResolved    `json:"resolved,omitempty"`
-	Tagged      *OriginTagged      `json:"tagged,omitempty"`
-	Preresolved *OriginPreresolved `json:"preresolved,omitempty"`
+	Git              *OriginGit              `json:"git,omitempty"`
+	Local            *OriginLocal            `json:"local,omitempty"`
+	Resolved         *OriginResolved         `json:"resolved,omitempty"`
+	Tagged           *OriginTagged           `json:"tagged,omitempty"`
+	Preresolved      *OriginPreresolved      `json:"preresolved,omitempty"`
+	PlatformSelected *OriginPlatformSelected `json:"platformSelected,omitempty"`
 }
 
 type OriginGit struct {
@@ -37,6 +38,13 @@ type OriginTagged struct {
 
 type OriginPreresolved struct {
 	URL string `json:"url"`
+}
+
+type OriginPlatformSelected struct {
+	Index        string `json:"index,omitempty"`
+	OS           string `json:"os,omitempty"`
+	Architecture string `json:"architecture,omitempty"`
+	Variant      string `json:"variant,omitempty"`
 }
 
 func NewOriginsFromString(str string) ([]Origin, error) {
