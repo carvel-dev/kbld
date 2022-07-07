@@ -512,3 +512,141 @@ spec:
 		t.Fatalf("Expected >>>%s<<< to match >>>%s<<<", out, expectedOut)
 	}
 }
+
+func TestResolveSuccessfulWithPlatformSelectionConfig(t *testing.T) {
+	env := BuildEnv(t)
+	kbld := Kbld{t, env.KbldBinaryPath, Logger{}}
+
+	input := `
+kind: Object
+spec:
+- image: nginx-arm64
+- image: nginx-amd64
+- image: nginx-all
+---
+apiVersion: kbld.k14s.io/v1alpha1
+kind: ImageOverrides
+overrides:
+- image: nginx-arm64
+  newImage: index.docker.io/library/nginx:1.14.2
+  platformSelection:
+    os: linux
+    architecture: arm64
+- image: nginx-amd64
+  newImage: index.docker.io/library/nginx:1.14.2
+  platformSelection:
+    os: linux
+    architecture: amd64
+- image: nginx-all
+  newImage: index.docker.io/library/nginx:1.14.2
+`
+
+	out, _ := kbld.RunWithOpts([]string{"-f", "-"}, RunOpts{
+		StdinReader: strings.NewReader(input),
+	})
+
+	expectedOut := `---
+kind: Object
+metadata:
+  annotations:
+    kbld.k14s.io/images: |
+      - origins:
+        - resolved:
+            tag: 1.14.2
+            url: index.docker.io/library/nginx:1.14.2
+        - platformSelected:
+            architecture: amd64
+            index: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
+            os: linux
+        url: index.docker.io/library/nginx@sha256:706446e9c6667c0880d5da3f39c09a6c7d2114f5a5d6b74a2fafd24ae30d2078
+      - origins:
+        - resolved:
+            tag: 1.14.2
+            url: index.docker.io/library/nginx:1.14.2
+        - platformSelected:
+            architecture: arm64
+            index: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
+            os: linux
+        url: index.docker.io/library/nginx@sha256:d58b3e481b8588c080b42e5d7427f2c2061decbf9194f06e2adce641822e282a
+      - origins:
+        - resolved:
+            tag: 1.14.2
+            url: index.docker.io/library/nginx:1.14.2
+        url: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
+spec:
+- image: index.docker.io/library/nginx@sha256:d58b3e481b8588c080b42e5d7427f2c2061decbf9194f06e2adce641822e282a
+- image: index.docker.io/library/nginx@sha256:706446e9c6667c0880d5da3f39c09a6c7d2114f5a5d6b74a2fafd24ae30d2078
+- image: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
+`
+
+	if out != expectedOut {
+		t.Fatalf("Expected >>>%s<<< to match >>>%s<<<", out, expectedOut)
+	}
+}
+
+func TestResolveSuccessfulWithPlatformSelectionWithGlobalFlag(t *testing.T) {
+	env := BuildEnv(t)
+	kbld := Kbld{t, env.KbldBinaryPath, Logger{}}
+
+	input := `
+kind: Object
+spec:
+- image: nginx-arm64
+- image: nginx-amd64
+- image: nginx-all
+---
+apiVersion: kbld.k14s.io/v1alpha1
+kind: ImageOverrides
+overrides:
+- image: nginx-arm64
+  newImage: index.docker.io/library/nginx:1.14.2
+  platformSelection:
+    os: linux
+    architecture: arm64
+- image: nginx-amd64
+  newImage: index.docker.io/library/nginx:1.14.2
+  platformSelection:
+    os: linux
+    architecture: amd64
+# will use flag provided platform selection
+- image: nginx-all
+  newImage: index.docker.io/library/nginx:1.14.2
+`
+
+	out, _ := kbld.RunWithOpts([]string{"-f", "-", "--platform", "linux/amd64"}, RunOpts{
+		StdinReader: strings.NewReader(input),
+	})
+
+	expectedOut := `---
+kind: Object
+metadata:
+  annotations:
+    kbld.k14s.io/images: |
+      - origins:
+        - resolved:
+            tag: 1.14.2
+            url: index.docker.io/library/nginx:1.14.2
+        - platformSelected:
+            architecture: amd64
+            index: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
+            os: linux
+        url: index.docker.io/library/nginx@sha256:706446e9c6667c0880d5da3f39c09a6c7d2114f5a5d6b74a2fafd24ae30d2078
+      - origins:
+        - resolved:
+            tag: 1.14.2
+            url: index.docker.io/library/nginx:1.14.2
+        - platformSelected:
+            architecture: arm64
+            index: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
+            os: linux
+        url: index.docker.io/library/nginx@sha256:d58b3e481b8588c080b42e5d7427f2c2061decbf9194f06e2adce641822e282a
+spec:
+- image: index.docker.io/library/nginx@sha256:d58b3e481b8588c080b42e5d7427f2c2061decbf9194f06e2adce641822e282a
+- image: index.docker.io/library/nginx@sha256:706446e9c6667c0880d5da3f39c09a6c7d2114f5a5d6b74a2fafd24ae30d2078
+- image: index.docker.io/library/nginx@sha256:706446e9c6667c0880d5da3f39c09a6c7d2114f5a5d6b74a2fafd24ae30d2078
+`
+
+	if out != expectedOut {
+		t.Fatalf("Expected >>>%s<<< to match >>>%s<<<", out, expectedOut)
+	}
+}

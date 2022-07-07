@@ -27,8 +27,9 @@ type Factory struct {
 }
 
 type FactoryOpts struct {
-	Conf           ctlconf.Conf
-	AllowedToBuild bool
+	Conf                    ctlconf.Conf
+	AllowedToBuild          bool
+	GlobalPlatformSelection *ctlconf.PlatformSelection
 }
 
 func NewFactory(opts FactoryOpts, registry ctlreg.Registry, logger ctllog.Logger) Factory {
@@ -36,13 +37,26 @@ func NewFactory(opts FactoryOpts, registry ctlreg.Registry, logger ctllog.Logger
 }
 
 func (f Factory) New(url string) Image {
+	platformSelection := f.opts.GlobalPlatformSelection
+
 	if overrideConf, found := f.shouldOverride(url); found {
-		url = overrideConf.NewImage
-		if overrideConf.Preresolved {
-			return NewPreresolvedImage(url, overrideConf.ImageOrigins)
-		} else if overrideConf.TagSelection != nil {
-			return NewTagSelectedImage(url, overrideConf.TagSelection, f.registry)
+		// Allow using same url but with additional selection (tag/platform)
+		if len(overrideConf.NewImage) > 0 {
+			url = overrideConf.NewImage
 		}
+		if overrideConf.PlatformSelection != nil {
+			platformSelection = overrideConf.PlatformSelection
+		}
+
+		if overrideConf.Preresolved {
+			// Do not support platform selection against explicitly configured image
+			return NewPreresolvedImage(url, overrideConf.ImageOrigins)
+		}
+		if overrideConf.TagSelection != nil {
+			tagSelected := NewTagSelectedImage(url, overrideConf.TagSelection, f.registry)
+			return NewPlatformSelectedImage(tagSelected, platformSelection, f.registry)
+		}
+		// Continue on with potentially changed url or platform selection
 	}
 
 	if srcConf, found := f.shouldBuild(url); found {
@@ -59,22 +73,22 @@ func (f Factory) New(url string) Image {
 		ko := ctlbko.NewKo(f.logger)
 		bazel := ctlbbz.NewBazel(docker, f.logger)
 
-		builtImg := NewBuiltImage(url, srcConf, imgDstConf,
+		var builtImg Image = NewBuiltImage(url, srcConf, imgDstConf,
 			docker, dockerBuildx, pack, kubectlBuildkit, ko, bazel)
 
 		if imgDstConf != nil {
-			return NewTaggedImage(builtImg, *imgDstConf, f.registry)
+			builtImg = NewTaggedImage(builtImg, *imgDstConf, f.registry)
 		}
-
-		return builtImg
+		return NewPlatformSelectedImage(builtImg, platformSelection, f.registry)
 	}
 
-	digestedImage := MaybeNewDigestedImage(url)
-	if digestedImage != nil {
-		return digestedImage
+	var resolvedImg Image
+	if digestedImage := MaybeNewDigestedImage(url); digestedImage != nil {
+		resolvedImg = digestedImage
+	} else {
+		resolvedImg = NewResolvedImage(url, f.registry)
 	}
-
-	return NewResolvedImage(url, f.registry)
+	return NewPlatformSelectedImage(resolvedImg, platformSelection, f.registry)
 }
 
 func (f Factory) shouldOverride(url string) (ctlconf.ImageOverride, bool) {

@@ -36,6 +36,7 @@ type ResolveOptions struct {
 	LockOutput        string
 	ImgpkgLockOutput  string
 	UnresolvedInspect bool
+	Platform          string
 }
 
 func NewResolveOptions(ui ui.UI) *ResolveOptions {
@@ -58,6 +59,7 @@ func NewResolveCmd(o *ResolveOptions) *cobra.Command {
 	cmd.Flags().StringVar(&o.LockOutput, "lock-output", "", "File path to emit configuration with resolved image references")
 	cmd.Flags().StringVar(&o.ImgpkgLockOutput, "imgpkg-lock-output", "", "File path to emit images lockfile with resolved image references")
 	cmd.Flags().BoolVar(&o.UnresolvedInspect, "unresolved-inspect", false, "List image references found in inputs")
+	cmd.Flags().StringVar(&o.Platform, "platform", "", "Apply platform selection to image indexes")
 	return cmd
 }
 
@@ -98,7 +100,16 @@ func (o *ResolveOptions) ResolveResources(logger *ctllog.Logger, pLogger *ctllog
 		return nil, err
 	}
 
-	opts := ctlimg.FactoryOpts{Conf: conf, AllowedToBuild: o.AllowedToBuild}
+	opts := ctlimg.FactoryOpts{
+		Conf:           conf,
+		AllowedToBuild: o.AllowedToBuild,
+	}
+	if len(o.Platform) > 0 {
+		opts.GlobalPlatformSelection, err = NewPlatformSelection(o.Platform)
+		if err != nil {
+			return nil, err
+		}
+	}
 	imgFactory := ctlimg.NewFactory(opts, registry, *logger)
 
 	imageURLs, err := o.collectImageReferences(nonConfigRs, conf)
@@ -301,4 +312,31 @@ func (o *ResolveOptions) imgpkgLockAnnotations(i ProcessedImageItem) map[string]
 	}
 
 	return anns
+}
+
+// NewPlatformSelection parses platform string into PlatformSelection
+// Examples: linux/386, linux/arm/v7, linux/arm/v6
+// Taken from https://github.com/google/go-containerregistry/blob/570ba6c88a5041afebd4599981d849af96f5dba9/cmd/crane/cmd/util.go#L45
+func NewPlatformSelection(platform string) (*ctlconf.PlatformSelection, error) {
+	result := &ctlconf.PlatformSelection{}
+
+	parts := strings.SplitN(platform, ":", 2)
+	if len(parts) == 2 {
+		result.OSVersion = parts[1]
+	}
+
+	parts = strings.Split(parts[0], "/")
+	if len(parts) < 2 {
+		return nil, fmt.Errorf("Parsing platform '%s': expected format os/arch[/variant]", platform)
+	}
+	if len(parts) > 3 {
+		return nil, fmt.Errorf("Parsing platform '%s': too many slashes", platform)
+	}
+
+	result.OS = parts[0]
+	result.Architecture = parts[1]
+	if len(parts) > 2 {
+		result.Variant = parts[2]
+	}
+	return result, nil
 }

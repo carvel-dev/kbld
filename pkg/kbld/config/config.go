@@ -65,10 +65,22 @@ type Source struct {
 
 type ImageOverride struct {
 	ImageRef
-	NewImage     string                     `json:"newImage"`
-	Preresolved  bool                       `json:"preresolved,omitempty"`
-	TagSelection *versions.VersionSelection `json:"tagSelection,omitempty"`
-	ImageOrigins []Origin                   `json:"origins,omitempty"`
+	NewImage          string                     `json:"newImage"`
+	Preresolved       bool                       `json:"preresolved,omitempty"`
+	TagSelection      *versions.VersionSelection `json:"tagSelection,omitempty"`
+	PlatformSelection *PlatformSelection         `json:"platformSelection,omitempty"`
+	ImageOrigins      []Origin                   `json:"origins,omitempty"`
+}
+
+// PlatformSelection
+// https://github.com/opencontainers/image-spec/blob/main/image-index.md#image-index-property-descriptions
+type PlatformSelection struct {
+	Architecture string   `json:"architecture,omitempty"`
+	OS           string   `json:"os,omitempty"`
+	OSVersion    string   `json:"os.version,omitempty"`  // note dot
+	OSFeatures   []string `json:"os.features,omitempty"` // note dot
+	Variant      string   `json:"variant,omitempty"`
+	Features     []string `json:"features,omitempty"`
 }
 
 type ImageDestination struct {
