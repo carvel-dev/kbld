@@ -13,7 +13,7 @@ require (
 	github.com/vmware-tanzu/carvel-imgpkg v0.28.0
 	github.com/vmware-tanzu/carvel-vendir v0.27.0
 	golang.org/x/sync v0.0.0-20220513210516-0976fa681c29
-	k8s.io/apimachinery v0.24.2
+	k8s.io/apimachinery v0.24.3
 	sigs.k8s.io/yaml v1.3.0
 )
 
