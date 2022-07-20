@@ -117,8 +117,8 @@ github.com/stretchr/testify/assert
 # github.com/vito/go-interact v1.0.1
 ## explicit; go 1.12
 github.com/vito/go-interact/interact
-# github.com/vmware-tanzu/carvel-imgpkg v0.28.0
-## explicit; go 1.17
+# github.com/vmware-tanzu/carvel-imgpkg v0.29.0
+## explicit; go 1.18
 github.com/vmware-tanzu/carvel-imgpkg/pkg/imgpkg/lockconfig
 # github.com/vmware-tanzu/carvel-vendir v0.27.0
 ## explicit; go 1.17
