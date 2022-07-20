@@ -165,7 +165,7 @@ spec:
 		AllowError:  true,
 	})
 
-	expectedErr := "Expected valid digest reference, but found 'nginx@sha256:digest', reason: digest must be between 71 and 71 runes in length: sha256:digest"
+	expectedErr := "Expected valid digest reference, but found 'nginx@sha256:digest', reason: digest must be between 71 and 71 characters in length: sha256:digest"
 
 	if !strings.Contains(err.Error(), expectedErr) {
 		t.Fatalf("Expected >>>%s<<< to match >>>%s<<<", err, expectedErr)
