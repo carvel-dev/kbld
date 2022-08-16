@@ -6,7 +6,7 @@
 - Slack: [#carvel in Kubernetes slack](https://slack.kubernetes.io)
 - [Docs](docs/README.md) with topics about building, packaging images, blog posts, etc.
 - Install: Grab prebuilt binaries from the [Releases page](https://github.com/vmware-tanzu/carvel-kbld/releases) or [Homebrew Carvel tap](https://github.com/vmware-tanzu/homebrew-carvel)
-- Backlog: [See what we're up to](https://app.zenhub.com/workspaces/carvel-backlog-6013063a24147d0011410709/board?repos=182335015). (Note: we use ZenHub which requires GitHub authorization).
+- Backlog: [See what we're up to](https://github.com/orgs/vmware-tanzu/projects/16/views/1?filterQuery=repo%3A%22vmware-tanzu%2Fcarvel-kbld%22).
 
 `kbld` (pronounced: `kei·bild`) seamlessly incorporates image building and image pushing into your development and deployment workflows.
 
