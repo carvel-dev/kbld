@@ -25,7 +25,3 @@ All contributors to this project must have a signed Contributor License Agreemen
 We generally only need you (or your employer) to sign our CLA once and once signed, you should be able to submit contributions to any VMware project.
 
 Note: if you would like to submit an "_obvious fix_" for something like a typo, formatting issue or spelling mistake, you may not need to sign the CLA.
-
-# Development
-
-See [docs/dev.md](docs/dev.md).
