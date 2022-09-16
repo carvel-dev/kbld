@@ -10,6 +10,8 @@ import (
 	"os"
 	"strings"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 func TestResolveSuccessful(t *testing.T) {
@@ -40,9 +42,7 @@ spec:
 - image: index.docker.io/library/nginx@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 `
 
-	if out != expectedOut {
-		t.Fatalf("Expected >>>%s<<< to match >>>%s<<<", out, expectedOut)
-	}
+	require.YAMLEq(t, expectedOut, out)
 }
 
 func TestResolveSuccessfulWithAnnotations(t *testing.T) {
@@ -88,9 +88,7 @@ spec:
 - image: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
 `
 
-	if out != expectedOut {
-		t.Fatalf("Expected >>>%s<<< to match >>>%s<<<", out, expectedOut)
-	}
+	require.YAMLEq(t, expectedOut, out)
 }
 
 func TestSortAnnotations(t *testing.T) {
@@ -145,9 +143,7 @@ spec:
 - image: ccc
 `
 
-	if out != expectedOut {
-		t.Fatalf("Expected >>>%s<<< to match >>>%s<<<", out, expectedOut)
-	}
+	require.YAMLEq(t, expectedOut, out)
 }
 
 func TestResolveInvalidDigest(t *testing.T) {
@@ -165,11 +161,8 @@ spec:
 		AllowError:  true,
 	})
 
-	expectedErr := "Expected valid digest reference, but found 'nginx@sha256:digest', reason: digest must be between 71 and 71 characters in length: sha256:digest"
-
-	if !strings.Contains(err.Error(), expectedErr) {
-		t.Fatalf("Expected >>>%s<<< to match >>>%s<<<", err, expectedErr)
-	}
+	expectedErr := "Expected valid digest reference, but found 'nginx@sha256:digest', reason: invalid checksum digest length"
+	require.Contains(t, err.Error(), expectedErr)
 }
 
 func TestResolveUnknownImage(t *testing.T) {
@@ -188,10 +181,7 @@ spec:
 	})
 
 	expectedErr := "- Resolving image 'unknown': GET https://index.docker.io/v2/library/unknown/manifests/latest: UNAUTHORIZED: authentication required;"
-
-	if !strings.Contains(err.Error(), expectedErr) {
-		t.Fatalf("Expected >>>%s<<< to match >>>%s<<<", err, expectedErr)
-	}
+	require.Contains(t, err.Error(), expectedErr)
 }
 
 func TestResolveWithOverride(t *testing.T) {
@@ -225,9 +215,7 @@ spec:
 - image: docker.io/library/nginx:1.14.2
 `
 
-	if out != expectedOut {
-		t.Fatalf("Expected >>>%s<<< to match >>>%s<<<", out, expectedOut)
-	}
+	require.YAMLEq(t, expectedOut, out)
 }
 
 func TestResolveWithImageMap(t *testing.T) {
@@ -274,9 +262,7 @@ spec:
 - image: img3
 `
 
-	if out != expectedOut {
-		t.Fatalf("Expected >>>%s<<< to match >>>%s<<<", out, expectedOut)
-	}
+	require.YAMLEq(t, expectedOut, out)
 }
 
 func TestResolveWithImageKeys(t *testing.T) {
@@ -311,9 +297,7 @@ spec:
     anotherCustomImage: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
 `
 
-	if out != expectedOut {
-		t.Fatalf("Expected >>>%s<<< to match >>>%s<<<", out, expectedOut)
-	}
+	require.YAMLEq(t, expectedOut, out)
 }
 
 func TestResolveWithOverrideMatchingImageRepo(t *testing.T) {
@@ -346,9 +330,7 @@ spec:
 - image: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
 `
 
-	if out != expectedOut {
-		t.Fatalf("Expected >>>%s<<< to match >>>%s<<<", out, expectedOut)
-	}
+	require.YAMLEq(t, expectedOut, out)
 }
 
 func TestResolveSuccessfulWithSearchRules(t *testing.T) {
@@ -421,9 +403,7 @@ spec:
 - image: skip
 `
 
-	if out != expectedOut {
-		t.Fatalf("Expected >>>%s<<< to match >>>%s<<<", out, expectedOut)
-	}
+	require.YAMLEq(t, expectedOut, out)
 }
 
 func TestResolveSuccessfulWithDuplicateSearchRules(t *testing.T) {
@@ -454,9 +434,7 @@ spec:
 - sidecarImage: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
 `
 
-	if out != expectedOut {
-		t.Fatalf("Expected >>>%s<<< to match >>>%s<<<", out, expectedOut)
-	}
+	require.YAMLEq(t, expectedOut, out)
 }
 
 func TestResolveSuccessfulWithTagSelection(t *testing.T) {
@@ -508,9 +486,7 @@ spec:
 - image: index.docker.io/library/nginx@sha256:32fdf92b4e986e109e4db0865758020cb0c3b70d6ba80d02fe87bad5cc3dc228
 `
 
-	if out != expectedOut {
-		t.Fatalf("Expected >>>%s<<< to match >>>%s<<<", out, expectedOut)
-	}
+	require.YAMLEq(t, expectedOut, out)
 }
 
 func TestResolveSuccessfulWithPlatformSelectionConfig(t *testing.T) {
@@ -579,9 +555,7 @@ spec:
 - image: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
 `
 
-	if out != expectedOut {
-		t.Fatalf("Expected >>>%s<<< to match >>>%s<<<", out, expectedOut)
-	}
+	require.YAMLEq(t, expectedOut, out)
 }
 
 func TestResolveSuccessfulWithPlatformSelectionWithGlobalFlag(t *testing.T) {
@@ -646,7 +620,5 @@ spec:
 - image: index.docker.io/library/nginx@sha256:706446e9c6667c0880d5da3f39c09a6c7d2114f5a5d6b74a2fafd24ae30d2078
 `
 
-	if out != expectedOut {
-		t.Fatalf("Expected >>>%s<<< to match >>>%s<<<", out, expectedOut)
-	}
+	require.YAMLEq(t, expectedOut, out)
 }
