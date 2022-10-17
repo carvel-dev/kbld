@@ -8,7 +8,7 @@ require (
 	github.com/google/go-containerregistry v0.11.0
 	github.com/hashicorp/go-version v1.6.0
 	github.com/kisielk/errcheck v1.6.2
-	github.com/spf13/cobra v1.5.0
+	github.com/spf13/cobra v1.6.0
 	github.com/stretchr/testify v1.8.0
 	github.com/vmware-tanzu/carvel-imgpkg v0.33.0
 	github.com/vmware-tanzu/carvel-vendir v0.31.0
@@ -27,7 +27,7 @@ require (
 	github.com/go-logr/logr v1.2.3 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/google/gofuzz v1.1.0 // indirect
-	github.com/inconshreveable/mousetrap v1.0.0 // indirect
+	github.com/inconshreveable/mousetrap v1.0.1 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/k14s/semver/v4 v4.0.1-0.20210701191048-266d47ac6115 // indirect
 	github.com/mattn/go-colorable v0.1.12 // indirect
