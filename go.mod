@@ -11,7 +11,7 @@ require (
 	github.com/spf13/cobra v1.6.0
 	github.com/stretchr/testify v1.8.0
 	github.com/vmware-tanzu/carvel-imgpkg v0.33.0
-	github.com/vmware-tanzu/carvel-vendir v0.31.0
+	github.com/vmware-tanzu/carvel-vendir v0.32.0
 	golang.org/x/sync v0.1.0
 	k8s.io/apimachinery v0.25.3
 	sigs.k8s.io/yaml v1.3.0

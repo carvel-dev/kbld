@@ -115,8 +115,8 @@ github.com/vito/go-interact v1.0.1 h1:O8xi8c93bRUv2Tb/v6HdiuGc+WnWt+AQzF74MOOdlB
 github.com/vito/go-interact v1.0.1/go.mod h1:HrdHSJXD2yn1MhlTwSIMeFgQ5WftiIorszVGd3S/DAA=
 github.com/vmware-tanzu/carvel-imgpkg v0.33.0 h1:ZfMeJ+PKXJkkxcRSRiI/N9Vzxgyqj7YWktY3BEgQC84=
 github.com/vmware-tanzu/carvel-imgpkg v0.33.0/go.mod h1:9J2sqH4lTws2fPhiloEWTc7tKvdsmmOxRqEWgMokTXM=
-github.com/vmware-tanzu/carvel-vendir v0.31.0 h1:ThjSBXbwh1DqUlDbgkMBkEwSlXgM9Y+XPTMkJ24ffOs=
-github.com/vmware-tanzu/carvel-vendir v0.31.0/go.mod h1:XvFCOvgpj7+f9FUwKs9JWuaFpvTejP2wqF+sHKvYggs=
+github.com/vmware-tanzu/carvel-vendir v0.32.0 h1:3PtLspXVOdwCMaLE+WZTDtEhowoUSSvxnfXITxJLu9Q=
+github.com/vmware-tanzu/carvel-vendir v0.32.0/go.mod h1:7TkdZo68KQK0XesY/+rvcedUOoFTqGP4gm4GpaVmZKg=
 github.com/yuin/goldmark v1.1.27/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 github.com/yuin/goldmark v1.2.1/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 github.com/yuin/goldmark v1.4.1/go.mod h1:mwnBkeHKe2W/ZEtQ+71ViKU8L12m81fl3OWwC1Zlc8k=
