@@ -11,7 +11,7 @@ require (
 	github.com/spf13/cobra v1.6.1
 	github.com/stretchr/testify v1.8.1
 	github.com/vmware-tanzu/carvel-imgpkg v0.33.0
-	github.com/vmware-tanzu/carvel-vendir v0.32.0
+	github.com/vmware-tanzu/carvel-vendir v0.32.1
 	golang.org/x/sync v0.1.0
 	k8s.io/apimachinery v0.25.4
 	sigs.k8s.io/yaml v1.3.0
@@ -43,9 +43,9 @@ require (
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/vito/go-interact v1.0.1 // indirect
 	golang.org/x/mod v0.6.0 // indirect
-	golang.org/x/net v0.1.0 // indirect
-	golang.org/x/sys v0.1.0 // indirect
-	golang.org/x/term v0.1.0 // indirect
+	golang.org/x/net v0.2.0 // indirect
+	golang.org/x/sys v0.2.0 // indirect
+	golang.org/x/term v0.2.0 // indirect
 	golang.org/x/text v0.4.0 // indirect
 	golang.org/x/tools v0.1.12 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
