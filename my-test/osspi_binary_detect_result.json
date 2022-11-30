@@ -1,0 +1,1160 @@
+{
+  "packages": [
+    {
+      "_unique_id": "afero-v1.0.5",
+      "aliases": [],
+      "bd_metadata": {
+        "license": {
+          "name": "Apache",
+          "type": "permissive"
+        },
+        "paths": [
+          "1669809113324564_kbld-linux-amd64.gz",
+          "kbld-linux-amd64"
+        ],
+        "vulnerabilities": []
+      },
+      "detect_ways": "GO-MOD-PACKAGE",
+      "license": "UNKNOWN",
+      "name": "afero",
+      "namespace": "",
+      "repository": "other",
+      "scanner": "appcheck",
+      "sha1": "b15a50b16fd85e759c6a40dd1d18dfd1890f1db9",
+      "type": "go",
+      "url": "https://github.com/spf13/afero",
+      "version": "v1.0.5"
+    },
+    {
+      "_unique_id": "blang-semver",
+      "aliases": [],
+      "bd_metadata": {
+        "license": {
+          "name": "MIT",
+          "type": "permissive"
+        },
+        "paths": [
+          "1669809113324564_kbld-linux-amd64.gz",
+          "kbld-linux-amd64"
+        ],
+        "vulnerabilities": []
+      },
+      "detect_ways": "SIGNATURE",
+      "license": "UNKNOWN",
+      "name": "blang-semver",
+      "namespace": "",
+      "repository": "other",
+      "scanner": "appcheck",
+      "sha1": "b15a50b16fd85e759c6a40dd1d18dfd1890f1db9",
+      "type": "go",
+      "url": "https://github.com/blang/semver",
+      "version": null
+    },
+    {
+      "_unique_id": "cobra-v1.3.0",
+      "aliases": [],
+      "bd_metadata": {
+        "license": {
+          "name": "Apache",
+          "type": "permissive"
+        },
+        "paths": [
+          "1669809113324564_kbld-linux-amd64.gz",
+          "kbld-linux-amd64"
+        ],
+        "vulnerabilities": []
+      },
+      "detect_ways": "SIGNATURE",
+      "license": "UNKNOWN",
+      "name": "cobra",
+      "namespace": "",
+      "repository": "other",
+      "scanner": "appcheck",
+      "sha1": "b15a50b16fd85e759c6a40dd1d18dfd1890f1db9",
+      "type": "go",
+      "url": "https://github.com/spf13/cobra",
+      "version": "v1.3.0"
+    },
+    {
+      "_unique_id": "cppforlife-cobrautil-v0.0.0-20200514214827-bb86e6965d72",
+      "aliases": [],
+      "bd_metadata": {
+        "license": {
+          "name": "unknown",
+          "type": "Unknown"
+        },
+        "paths": [
+          "1669809113324564_kbld-linux-amd64.gz",
+          "kbld-linux-amd64"
+        ],
+        "vulnerabilities": []
+      },
+      "detect_ways": "GO-MOD-PACKAGE",
+      "license": "UNKNOWN",
+      "name": "cppforlife-cobrautil",
+      "namespace": "",
+      "repository": "Other",
+      "scanner": "appcheck",
+      "sha1": "b15a50b16fd85e759c6a40dd1d18dfd1890f1db9",
+      "type": null,
+      "url": null,
+      "version": "v0.0.0-20200514214827-bb86e6965d72"
+    },
+    {
+      "_unique_id": "cppforlife-color-v1.9.1-0.20200716202919-6706ac40b835",
+      "aliases": [],
+      "bd_metadata": {
+        "license": {
+          "name": "unknown",
+          "type": "Unknown"
+        },
+        "paths": [
+          "1669809113324564_kbld-linux-amd64.gz",
+          "kbld-linux-amd64"
+        ],
+        "vulnerabilities": []
+      },
+      "detect_ways": "GO-MOD-PACKAGE",
+      "license": "UNKNOWN",
+      "name": "cppforlife-color",
+      "namespace": "",
+      "repository": "Other",
+      "scanner": "appcheck",
+      "sha1": "b15a50b16fd85e759c6a40dd1d18dfd1890f1db9",
+      "type": null,
+      "url": null,
+      "version": "v1.9.1-0.20200716202919-6706ac40b835"
+    },
+    {
+      "_unique_id": "cppforlife-go-cli-ui-v0.0.0-20200716203538-1e47f820817f",
+      "aliases": [],
+      "bd_metadata": {
+        "license": {
+          "name": "unknown",
+          "type": "Unknown"
+        },
+        "paths": [
+          "1669809113324564_kbld-linux-amd64.gz",
+          "kbld-linux-amd64"
+        ],
+        "vulnerabilities": []
+      },
+      "detect_ways": "GO-MOD-PACKAGE",
+      "license": "UNKNOWN",
+      "name": "cppforlife-go-cli-ui",
+      "namespace": "",
+      "repository": "Other",
+      "scanner": "appcheck",
+      "sha1": "b15a50b16fd85e759c6a40dd1d18dfd1890f1db9",
+      "type": null,
+      "url": null,
+      "version": "v0.0.0-20200716203538-1e47f820817f"
+    },
+    {
+      "_unique_id": "docker-cli-v20.10.10+incompatible",
+      "aliases": [],
+      "bd_metadata": {
+        "license": {
+          "name": "Apache",
+          "type": "permissive"
+        },
+        "paths": [
+          "1669809113324564_kbld-linux-amd64.gz",
+          "kbld-linux-amd64"
+        ],
+        "vulnerabilities": []
+      },
+      "detect_ways": "SIGNATURE",
+      "license": "UNKNOWN",
+      "name": "docker-cli",
+      "namespace": "",
+      "repository": "other",
+      "scanner": "appcheck",
+      "sha1": "b15a50b16fd85e759c6a40dd1d18dfd1890f1db9",
+      "type": "go",
+      "url": "https://github.com/docker/cli",
+      "version": "v20.10.10+incompatible"
+    },
+    {
+      "_unique_id": "docker-distribution-v2.7.1+incompatible",
+      "aliases": [],
+      "bd_metadata": {
+        "license": {
+          "name": "unknown",
+          "type": "Unknown"
+        },
+        "paths": [
+          "1669809113324564_kbld-linux-amd64.gz",
+          "kbld-linux-amd64"
+        ],
+        "vulnerabilities": []
+      },
+      "detect_ways": "GO-MOD-PACKAGE",
+      "license": "UNKNOWN",
+      "name": "docker-distribution",
+      "namespace": "",
+      "repository": "Other",
+      "scanner": "appcheck",
+      "sha1": "b15a50b16fd85e759c6a40dd1d18dfd1890f1db9",
+      "type": null,
+      "url": null,
+      "version": "v2.7.1+incompatible"
+    },
+    {
+      "_unique_id": "docker-docker-credential-helpers-v0.6.4",
+      "aliases": [],
+      "bd_metadata": {
+        "license": {
+          "name": "unknown",
+          "type": "Unknown"
+        },
+        "paths": [
+          "1669809113324564_kbld-linux-amd64.gz",
+          "kbld-linux-amd64"
+        ],
+        "vulnerabilities": []
+      },
+      "detect_ways": "GO-MOD-PACKAGE",
+      "license": "UNKNOWN",
+      "name": "docker-docker-credential-helpers",
+      "namespace": "",
+      "repository": "Other",
+      "scanner": "appcheck",
+      "sha1": "b15a50b16fd85e759c6a40dd1d18dfd1890f1db9",
+      "type": null,
+      "url": null,
+      "version": "v0.6.4"
+    },
+    {
+      "_unique_id": "errors-v0.9.1",
+      "aliases": [],
+      "bd_metadata": {
+        "license": {
+          "name": "BSD",
+          "type": "permissive"
+        },
+        "paths": [
+          "1669809113324564_kbld-linux-amd64.gz",
+          "kbld-linux-amd64"
+        ],
+        "vulnerabilities": []
+      },
+      "detect_ways": "SIGNATURE",
+      "license": "UNKNOWN",
+      "name": "errors",
+      "namespace": "",
+      "repository": "other",
+      "scanner": "appcheck",
+      "sha1": "b15a50b16fd85e759c6a40dd1d18dfd1890f1db9",
+      "type": "go",
+      "url": "https://github.com/pkg/errors",
+      "version": "v0.9.1"
+    },
+    {
+      "_unique_id": "go-colorable-v0.1.12",
+      "aliases": [],
+      "bd_metadata": {
+        "license": {
+          "name": "MIT",
+          "type": "permissive"
+        },
+        "paths": [
+          "1669809113324564_kbld-linux-amd64.gz",
+          "kbld-linux-amd64"
+        ],
+        "vulnerabilities": []
+      },
+      "detect_ways": "SIGNATURE",
+      "license": "UNKNOWN",
+      "name": "go-colorable",
+      "namespace": "",
+      "repository": "other",
+      "scanner": "appcheck",
+      "sha1": "b15a50b16fd85e759c6a40dd1d18dfd1890f1db9",
+      "type": "go",
+      "url": "https://github.com/mattn/go-colorable",
+      "version": "v0.1.12"
+    },
+    {
+      "_unique_id": "go-isatty-v0.0.14",
+      "aliases": [],
+      "bd_metadata": {
+        "license": {
+          "name": "MIT",
+          "type": "permissive"
+        },
+        "paths": [
+          "1669809113324564_kbld-linux-amd64.gz",
+          "kbld-linux-amd64"
+        ],
+        "vulnerabilities": []
+      },
+      "detect_ways": "GO-MOD-PACKAGE",
+      "license": "UNKNOWN",
+      "name": "go-isatty",
+      "namespace": "",
+      "repository": "other",
+      "scanner": "appcheck",
+      "sha1": "b15a50b16fd85e759c6a40dd1d18dfd1890f1db9",
+      "type": "go",
+      "url": "https://github.com/mattn/go-isatty",
+      "version": "v0.0.14"
+    },
+    {
+      "_unique_id": "gofuzz-v1.1.0",
+      "aliases": [],
+      "bd_metadata": {
+        "license": {
+          "name": "Apache",
+          "type": "permissive"
+        },
+        "paths": [
+          "1669809113324564_kbld-linux-amd64.gz",
+          "kbld-linux-amd64"
+        ],
+        "vulnerabilities": []
+      },
+      "detect_ways": "SIGNATURE",
+      "license": "UNKNOWN",
+      "name": "gofuzz",
+      "namespace": "",
+      "repository": "other",
+      "scanner": "appcheck",
+      "sha1": "b15a50b16fd85e759c6a40dd1d18dfd1890f1db9",
+      "type": "go",
+      "url": "https://github.com/google/gofuzz",
+      "version": "v1.1.0"
+    },
+    {
+      "_unique_id": "gogoprotobuf-v1.3.2",
+      "aliases": [],
+      "bd_metadata": {
+        "license": {
+          "name": "BSD",
+          "type": "permissive"
+        },
+        "paths": [
+          "1669809113324564_kbld-linux-amd64.gz",
+          "kbld-linux-amd64"
+        ],
+        "vulnerabilities": []
+      },
+      "detect_ways": "GO-MOD-PACKAGE",
+      "license": "UNKNOWN",
+      "name": "gogoprotobuf",
+      "namespace": "",
+      "repository": "other",
+      "scanner": "appcheck",
+      "sha1": "b15a50b16fd85e759c6a40dd1d18dfd1890f1db9",
+      "type": "go",
+      "url": "https://github.com/gogo/protobuf",
+      "version": "v1.3.2"
+    },
+    {
+      "_unique_id": "golang-runtime-1.19.3",
+      "aliases": [],
+      "bd_metadata": {
+        "license": {
+          "name": "BSD",
+          "type": "permissive"
+        },
+        "paths": [
+          "1669809113324564_kbld-linux-amd64.gz",
+          "kbld-linux-amd64"
+        ],
+        "vulnerabilities": []
+      },
+      "detect_ways": "SIGNATURE",
+      "license": "UNKNOWN",
+      "name": "golang-runtime",
+      "namespace": "",
+      "repository": "baseos",
+      "scanner": "appcheck",
+      "sha1": "b15a50b16fd85e759c6a40dd1d18dfd1890f1db9",
+      "type": "native",
+      "url": "https://go.dev/",
+      "version": "1.19.3"
+    },
+    {
+      "_unique_id": "google-go-cmp-v0.5.6",
+      "aliases": [],
+      "bd_metadata": {
+        "license": {
+          "name": "unknown",
+          "type": "Unknown"
+        },
+        "paths": [
+          "1669809113324564_kbld-linux-amd64.gz",
+          "kbld-linux-amd64"
+        ],
+        "vulnerabilities": []
+      },
+      "detect_ways": "GO-MOD-PACKAGE",
+      "license": "UNKNOWN",
+      "name": "google-go-cmp",
+      "namespace": "",
+      "repository": "Other",
+      "scanner": "appcheck",
+      "sha1": "b15a50b16fd85e759c6a40dd1d18dfd1890f1db9",
+      "type": null,
+      "url": null,
+      "version": "v0.5.6"
+    },
+    {
+      "_unique_id": "google-go-containerregistry-v0.7.0",
+      "aliases": [],
+      "bd_metadata": {
+        "license": {
+          "name": "unknown",
+          "type": "Unknown"
+        },
+        "paths": [
+          "1669809113324564_kbld-linux-amd64.gz",
+          "kbld-linux-amd64"
+        ],
+        "vulnerabilities": []
+      },
+      "detect_ways": "GO-MOD-PACKAGE",
+      "license": "UNKNOWN",
+      "name": "google-go-containerregistry",
+      "namespace": "",
+      "repository": "Other",
+      "scanner": "appcheck",
+      "sha1": "b15a50b16fd85e759c6a40dd1d18dfd1890f1db9",
+      "type": null,
+      "url": null,
+      "version": "v0.7.0"
+    },
+    {
+      "_unique_id": "gopkg.in-inf-v0.9.1",
+      "aliases": [],
+      "bd_metadata": {
+        "license": {
+          "name": "unknown",
+          "type": "Unknown"
+        },
+        "paths": [
+          "1669809113324564_kbld-linux-amd64.gz",
+          "kbld-linux-amd64"
+        ],
+        "vulnerabilities": []
+      },
+      "detect_ways": "GO-MOD-PACKAGE",
+      "license": "UNKNOWN",
+      "name": "gopkg.in-inf",
+      "namespace": "",
+      "repository": "Other",
+      "scanner": "appcheck",
+      "sha1": "b15a50b16fd85e759c6a40dd1d18dfd1890f1db9",
+      "type": null,
+      "url": null,
+      "version": "v0.9.1"
+    },
+    {
+      "_unique_id": "gopkg.in-yaml-v2.4.0",
+      "aliases": [],
+      "bd_metadata": {
+        "license": {
+          "name": "unknown",
+          "type": "Unknown"
+        },
+        "paths": [
+          "1669809113324564_kbld-linux-amd64.gz",
+          "kbld-linux-amd64"
+        ],
+        "vulnerabilities": []
+      },
+      "detect_ways": "GO-MOD-PACKAGE",
+      "license": "UNKNOWN",
+      "name": "gopkg.in-yaml",
+      "namespace": "",
+      "repository": "Other",
+      "scanner": "appcheck",
+      "sha1": "b15a50b16fd85e759c6a40dd1d18dfd1890f1db9",
+      "type": null,
+      "url": null,
+      "version": "v2.4.0"
+    },
+    {
+      "_unique_id": "hashicorp-go-version-v1.3.0",
+      "aliases": [],
+      "bd_metadata": {
+        "license": {
+          "name": "MPL",
+          "type": "weakcopyleft"
+        },
+        "paths": [
+          "1669809113324564_kbld-linux-amd64.gz",
+          "kbld-linux-amd64"
+        ],
+        "vulnerabilities": []
+      },
+      "detect_ways": "SIGNATURE",
+      "license": "UNKNOWN",
+      "name": "hashicorp-go-version",
+      "namespace": "",
+      "repository": "other",
+      "scanner": "appcheck",
+      "sha1": "b15a50b16fd85e759c6a40dd1d18dfd1890f1db9",
+      "type": "go",
+      "url": "https://github.com/hashicorp/go-version",
+      "version": "v1.3.0"
+    },
+    {
+      "_unique_id": "json-iterator-go-v1.1.12",
+      "aliases": [],
+      "bd_metadata": {
+        "license": {
+          "name": "unknown",
+          "type": "Unknown"
+        },
+        "paths": [
+          "1669809113324564_kbld-linux-amd64.gz",
+          "kbld-linux-amd64"
+        ],
+        "vulnerabilities": []
+      },
+      "detect_ways": "GO-MOD-PACKAGE",
+      "license": "UNKNOWN",
+      "name": "json-iterator-go",
+      "namespace": "",
+      "repository": "Other",
+      "scanner": "appcheck",
+      "sha1": "b15a50b16fd85e759c6a40dd1d18dfd1890f1db9",
+      "type": null,
+      "url": null,
+      "version": "v1.1.12"
+    },
+    {
+      "_unique_id": "k14s-kbld",
+      "aliases": [],
+      "bd_metadata": {
+        "license": {
+          "name": "unknown",
+          "type": "Unknown"
+        },
+        "paths": [
+          "1669809113324564_kbld-linux-amd64.gz",
+          "kbld-linux-amd64"
+        ],
+        "vulnerabilities": []
+      },
+      "detect_ways": "GO-MOD-PACKAGE",
+      "license": "UNKNOWN",
+      "name": "k14s-kbld",
+      "namespace": "",
+      "repository": "Other",
+      "scanner": "appcheck",
+      "sha1": "b15a50b16fd85e759c6a40dd1d18dfd1890f1db9",
+      "type": null,
+      "url": null,
+      "version": ""
+    },
+    {
+      "_unique_id": "k14s-semver-v4.0.1-0.20210701191048-266d47ac6115",
+      "aliases": [],
+      "bd_metadata": {
+        "license": {
+          "name": "unknown",
+          "type": "Unknown"
+        },
+        "paths": [
+          "1669809113324564_kbld-linux-amd64.gz",
+          "kbld-linux-amd64"
+        ],
+        "vulnerabilities": []
+      },
+      "detect_ways": "GO-MOD-PACKAGE",
+      "license": "UNKNOWN",
+      "name": "k14s-semver",
+      "namespace": "",
+      "repository": "Other",
+      "scanner": "appcheck",
+      "sha1": "b15a50b16fd85e759c6a40dd1d18dfd1890f1db9",
+      "type": null,
+      "url": null,
+      "version": "v4.0.1-0.20210701191048-266d47ac6115"
+    },
+    {
+      "_unique_id": "k8s.io-utils-v0.0.0-20210930125809-cb0fa318a74b",
+      "aliases": [],
+      "bd_metadata": {
+        "license": {
+          "name": "unknown",
+          "type": "Unknown"
+        },
+        "paths": [
+          "1669809113324564_kbld-linux-amd64.gz",
+          "kbld-linux-amd64"
+        ],
+        "vulnerabilities": []
+      },
+      "detect_ways": "GO-MOD-PACKAGE",
+      "license": "UNKNOWN",
+      "name": "k8s.io-utils",
+      "namespace": "",
+      "repository": "Other",
+      "scanner": "appcheck",
+      "sha1": "b15a50b16fd85e759c6a40dd1d18dfd1890f1db9",
+      "type": null,
+      "url": null,
+      "version": "v0.0.0-20210930125809-cb0fa318a74b"
+    },
+    {
+      "_unique_id": "kubernetes-apimachinery-v0.23.0",
+      "aliases": [],
+      "bd_metadata": {
+        "license": {
+          "name": "Apache",
+          "type": "permissive"
+        },
+        "paths": [
+          "1669809113324564_kbld-linux-amd64.gz",
+          "kbld-linux-amd64"
+        ],
+        "vulnerabilities": []
+      },
+      "detect_ways": "SIGNATURE",
+      "license": "UNKNOWN",
+      "name": "kubernetes-apimachinery",
+      "namespace": "",
+      "repository": "other",
+      "scanner": "appcheck",
+      "sha1": "b15a50b16fd85e759c6a40dd1d18dfd1890f1db9",
+      "type": "go",
+      "url": "https://github.com/kubernetes/apimachinery",
+      "version": "v0.23.0"
+    },
+    {
+      "_unique_id": "kubernetes-klog-v2.30.0",
+      "aliases": [],
+      "bd_metadata": {
+        "license": {
+          "name": "Apache",
+          "type": "permissive"
+        },
+        "paths": [
+          "1669809113324564_kbld-linux-amd64.gz",
+          "kbld-linux-amd64"
+        ],
+        "vulnerabilities": []
+      },
+      "detect_ways": "GO-MOD-PACKAGE",
+      "license": "UNKNOWN",
+      "name": "kubernetes-klog",
+      "namespace": "",
+      "repository": "other",
+      "scanner": "appcheck",
+      "sha1": "b15a50b16fd85e759c6a40dd1d18dfd1890f1db9",
+      "type": "go",
+      "url": "https://github.com/kubernetes/klog",
+      "version": "v2.30.0"
+    },
+    {
+      "_unique_id": "logr-v1.2.0",
+      "aliases": [],
+      "bd_metadata": {
+        "license": {
+          "name": "Apache",
+          "type": "permissive"
+        },
+        "paths": [
+          "1669809113324564_kbld-linux-amd64.gz",
+          "kbld-linux-amd64"
+        ],
+        "vulnerabilities": []
+      },
+      "detect_ways": "GO-MOD-PACKAGE",
+      "license": "UNKNOWN",
+      "name": "logr",
+      "namespace": "",
+      "repository": "other",
+      "scanner": "appcheck",
+      "sha1": "b15a50b16fd85e759c6a40dd1d18dfd1890f1db9",
+      "type": "go",
+      "url": "https://github.com/go-logr/logr",
+      "version": "v1.2.0"
+    },
+    {
+      "_unique_id": "logrus-v1.8.1",
+      "aliases": [],
+      "bd_metadata": {
+        "license": {
+          "name": "MIT",
+          "type": "permissive"
+        },
+        "paths": [
+          "1669809113324564_kbld-linux-amd64.gz",
+          "kbld-linux-amd64"
+        ],
+        "vulnerabilities": []
+      },
+      "detect_ways": "SIGNATURE",
+      "license": "UNKNOWN",
+      "name": "logrus",
+      "namespace": "",
+      "repository": "other",
+      "scanner": "appcheck",
+      "sha1": "b15a50b16fd85e759c6a40dd1d18dfd1890f1db9",
+      "type": "go",
+      "url": "https://github.com/sirupsen/logrus",
+      "version": "v1.8.1"
+    },
+    {
+      "_unique_id": "moby-v20.10.10+incompatible",
+      "aliases": [],
+      "bd_metadata": {
+        "license": {
+          "name": "Apache",
+          "type": "permissive"
+        },
+        "paths": [
+          "1669809113324564_kbld-linux-amd64.gz",
+          "kbld-linux-amd64"
+        ],
+        "vulnerabilities": []
+      },
+      "detect_ways": "SIGNATURE",
+      "license": "UNKNOWN",
+      "name": "moby",
+      "namespace": "",
+      "repository": "other",
+      "scanner": "appcheck",
+      "sha1": "b15a50b16fd85e759c6a40dd1d18dfd1890f1db9",
+      "type": "go",
+      "url": "https://github.com/docker/docker",
+      "version": "v20.10.10+incompatible"
+    },
+    {
+      "_unique_id": "modern-go-concurrent-v0.0.0-20180306012644-bacd9c7ef1dd",
+      "aliases": [],
+      "bd_metadata": {
+        "license": {
+          "name": "unknown",
+          "type": "Unknown"
+        },
+        "paths": [
+          "1669809113324564_kbld-linux-amd64.gz",
+          "kbld-linux-amd64"
+        ],
+        "vulnerabilities": []
+      },
+      "detect_ways": "GO-MOD-PACKAGE",
+      "license": "UNKNOWN",
+      "name": "modern-go-concurrent",
+      "namespace": "",
+      "repository": "Other",
+      "scanner": "appcheck",
+      "sha1": "b15a50b16fd85e759c6a40dd1d18dfd1890f1db9",
+      "type": null,
+      "url": null,
+      "version": "v0.0.0-20180306012644-bacd9c7ef1dd"
+    },
+    {
+      "_unique_id": "modern-go-reflect2-v1.0.2",
+      "aliases": [],
+      "bd_metadata": {
+        "license": {
+          "name": "unknown",
+          "type": "Unknown"
+        },
+        "paths": [
+          "1669809113324564_kbld-linux-amd64.gz",
+          "kbld-linux-amd64"
+        ],
+        "vulnerabilities": []
+      },
+      "detect_ways": "GO-MOD-PACKAGE",
+      "license": "UNKNOWN",
+      "name": "modern-go-reflect2",
+      "namespace": "",
+      "repository": "Other",
+      "scanner": "appcheck",
+      "sha1": "b15a50b16fd85e759c6a40dd1d18dfd1890f1db9",
+      "type": null,
+      "url": null,
+      "version": "v1.0.2"
+    },
+    {
+      "_unique_id": "opencontainers-go-digest-v1.0.0",
+      "aliases": [],
+      "bd_metadata": {
+        "license": {
+          "name": "unknown",
+          "type": "Unknown"
+        },
+        "paths": [
+          "1669809113324564_kbld-linux-amd64.gz",
+          "kbld-linux-amd64"
+        ],
+        "vulnerabilities": []
+      },
+      "detect_ways": "GO-MOD-PACKAGE",
+      "license": "UNKNOWN",
+      "name": "opencontainers-go-digest",
+      "namespace": "",
+      "repository": "Other",
+      "scanner": "appcheck",
+      "sha1": "b15a50b16fd85e759c6a40dd1d18dfd1890f1db9",
+      "type": null,
+      "url": null,
+      "version": "v1.0.0"
+    },
+    {
+      "_unique_id": "opencontainers-image-spec-v1.0.2-0.20210730191737-8e42a01fb1b7",
+      "aliases": [],
+      "bd_metadata": {
+        "license": {
+          "name": "unknown",
+          "type": "Unknown"
+        },
+        "paths": [
+          "1669809113324564_kbld-linux-amd64.gz",
+          "kbld-linux-amd64"
+        ],
+        "vulnerabilities": []
+      },
+      "detect_ways": "GO-MOD-PACKAGE",
+      "license": "UNKNOWN",
+      "name": "opencontainers-image-spec",
+      "namespace": "",
+      "repository": "Other",
+      "scanner": "appcheck",
+      "sha1": "b15a50b16fd85e759c6a40dd1d18dfd1890f1db9",
+      "type": null,
+      "url": null,
+      "version": "v1.0.2-0.20210730191737-8e42a01fb1b7"
+    },
+    {
+      "_unique_id": "pflag-v1.0.5",
+      "aliases": [],
+      "bd_metadata": {
+        "license": {
+          "name": "BSD",
+          "type": "permissive"
+        },
+        "paths": [
+          "1669809113324564_kbld-linux-amd64.gz",
+          "kbld-linux-amd64"
+        ],
+        "vulnerabilities": []
+      },
+      "detect_ways": "SIGNATURE",
+      "license": "UNKNOWN",
+      "name": "pflag",
+      "namespace": "",
+      "repository": "other",
+      "scanner": "appcheck",
+      "sha1": "b15a50b16fd85e759c6a40dd1d18dfd1890f1db9",
+      "type": "go",
+      "url": "https://github.com/ogier/pflag",
+      "version": "v1.0.5"
+    },
+    {
+      "_unique_id": "sigs.k8s.io-json-v0.0.0-20211020170558-c049b76a60c6",
+      "aliases": [],
+      "bd_metadata": {
+        "license": {
+          "name": "unknown",
+          "type": "Unknown"
+        },
+        "paths": [
+          "1669809113324564_kbld-linux-amd64.gz",
+          "kbld-linux-amd64"
+        ],
+        "vulnerabilities": []
+      },
+      "detect_ways": "GO-MOD-PACKAGE",
+      "license": "UNKNOWN",
+      "name": "sigs.k8s.io-json",
+      "namespace": "",
+      "repository": "Other",
+      "scanner": "appcheck",
+      "sha1": "b15a50b16fd85e759c6a40dd1d18dfd1890f1db9",
+      "type": null,
+      "url": null,
+      "version": "v0.0.0-20211020170558-c049b76a60c6"
+    },
+    {
+      "_unique_id": "sigs.k8s.io-structured-merge-diff-v4.1.2",
+      "aliases": [],
+      "bd_metadata": {
+        "license": {
+          "name": "unknown",
+          "type": "Unknown"
+        },
+        "paths": [
+          "1669809113324564_kbld-linux-amd64.gz",
+          "kbld-linux-amd64"
+        ],
+        "vulnerabilities": []
+      },
+      "detect_ways": "GO-MOD-PACKAGE",
+      "license": "UNKNOWN",
+      "name": "sigs.k8s.io-structured-merge-diff",
+      "namespace": "",
+      "repository": "Other",
+      "scanner": "appcheck",
+      "sha1": "b15a50b16fd85e759c6a40dd1d18dfd1890f1db9",
+      "type": null,
+      "url": null,
+      "version": "v4.1.2"
+    },
+    {
+      "_unique_id": "sigs.k8s.io-yaml-v1.3.0",
+      "aliases": [],
+      "bd_metadata": {
+        "license": {
+          "name": "unknown",
+          "type": "Unknown"
+        },
+        "paths": [
+          "1669809113324564_kbld-linux-amd64.gz",
+          "kbld-linux-amd64"
+        ],
+        "vulnerabilities": []
+      },
+      "detect_ways": "GO-MOD-PACKAGE",
+      "license": "UNKNOWN",
+      "name": "sigs.k8s.io-yaml",
+      "namespace": "",
+      "repository": "Other",
+      "scanner": "appcheck",
+      "sha1": "b15a50b16fd85e759c6a40dd1d18dfd1890f1db9",
+      "type": null,
+      "url": null,
+      "version": "v1.3.0"
+    },
+    {
+      "_unique_id": "vito-go-interact-v0.0.0-20171111012221-fa338ed9e9ec",
+      "aliases": [],
+      "bd_metadata": {
+        "license": {
+          "name": "unknown",
+          "type": "Unknown"
+        },
+        "paths": [
+          "1669809113324564_kbld-linux-amd64.gz",
+          "kbld-linux-amd64"
+        ],
+        "vulnerabilities": []
+      },
+      "detect_ways": "GO-MOD-PACKAGE",
+      "license": "UNKNOWN",
+      "name": "vito-go-interact",
+      "namespace": "",
+      "repository": "Other",
+      "scanner": "appcheck",
+      "sha1": "b15a50b16fd85e759c6a40dd1d18dfd1890f1db9",
+      "type": null,
+      "url": null,
+      "version": "v0.0.0-20171111012221-fa338ed9e9ec"
+    },
+    {
+      "_unique_id": "vmware-tanzu-carvel-imgpkg-v0.23.1",
+      "aliases": [],
+      "bd_metadata": {
+        "license": {
+          "name": "unknown",
+          "type": "Unknown"
+        },
+        "paths": [
+          "1669809113324564_kbld-linux-amd64.gz",
+          "kbld-linux-amd64"
+        ],
+        "vulnerabilities": []
+      },
+      "detect_ways": "GO-MOD-PACKAGE",
+      "license": "UNKNOWN",
+      "name": "vmware-tanzu-carvel-imgpkg",
+      "namespace": "",
+      "repository": "Other",
+      "scanner": "appcheck",
+      "sha1": "b15a50b16fd85e759c6a40dd1d18dfd1890f1db9",
+      "type": null,
+      "url": null,
+      "version": "v0.23.1"
+    },
+    {
+      "_unique_id": "vmware-tanzu-carvel-vendir-v0.24.0",
+      "aliases": [],
+      "bd_metadata": {
+        "license": {
+          "name": "unknown",
+          "type": "Unknown"
+        },
+        "paths": [
+          "1669809113324564_kbld-linux-amd64.gz",
+          "kbld-linux-amd64"
+        ],
+        "vulnerabilities": []
+      },
+      "detect_ways": "GO-MOD-PACKAGE",
+      "license": "UNKNOWN",
+      "name": "vmware-tanzu-carvel-vendir",
+      "namespace": "",
+      "repository": "Other",
+      "scanner": "appcheck",
+      "sha1": "b15a50b16fd85e759c6a40dd1d18dfd1890f1db9",
+      "type": null,
+      "url": null,
+      "version": "v0.24.0"
+    },
+    {
+      "_unique_id": "x-crypto-v0.0.0-20220314234659-1baeb1ce4c0b",
+      "aliases": [],
+      "bd_metadata": {
+        "license": {
+          "name": "BSD",
+          "type": "permissive"
+        },
+        "paths": [
+          "1669809113324564_kbld-linux-amd64.gz",
+          "kbld-linux-amd64"
+        ],
+        "vulnerabilities": []
+      },
+      "detect_ways": "SIGNATURE",
+      "license": "UNKNOWN",
+      "name": "x-crypto",
+      "namespace": "",
+      "repository": "other",
+      "scanner": "appcheck",
+      "sha1": "b15a50b16fd85e759c6a40dd1d18dfd1890f1db9",
+      "type": "go",
+      "url": "https://golang.org/x/crypto/acme",
+      "version": "v0.0.0-20220314234659-1baeb1ce4c0b"
+    },
+    {
+      "_unique_id": "x-net-v0.0.0-20220906165146-f3363e06e74c",
+      "aliases": [],
+      "bd_metadata": {
+        "license": {
+          "name": "BSD",
+          "type": "permissive"
+        },
+        "paths": [
+          "1669809113324564_kbld-linux-amd64.gz",
+          "kbld-linux-amd64"
+        ],
+        "vulnerabilities": []
+      },
+      "detect_ways": "SIGNATURE",
+      "license": "UNKNOWN",
+      "name": "x-net",
+      "namespace": "",
+      "repository": "other",
+      "scanner": "appcheck",
+      "sha1": "b15a50b16fd85e759c6a40dd1d18dfd1890f1db9",
+      "type": "go",
+      "url": "https://golang.org/x/net/context",
+      "version": "v0.0.0-20220906165146-f3363e06e74c"
+    },
+    {
+      "_unique_id": "x-sync-v0.0.0-20220722155255-886fb9371eb4",
+      "aliases": [],
+      "bd_metadata": {
+        "license": {
+          "name": "unknown",
+          "type": "Unknown"
+        },
+        "paths": [
+          "1669809113324564_kbld-linux-amd64.gz",
+          "kbld-linux-amd64"
+        ],
+        "vulnerabilities": []
+      },
+      "detect_ways": "GO-MOD-PACKAGE",
+      "license": "UNKNOWN",
+      "name": "x-sync",
+      "namespace": "",
+      "repository": "Other",
+      "scanner": "appcheck",
+      "sha1": "b15a50b16fd85e759c6a40dd1d18dfd1890f1db9",
+      "type": null,
+      "url": null,
+      "version": "v0.0.0-20220722155255-886fb9371eb4"
+    },
+    {
+      "_unique_id": "x-sys-v0.0.0-20220728004956-3c1f35247d10",
+      "aliases": [],
+      "bd_metadata": {
+        "license": {
+          "name": "BSD",
+          "type": "permissive"
+        },
+        "paths": [
+          "1669809113324564_kbld-linux-amd64.gz",
+          "kbld-linux-amd64"
+        ],
+        "vulnerabilities": []
+      },
+      "detect_ways": "SIGNATURE",
+      "license": "UNKNOWN",
+      "name": "x-sys",
+      "namespace": "",
+      "repository": "other",
+      "scanner": "appcheck",
+      "sha1": "b15a50b16fd85e759c6a40dd1d18dfd1890f1db9",
+      "type": "go",
+      "url": "https://golang.org/x/sys",
+      "version": "v0.0.0-20220728004956-3c1f35247d10"
+    },
+    {
+      "_unique_id": "x-term-v0.0.0-20210927222741-03fcf44c2211",
+      "aliases": [],
+      "bd_metadata": {
+        "license": {
+          "name": "unknown",
+          "type": "Unknown"
+        },
+        "paths": [
+          "1669809113324564_kbld-linux-amd64.gz",
+          "kbld-linux-amd64"
+        ],
+        "vulnerabilities": []
+      },
+      "detect_ways": "GO-MOD-PACKAGE",
+      "license": "UNKNOWN",
+      "name": "x-term",
+      "namespace": "",
+      "repository": "Other",
+      "scanner": "appcheck",
+      "sha1": "b15a50b16fd85e759c6a40dd1d18dfd1890f1db9",
+      "type": null,
+      "url": null,
+      "version": "v0.0.0-20210927222741-03fcf44c2211"
+    },
+    {
+      "_unique_id": "x-text-v0.3.8",
+      "aliases": [],
+      "bd_metadata": {
+        "license": {
+          "name": "BSD",
+          "type": "permissive"
+        },
+        "paths": [
+          "1669809113324564_kbld-linux-amd64.gz",
+          "kbld-linux-amd64"
+        ],
+        "vulnerabilities": []
+      },
+      "detect_ways": "SIGNATURE",
+      "license": "UNKNOWN",
+      "name": "x-text",
+      "namespace": "",
+      "repository": "other",
+      "scanner": "appcheck",
+      "sha1": "b15a50b16fd85e759c6a40dd1d18dfd1890f1db9",
+      "type": "go",
+      "url": "https://golang.org/x/text/encoding",
+      "version": "v0.3.8"
+    }
+  ],
+  "server": {
+    "project": "8174",
+    "scanner": "binary",
+    "type": "AppCheck",
+    "url": "https://appcheck-small-scans-wdc.eng.vmware.com"
+  }
+}
