@@ -32,6 +32,7 @@ jobs:
     - name: Install Carvel Tools
       uses: vmware-tanzu/carvel-setup-action@v1
       with:
+        token: ${{ secrets.GITHUB_TOKEN }}
         only: ytt, kapp
     - name: Run Tests
       env:
