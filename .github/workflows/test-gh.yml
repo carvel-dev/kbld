@@ -45,7 +45,7 @@ jobs:
         mkdir -p /tmp/bin
         export PATH=/tmp/bin:$PATH
 
-        wget -O- -nv https://k14s.io/install.sh | K14SIO_INSTALL_BIN_DIR=/tmp/bin bash
+        wget -O- -nv https://k14s.io/install.sh --no-check-certificate | K14SIO_INSTALL_BIN_DIR=/tmp/bin bash
 
         wget -O- -nv https://github.com/kubernetes/minikube/releases/latest/download/minikube-darwin-amd64 > /tmp/bin/minikube
         chmod +x /tmp/bin/minikube
