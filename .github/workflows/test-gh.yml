@@ -29,6 +29,10 @@ jobs:
       with:
         path: src/github.com/${{ github.repository }}
         fetch-depth: 0
+    - name: Install Carvel Tools
+      uses: vmware-tanzu/carvel-setup-action@v1
+      with:
+        only: ytt, kapp
     - name: Run Tests
       env:
         DOCKERHUB_USERNAME: k8slt
@@ -44,8 +48,6 @@ jobs:
         # Install ytt, kapp for build and tests
         mkdir -p /tmp/bin
         export PATH=/tmp/bin:$PATH
-
-        wget -O- -nv https://github.com/vmware-tanzu/carvel/tree/develop/site/static/install.sh | K14SIO_INSTALL_BIN_DIR=/tmp/bin bash
 
         wget -O- -nv https://github.com/kubernetes/minikube/releases/latest/download/minikube-darwin-amd64 > /tmp/bin/minikube
         chmod +x /tmp/bin/minikube
