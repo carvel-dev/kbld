@@ -10,7 +10,7 @@ jobs:
     with:
       repo: vmware-tanzu/carvel-kbld
       tool: kbld
-      goVersion: 1.18
+      goVersion: 1.19.3
     secrets:
       githubToken: ${{ secrets.GITHUB_TOKEN }}
       slackWebhookURL: ${{ secrets.SLACK_WEBHOOK_URL }}
