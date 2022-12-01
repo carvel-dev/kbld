@@ -337,7 +337,8 @@ func (d Config) WriteToFile(path string) error {
 }
 
 // Equal reports whether this ImageOverride is equal to another ImageOverride.
-//   (`ImageMeta` is descriptive — not identifying — so not part of equality)
+//
+//	(`ImageMeta` is descriptive — not identifying — so not part of equality)
 func (d ImageOverride) Equal(other ImageOverride) bool {
 	return d.ImageRef == other.ImageRef &&
 		d.NewImage == other.NewImage &&
