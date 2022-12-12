@@ -3,14 +3,14 @@ module github.com/vmware-tanzu/carvel-kbld
 go 1.19
 
 require (
-	github.com/cppforlife/cobrautil v0.0.0-20200514214827-bb86e6965d72
+	github.com/cppforlife/cobrautil v0.0.0-20221021151949-d60711905d65
 	github.com/cppforlife/go-cli-ui v0.0.0-20220428182907-73db60c7611a
 	github.com/google/go-containerregistry v0.12.1
 	github.com/hashicorp/go-version v1.6.0
 	github.com/kisielk/errcheck v1.6.2
 	github.com/spf13/cobra v1.6.1
 	github.com/stretchr/testify v1.8.1
-	github.com/vmware-tanzu/carvel-imgpkg v0.33.0
+	github.com/vmware-tanzu/carvel-imgpkg v0.34.1
 	github.com/vmware-tanzu/carvel-vendir v0.32.0
 	golang.org/x/sync v0.1.0
 	k8s.io/apimachinery v0.25.4
@@ -44,7 +44,7 @@ require (
 	github.com/vito/go-interact v1.0.1 // indirect
 	golang.org/x/mod v0.6.0 // indirect
 	golang.org/x/net v0.1.0 // indirect
-	golang.org/x/sys v0.1.0 // indirect
+	golang.org/x/sys v0.3.0 // indirect
 	golang.org/x/term v0.1.0 // indirect
 	golang.org/x/text v0.4.0 // indirect
 	golang.org/x/tools v0.1.12 // indirect
