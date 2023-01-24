@@ -220,9 +220,6 @@ overrides:
 - image: gcr.io/cf-build-service-public/kpack/webhook@sha256:c2461ef9634c771f2a06bc0371040b43c9a78dd0e4ac1c9fde3f4525e0ae21f2
   newImage: gcr.io/cf-build-service-public/kpack/webhook@sha256:c2461ef9634c771f2a06bc0371040b43c9a78dd0e4ac1c9fde3f4525e0ae21f2
   preresolved: true
-- image: gcr.io/cf-networking-images/cf-k8s-networking/cfroutesync@sha256:de15fb9d960ecd36082550ec7a24dcad12a63f7ca53d110fbb4c9c59eca9b544
-  newImage: gcr.io/cf-networking-images/cf-k8s-networking/cfroutesync@sha256:de15fb9d960ecd36082550ec7a24dcad12a63f7ca53d110fbb4c9c59eca9b544
-  preresolved: true
 - image: index.docker.io/bitnami/postgresql@sha256:9762d9a80b90a5efe299d4848057ac5c45fb384570b36f60aad38fe2b1704bd6
   newImage: index.docker.io/bitnami/postgresql@sha256:9762d9a80b90a5efe299d4848057ac5c45fb384570b36f60aad38fe2b1704bd6
   preresolved: true
