@@ -230,14 +230,14 @@ overrides:
 - image: index.docker.io/cloudfoundry/cf-k8s-logging@sha256:d8c73e6c87b2a71c8b6798205761bb7870fb2080a4329c4eefb0b4620656eeaa
   newImage: index.docker.io/cloudfoundry/cf-k8s-logging@sha256:d8c73e6c87b2a71c8b6798205761bb7870fb2080a4329c4eefb0b4620656eeaa
   preresolved: true
-- image: logcache/log-cache-cf-auth-proxy@sha256:6a436c864e5e6d2e153da4776f08fa064021eb365407f5f435a4a9f47afdef3d
-  newImage: index.docker.io/logcache/log-cache-cf-auth-proxy@sha256:6a436c864e5e6d2e153da4776f08fa064021eb365407f5f435a4a9f47afdef3d
+- image: index.docker.io/cloudfoundry/log-cache-cf-auth-proxy@sha256:f75fc1585dbf869a1a98ee094d334525bb944a07aa0ebe522019c3a479b843de
+  newImage: index.docker.io/cloudfoundry/log-cache-cf-auth-proxy@sha256:f75fc1585dbf869a1a98ee094d334525bb944a07aa0ebe522019c3a479b843de
   preresolved: true
-- image: logcache/log-cache-gateway@sha256:65b34fb624b40a263b6d1be9410ba61d55d515ac340226860d8fd7ef4ac0dbf1
-  newImage: index.docker.io/logcache/log-cache-gateway@sha256:65b34fb624b40a263b6d1be9410ba61d55d515ac340226860d8fd7ef4ac0dbf1
+- image: index.docker.io/cloudfoundry/log-cache-gateway@sha256:51bc54b4a901228537f43efe3b687c3d8c07f49c015775141a0dffa66cd83ec6
+  newImage: index.docker.io/cloudfoundry/log-cache-gateway@sha256:51bc54b4a901228537f43efe3b687c3d8c07f49c015775141a0dffa66cd83ec6
   preresolved: true
-- image: logcache/log-cache@sha256:20ffd743bd6b52ff217918b2df3df4886969877feb5565b47248bfefe7b2b210
-  newImage: index.docker.io/logcache/log-cache@sha256:20ffd743bd6b52ff217918b2df3df4886969877feb5565b47248bfefe7b2b210
+- image: index.docker.io/cloudfoundry/log-cache@sha256:616ce5401945100a84df5380e913d1136f2ed714aa90c78f592839de88928dfb
+  newImage: index.docker.io/cloudfoundry/log-cache@sha256:616ce5401945100a84df5380e913d1136f2ed714aa90c78f592839de88928dfb
   preresolved: true
 - image: index.docker.io/cloudfoundry/syslog-server@sha256:39a386521f94c70071eab4a7fb67cc7e28adba2e2dd8113d6df155c17b19f5a5
   newImage: index.docker.io/cloudfoundry/syslog-server@sha256:39a386521f94c70071eab4a7fb67cc7e28adba2e2dd8113d6df155c17b19f5a5
@@ -250,7 +250,7 @@ overrides:
   preresolved: true
 `
 
-	expectedPackagedSHA := "ebb27484fe5955870f5e8d56b25afb026e90e88b"
+	expectedPackagedSHA := "16ed9a2847ebb5db1cab57bc93817174eed98752"
 
 	path := "/tmp/kbld-test-pkg-unpkg-successful-with-many-images"
 	defer os.RemoveAll(path)
