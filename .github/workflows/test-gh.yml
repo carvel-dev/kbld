@@ -29,7 +29,7 @@ jobs:
         path: src/github.com/${{ github.repository }}
         fetch-depth: 0
     - name: Install Carvel Tools
-      uses: vmware-tanzu/carvel-setup-action@v1
+      uses: carvel-dev/setup-action@v1
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         only: ytt, kapp

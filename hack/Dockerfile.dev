@@ -16,10 +16,10 @@ RUN curl -sL https://github.com/google/ko/releases/download/v0.8.0/ko_0.8.0_Linu
 RUN curl -sLo /usr/local/bin/bazel https://github.com/bazelbuild/bazel/releases/download/4.2.0/bazel-4.2.0-linux-x86_64
 RUN chmod +x /usr/local/bin/bazel
 
-RUN curl -sLo /usr/local/bin/kapp https://github.com/vmware-tanzu/carvel-kapp/releases/download/v0.48.0/kapp-linux-amd64
+RUN curl -sLo /usr/local/bin/kapp https://github.com/carvel-dev/kapp/releases/download/v0.48.0/kapp-linux-amd64
 RUN chmod +x /usr/local/bin/kapp
 
-RUN curl -sLo /usr/local/bin/ytt https://github.com/vmware-tanzu/carvel-ytt/releases/download/v0.41.1/ytt-linux-amd64
+RUN curl -sLo /usr/local/bin/ytt https://github.com/carvel-dev/ytt/releases/download/v0.41.1/ytt-linux-amd64
 RUN chmod +x /usr/local/bin/ytt
 
 RUN echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
