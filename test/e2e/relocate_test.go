@@ -72,11 +72,11 @@ spec:
 - image: index.docker.io/bitnami/postgresql@sha256:9762d9a80b90a5efe299d4848057ac5c45fb384570b36f60aad38fe2b1704bd6
 - image: index.docker.io/metacontroller/metacontroller@sha256:ad85cb5f5ad9a61a3f38277fed371df43ea0fc55d9073dfa8f4fc2e27c127603
 - image: index.docker.io/minio/minio@sha256:5e96d539583afd9a7da14e0d9bf2360d316e4e8219659d82b8ef106a9d75b16c
-- image: index.docker.io/logcache/cf-k8s-logging@sha256:7ee4b08db98627c76091b8b82210eaa9e3a0646db56b534feba7dd0a35c35948
+- image: index.docker.io/cloudfoundry/cf-k8s-logging@sha256:d8c73e6c87b2a71c8b6798205761bb7870fb2080a4329c4eefb0b4620656eeaa
 - image: index.docker.io/logcache/log-cache-cf-auth-proxy@sha256:6a436c864e5e6d2e153da4776f08fa064021eb365407f5f435a4a9f47afdef3d
 - image: index.docker.io/logcache/log-cache-gateway@sha256:65b34fb624b40a263b6d1be9410ba61d55d515ac340226860d8fd7ef4ac0dbf1
 - image: index.docker.io/logcache/log-cache@sha256:20ffd743bd6b52ff217918b2df3df4886969877feb5565b47248bfefe7b2b210
-- image: index.docker.io/logcache/syslog-server@sha256:623ade911f957d38b36944d9f069feff3d4139ece24557a94d09b28f2efbe3d8
+- image: index.docker.io/cloudfoundry/syslog-server@sha256:39a386521f94c70071eab4a7fb67cc7e28adba2e2dd8113d6df155c17b19f5a5
 - image: index.docker.io/oratos/metric-proxy@sha256:a2a0d2201d1a57602a3db337bfa256d6e042dfc09a63ba1b6f39c952847e00dc
 - image: index.docker.io/prom/statsd-exporter@sha256:e3174186628b401e4a441b78513ba06e957644267332436be0c77dd7af9bdddc
 `

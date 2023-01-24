@@ -227,8 +227,8 @@ overrides:
 - image: index.docker.io/minio/minio@sha256:5e96d539583afd9a7da14e0d9bf2360d316e4e8219659d82b8ef106a9d75b16c
   newImage: index.docker.io/minio/minio@sha256:5e96d539583afd9a7da14e0d9bf2360d316e4e8219659d82b8ef106a9d75b16c
   preresolved: true
-- image: logcache/cf-k8s-logging@sha256:7ee4b08db98627c76091b8b82210eaa9e3a0646db56b534feba7dd0a35c35948
-  newImage: index.docker.io/logcache/cf-k8s-logging@sha256:7ee4b08db98627c76091b8b82210eaa9e3a0646db56b534feba7dd0a35c35948
+- image: index.docker.io/cloudfoundry/cf-k8s-logging@sha256:d8c73e6c87b2a71c8b6798205761bb7870fb2080a4329c4eefb0b4620656eeaa
+  newImage: index.docker.io/cloudfoundry/cf-k8s-logging@sha256:d8c73e6c87b2a71c8b6798205761bb7870fb2080a4329c4eefb0b4620656eeaa
   preresolved: true
 - image: logcache/log-cache-cf-auth-proxy@sha256:6a436c864e5e6d2e153da4776f08fa064021eb365407f5f435a4a9f47afdef3d
   newImage: index.docker.io/logcache/log-cache-cf-auth-proxy@sha256:6a436c864e5e6d2e153da4776f08fa064021eb365407f5f435a4a9f47afdef3d
@@ -239,8 +239,8 @@ overrides:
 - image: logcache/log-cache@sha256:20ffd743bd6b52ff217918b2df3df4886969877feb5565b47248bfefe7b2b210
   newImage: index.docker.io/logcache/log-cache@sha256:20ffd743bd6b52ff217918b2df3df4886969877feb5565b47248bfefe7b2b210
   preresolved: true
-- image: logcache/syslog-server@sha256:623ade911f957d38b36944d9f069feff3d4139ece24557a94d09b28f2efbe3d8
-  newImage: index.docker.io/logcache/syslog-server@sha256:623ade911f957d38b36944d9f069feff3d4139ece24557a94d09b28f2efbe3d8
+- image: index.docker.io/cloudfoundry/syslog-server@sha256:39a386521f94c70071eab4a7fb67cc7e28adba2e2dd8113d6df155c17b19f5a5
+  newImage: index.docker.io/cloudfoundry/syslog-server@sha256:39a386521f94c70071eab4a7fb67cc7e28adba2e2dd8113d6df155c17b19f5a5
   preresolved: true
 - image: oratos/metric-proxy@sha256:a2a0d2201d1a57602a3db337bfa256d6e042dfc09a63ba1b6f39c952847e00dc
   newImage: index.docker.io/oratos/metric-proxy@sha256:a2a0d2201d1a57602a3db337bfa256d6e042dfc09a63ba1b6f39c952847e00dc
