@@ -10,7 +10,7 @@ require (
 	github.com/kisielk/errcheck v1.6.2
 	github.com/spf13/cobra v1.6.1
 	github.com/stretchr/testify v1.8.1
-	github.com/vmware-tanzu/carvel-imgpkg v0.34.1
+	github.com/vmware-tanzu/carvel-imgpkg v0.35.0
 	github.com/vmware-tanzu/carvel-vendir v0.32.0
 	golang.org/x/sync v0.1.0
 	k8s.io/apimachinery v0.25.4
@@ -31,7 +31,7 @@ require (
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/k14s/semver/v4 v4.0.1-0.20210701191048-266d47ac6115 // indirect
 	github.com/mattn/go-colorable v0.1.12 // indirect
-	github.com/mattn/go-isatty v0.0.16 // indirect
+	github.com/mattn/go-isatty v0.0.17 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
@@ -44,7 +44,7 @@ require (
 	github.com/vito/go-interact v1.0.1 // indirect
 	golang.org/x/mod v0.6.0 // indirect
 	golang.org/x/net v0.4.0 // indirect
-	golang.org/x/sys v0.3.0 // indirect
+	golang.org/x/sys v0.4.0 // indirect
 	golang.org/x/term v0.3.0 // indirect
 	golang.org/x/text v0.5.0 // indirect
 	golang.org/x/tools v0.1.12 // indirect
