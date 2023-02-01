@@ -20,7 +20,7 @@ builds:
       - -trimpath
 
     ldflags:
-      - -X github.com/carvel-dev/kbld/pkg/kbld/version.Version={{ .Version }}
+      - -X github.com/vmware-tanzu/carvel-kbld/pkg/kbld/version.Version={{ .Version }}
 
 archives:
   - format: binary
