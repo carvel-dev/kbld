@@ -1,0 +1,16 @@
+name: Trivy CVE Dependency Scanner
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+
+jobs:
+  trivy-scan:
+    uses: carvel-dev/release-scripts/.github/workflows/trivy-scan.yml@main
+    with:
+      repo: carvel-dev/kbld
+      tool: kbld
+      goVersion: 1.19.4
+    secrets:
+      githubToken: ${{ secrets.GITHUB_TOKEN }}
+      slackWebhookURL: ${{ secrets.SLACK_WEBHOOK_URL }}
