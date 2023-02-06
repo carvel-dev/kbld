@@ -131,7 +131,7 @@ github.com/vito/go-interact/interact
 # github.com/vmware-tanzu/carvel-imgpkg v0.35.0
 ## explicit; go 1.19
 github.com/vmware-tanzu/carvel-imgpkg/pkg/imgpkg/lockconfig
-# github.com/vmware-tanzu/carvel-vendir v0.32.4
+# github.com/vmware-tanzu/carvel-vendir v0.32.5
 ## explicit; go 1.19
 github.com/vmware-tanzu/carvel-vendir/pkg/vendir/versions
 github.com/vmware-tanzu/carvel-vendir/pkg/vendir/versions/v1alpha1
