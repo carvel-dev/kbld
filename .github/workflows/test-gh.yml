@@ -18,6 +18,7 @@ jobs:
   test-all:
     name: Test GH
     runs-on: ubuntu-latest
+    environment: DockerHub E2E
     steps:
     - name: Set up Go 1.x
       uses: actions/setup-go@v2
