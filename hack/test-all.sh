@@ -2,7 +2,7 @@
 
 set -e -x -u
 
-./hack/build.sh
+./hack/build.sh $@
 
 export KBLD_BINARY_PATH="$PWD/kbld"
 
