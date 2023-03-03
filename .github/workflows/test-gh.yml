@@ -29,6 +29,8 @@ jobs:
       with:
         path: src/github.com/${{ github.repository }}
         fetch-depth: 0
+    - name: Fix to add the source code has a safe directory in git
+      run: sudo git config --system --add safe.directory src/github.com/${{ github.repository }}
     - name: Install Carvel Tools
       uses: carvel-dev/setup-action@v1
       with:
