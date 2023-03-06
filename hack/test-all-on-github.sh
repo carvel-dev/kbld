@@ -12,6 +12,7 @@ chmod +x ~/.docker/cli-plugins/docker-buildx
 curl -sL https://github.com/buildpacks/pack/releases/download/v0.8.1/pack-v0.8.1-linux.tgz | tar -C /usr/local/bin -xz
 curl -sL https://github.com/vmware-tanzu/buildkit-cli-for-kubectl/releases/download/v0.1.0/linux-refs.tags.v0.1.0.tgz | tar -C /usr/local/bin -xz
 curl -sL https://github.com/google/ko/releases/download/v0.8.0/ko_0.8.0_Linux_x86_64.tar.gz | tar -C /usr/local/bin -xz
+mkdir -p /usr/local/bin
 curl -sLo /usr/local/bin/bazel https://github.com/bazelbuild/bazel/releases/download/4.2.0/bazel-4.2.0-linux-x86_64
 chmod +x /usr/local/bin/bazel
 curl -sLo /usr/local/bin/kapp https://github.com/carvel-dev/kapp/releases/download/v0.48.0/kapp-linux-amd64
