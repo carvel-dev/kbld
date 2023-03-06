@@ -38,6 +38,8 @@ func TestMain(m *testing.M) {
 func TestGitRepoValidNonEmptyRepo(t *testing.T) {
 	gitRepo := ctlimg.NewGitRepo(".")
 	if gitRepo.IsValid() != true {
+		_, err := gitRepo.HeadSHA()
+		fmt.Printf("error message: %s\n", err)
 		t.Fatalf("Expected kbld to be a git repo")
 	}
 	url, err := gitRepo.RemoteURL()
