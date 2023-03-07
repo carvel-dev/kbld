@@ -11,13 +11,14 @@ require (
 	github.com/spf13/cobra v1.6.1
 	github.com/stretchr/testify v1.8.2
 	github.com/vmware-tanzu/carvel-imgpkg v0.36.0
-	github.com/vmware-tanzu/carvel-vendir v0.32.4
+	github.com/vmware-tanzu/carvel-vendir v0.33.1
 	golang.org/x/sync v0.1.0
 	k8s.io/apimachinery v0.25.4
 	sigs.k8s.io/yaml v1.3.0
 )
 
 require (
+	github.com/carvel-dev/semver/v4 v4.0.1-0.20230221220520-8090ce423695 // indirect
 	github.com/cppforlife/color v1.9.1-0.20200716202919-6706ac40b835 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/docker/cli v20.10.20+incompatible // indirect
@@ -29,7 +30,7 @@ require (
 	github.com/google/gofuzz v1.1.0 // indirect
 	github.com/inconshreveable/mousetrap v1.0.1 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
-	github.com/k14s/semver/v4 v4.0.1-0.20210701191048-266d47ac6115 // indirect
+	github.com/klauspost/compress v1.15.11 // indirect
 	github.com/mattn/go-colorable v0.1.12 // indirect
 	github.com/mattn/go-isatty v0.0.16 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect

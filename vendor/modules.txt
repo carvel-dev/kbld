@@ -1,4 +1,7 @@
-# github.com/cppforlife/cobrautil v0.0.0-20200514214827-bb86e6965d72
+# github.com/carvel-dev/semver/v4 v4.0.1-0.20230221220520-8090ce423695
+## explicit; go 1.14
+github.com/carvel-dev/semver/v4
+# github.com/cppforlife/cobrautil v0.0.0-20221021151949-d60711905d65
 ## explicit
 github.com/cppforlife/cobrautil
 # github.com/cppforlife/color v1.9.1-0.20200716202919-6706ac40b835
@@ -65,10 +68,7 @@ github.com/inconshreveable/mousetrap
 # github.com/json-iterator/go v1.1.12
 ## explicit; go 1.12
 github.com/json-iterator/go
-# github.com/k14s/semver/v4 v4.0.1-0.20210701191048-266d47ac6115
-## explicit; go 1.14
-github.com/k14s/semver/v4
-# github.com/kisielk/errcheck v1.6.2
+# github.com/kisielk/errcheck v1.6.3
 ## explicit; go 1.14
 github.com/kisielk/errcheck
 github.com/kisielk/errcheck/errcheck
@@ -119,7 +119,7 @@ github.com/vito/go-interact/interact
 # github.com/vmware-tanzu/carvel-imgpkg v0.36.0
 ## explicit; go 1.19
 github.com/vmware-tanzu/carvel-imgpkg/pkg/imgpkg/lockconfig
-# github.com/vmware-tanzu/carvel-vendir v0.32.0
+# github.com/vmware-tanzu/carvel-vendir v0.33.1
 ## explicit; go 1.19
 github.com/vmware-tanzu/carvel-vendir/pkg/vendir/versions
 github.com/vmware-tanzu/carvel-vendir/pkg/vendir/versions/v1alpha1
