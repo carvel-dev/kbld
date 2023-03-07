@@ -15,12 +15,12 @@ apiVersion: kbld.k14s.io/v1alpha1
 kind: Config
 sources:
 - image: test-dependencies
-  path: hack/
+  path: .
   docker:
     build:
       pull: true
       noCache: false
-      file: Dockerfile.dev
+      file: hack/Dockerfile.dev
 EOF
 }
 
