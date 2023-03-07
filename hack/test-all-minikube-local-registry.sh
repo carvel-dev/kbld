@@ -35,7 +35,7 @@ docker buildx create minikube --use --driver=kubernetes --bootstrap --config bui
 if [ "$2" == "github-workflow" ]
 then
   git init . --bare
-  git config --global --add safe.directory "/go/src/kbld"
+  git config --global --add safe.directory /__w/go/src/kbld
 fi
 
 ./hack/test-all.sh $@
