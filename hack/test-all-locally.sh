@@ -1,8 +1,6 @@
 #!/bin/bash
 set -e -x -u
 
-SCRIPT_DIR="$( cd -- "$( dirname -- "${BASH_SOURCE[0]:-$0}"; )" &> /dev/null && pwd 2> /dev/null; )";
-
 go clean -testcache
 ./hack/build.sh
 export KBLD_BINARY_PATH="${KBLD_BINARY_PATH:-$PWD/kbld}"
@@ -15,12 +13,12 @@ apiVersion: kbld.k14s.io/v1alpha1
 kind: Config
 sources:
 - image: test-dependencies
-  path: hack/
+  path: .
   docker:
     build:
       pull: true
       noCache: false
-      file: Dockerfile.dev
+      file: hack/Dockerfile.dev
 EOF
 }
 
@@ -41,7 +39,6 @@ docker run \
 -v ~/.config:/root/.config \
 -v ~/.minikube:"$HOME/.minikube" \
 -v ~/.kube:/root/.kube \
--v ${SCRIPT_DIR}/..:/go/src/kbld \
 -v /etc/docker/:/host-etc-docker \
 --workdir /go/src/kbld \
 -i -a STDOUT -a STDERR \
