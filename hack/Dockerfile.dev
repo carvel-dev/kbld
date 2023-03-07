@@ -33,5 +33,5 @@ RUN git config --global --add safe.directory /go/src/kbld
 
 RUN curl -sLo /usr/local/bin/kubectl "https://dl.k8s.io/release/$(curl -sL https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
 RUN chmod +x /usr/local/bin/kubectl
-COPY ./* /go/src/kbld
 
+RUN git clone https://github.com/carvel-dev/kbld.git /go/src/kbld
