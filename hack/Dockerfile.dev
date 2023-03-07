@@ -29,6 +29,7 @@ RUN apt-get install google-cloud-cli -y
 
 RUN git config --global user.email "email@example.com"
 RUN git config --global user.name "Some Person"
+RUN git config --global --add safe.directory /go/src/kbld
 
 RUN curl -sLo /usr/local/bin/kubectl "https://dl.k8s.io/release/$(curl -sL https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
 RUN chmod +x /usr/local/bin/kubectl
