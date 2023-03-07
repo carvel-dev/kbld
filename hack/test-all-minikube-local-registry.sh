@@ -32,10 +32,7 @@ EOF
 # Need to bootstrap to avoid race conditions to boot
 docker buildx create minikube --use --driver=kubernetes --bootstrap --config buildkitd.toml
 
-if [ "$2" == "github-workflow" ]
-then
-  git init . --bare
-  git config --global --add safe.directory /__w/go/src/kbld
-fi
+git init . --bare
+git config --global --add safe.directory /go/src/kbld
 
 ./hack/test-all.sh $@
