@@ -302,7 +302,7 @@ func (r *Decoder) Int64() int64 {
 	return r.rawVarint()
 }
 
-// Int64 decodes and returns a uint64 value from the element bitstream.
+// Uint64 decodes and returns a uint64 value from the element bitstream.
 func (r *Decoder) Uint64() uint64 {
 	r.Sync(SyncUint64)
 	return r.rawUvarint()
