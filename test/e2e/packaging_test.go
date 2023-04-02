@@ -244,15 +244,15 @@ overrides:
 - image: index.docker.io/cloudfoundry/syslog-server@sha256:39a386521f94c70071eab4a7fb67cc7e28adba2e2dd8113d6df155c17b19f5a5
   newImage: index.docker.io/cloudfoundry/syslog-server@sha256:39a386521f94c70071eab4a7fb67cc7e28adba2e2dd8113d6df155c17b19f5a5
   preresolved: true
-- image: oratos/metric-proxy@sha256:a2a0d2201d1a57602a3db337bfa256d6e042dfc09a63ba1b6f39c952847e00dc
-  newImage: index.docker.io/oratos/metric-proxy@sha256:a2a0d2201d1a57602a3db337bfa256d6e042dfc09a63ba1b6f39c952847e00dc
+- image: index.docker.io/cloudfoundry/metric-proxy@sha256:0f10d093fbb4437e071dcf31411ef344b4059bf26494e4b23e2625a7d9d4e77e
+  newImage: index.docker.io/cloudfoundry/metric-proxy@sha256:0f10d093fbb4437e071dcf31411ef344b4059bf26494e4b23e2625a7d9d4e77e
   preresolved: true
 - image: prom/statsd-exporter:v0.15.0@sha256:e3174186628b401e4a441b78513ba06e957644267332436be0c77dd7af9bdddc
   newImage: index.docker.io/prom/statsd-exporter@sha256:e3174186628b401e4a441b78513ba06e957644267332436be0c77dd7af9bdddc
   preresolved: true
 `
 
-	expectedPackagedSHA := "16ed9a2847ebb5db1cab57bc93817174eed98752"
+	expectedPackagedSHA := "9d2f9e15541d6c136c28cc10e0e469f6a8b48876"
 
 	path := "/tmp/kbld-test-pkg-unpkg-successful-with-many-images"
 	defer os.RemoveAll(path)
