@@ -1,6 +1,6 @@
 module github.com/vmware-tanzu/carvel-kbld
 
-go 1.19
+go 1.20
 
 require (
 	github.com/cppforlife/cobrautil v0.0.0-20221021151949-d60711905d65
