@@ -8,7 +8,7 @@ require (
 	github.com/google/go-containerregistry v0.14.0
 	github.com/hashicorp/go-version v1.6.0
 	github.com/kisielk/errcheck v1.6.3
-	github.com/spf13/cobra v1.6.1
+	github.com/spf13/cobra v1.7.0
 	github.com/stretchr/testify v1.8.2
 	github.com/vmware-tanzu/carvel-imgpkg v0.36.1
 	github.com/vmware-tanzu/carvel-vendir v0.33.1
