@@ -10,8 +10,8 @@ require (
 	github.com/kisielk/errcheck v1.6.3
 	github.com/spf13/cobra v1.7.0
 	github.com/stretchr/testify v1.8.2
-	github.com/vmware-tanzu/carvel-imgpkg v0.36.1
-	github.com/vmware-tanzu/carvel-vendir v0.33.1
+	github.com/vmware-tanzu/carvel-imgpkg v0.36.2
+	github.com/vmware-tanzu/carvel-vendir v0.33.2
 	golang.org/x/sync v0.2.0
 	k8s.io/apimachinery v0.27.2
 	sigs.k8s.io/yaml v1.3.0
