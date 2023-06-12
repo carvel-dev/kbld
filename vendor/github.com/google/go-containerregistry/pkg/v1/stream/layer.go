@@ -12,13 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package stream implements a single-pass streaming v1.Layer.
 package stream
 
 import (
 	"bufio"
 	"compress/gzip"
-	"crypto"
+	"crypto/sha256"
 	"encoding/hex"
 	"errors"
 	"hash"
@@ -130,8 +129,6 @@ func (l *Layer) Uncompressed() (io.ReadCloser, error) {
 
 // Compressed implements v1.Layer.
 func (l *Layer) Compressed() (io.ReadCloser, error) {
-	l.mu.Lock()
-	defer l.mu.Unlock()
 	if l.consumed {
 		return nil, ErrConsumed
 	}
@@ -168,8 +165,8 @@ type compressedReader struct {
 func newCompressedReader(l *Layer) (*compressedReader, error) {
 	// Collect digests of compressed and uncompressed stream and size of
 	// compressed stream.
-	h := crypto.SHA256.New()
-	zh := crypto.SHA256.New()
+	h := sha256.New()
+	zh := sha256.New()
 	count := &countWriter{}
 
 	// gzip.Writer writes to the output stream via pipe, a hasher to
