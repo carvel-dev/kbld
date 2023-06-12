@@ -28,7 +28,6 @@ type Manifest struct {
 	Config        Descriptor        `json:"config"`
 	Layers        []Descriptor      `json:"layers"`
 	Annotations   map[string]string `json:"annotations,omitempty"`
-	Subject       *Descriptor       `json:"subject,omitempty"`
 }
 
 // IndexManifest represents an OCI image index in a structured way.
@@ -37,19 +36,17 @@ type IndexManifest struct {
 	MediaType     types.MediaType   `json:"mediaType,omitempty"`
 	Manifests     []Descriptor      `json:"manifests"`
 	Annotations   map[string]string `json:"annotations,omitempty"`
-	Subject       *Descriptor       `json:"subject,omitempty"`
 }
 
 // Descriptor holds a reference from the manifest to one of its constituent elements.
 type Descriptor struct {
-	MediaType    types.MediaType   `json:"mediaType"`
-	Size         int64             `json:"size"`
-	Digest       Hash              `json:"digest"`
-	Data         []byte            `json:"data,omitempty"`
-	URLs         []string          `json:"urls,omitempty"`
-	Annotations  map[string]string `json:"annotations,omitempty"`
-	Platform     *Platform         `json:"platform,omitempty"`
-	ArtifactType string            `json:"artifactType,omitempty"`
+	MediaType   types.MediaType   `json:"mediaType"`
+	Size        int64             `json:"size"`
+	Digest      Hash              `json:"digest"`
+	Data        []byte            `json:"data,omitempty"`
+	URLs        []string          `json:"urls,omitempty"`
+	Annotations map[string]string `json:"annotations,omitempty"`
+	Platform    *Platform         `json:"platform,omitempty"`
 }
 
 // ParseManifest parses the io.Reader's contents into a Manifest.

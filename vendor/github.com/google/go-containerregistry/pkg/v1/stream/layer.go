@@ -12,13 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package stream implements a single-pass streaming v1.Layer.
 package stream
 
 import (
 	"bufio"
 	"compress/gzip"
-	"crypto"
+	"crypto/sha256"
 	"encoding/hex"
 	"errors"
 	"hash"
@@ -49,7 +48,6 @@ type Layer struct {
 	mu             sync.Mutex
 	digest, diffID *v1.Hash
 	size           int64
-	mediaType      types.MediaType
 }
 
 var _ v1.Layer = (*Layer)(nil)
@@ -64,21 +62,11 @@ func WithCompressionLevel(level int) LayerOption {
 	}
 }
 
-// WithMediaType is a functional option for overriding the layer's media type.
-func WithMediaType(mt types.MediaType) LayerOption {
-	return func(l *Layer) {
-		l.mediaType = mt
-	}
-}
-
 // NewLayer creates a Layer from an io.ReadCloser.
 func NewLayer(rc io.ReadCloser, opts ...LayerOption) *Layer {
 	layer := &Layer{
 		blob:        rc,
 		compression: gzip.BestSpeed,
-		// We use DockerLayer for now as uncompressed layers
-		// are unimplemented
-		mediaType: types.DockerLayer,
 	}
 
 	for _, opt := range opts {
@@ -120,7 +108,9 @@ func (l *Layer) Size() (int64, error) {
 
 // MediaType implements v1.Layer
 func (l *Layer) MediaType() (types.MediaType, error) {
-	return l.mediaType, nil
+	// We return DockerLayer for now as uncompressed layers
+	// are unimplemented
+	return types.DockerLayer, nil
 }
 
 // Uncompressed implements v1.Layer.
@@ -130,8 +120,6 @@ func (l *Layer) Uncompressed() (io.ReadCloser, error) {
 
 // Compressed implements v1.Layer.
 func (l *Layer) Compressed() (io.ReadCloser, error) {
-	l.mu.Lock()
-	defer l.mu.Unlock()
 	if l.consumed {
 		return nil, ErrConsumed
 	}
@@ -168,8 +156,8 @@ type compressedReader struct {
 func newCompressedReader(l *Layer) (*compressedReader, error) {
 	// Collect digests of compressed and uncompressed stream and size of
 	// compressed stream.
-	h := crypto.SHA256.New()
-	zh := crypto.SHA256.New()
+	h := sha256.New()
+	zh := sha256.New()
 	count := &countWriter{}
 
 	// gzip.Writer writes to the output stream via pipe, a hasher to

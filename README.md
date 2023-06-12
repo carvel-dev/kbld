@@ -5,8 +5,8 @@
 - Website: https://carvel.dev/kbld
 - Slack: [#carvel in Kubernetes slack](https://slack.kubernetes.io)
 - [Docs](docs/README.md) with topics about building, packaging images, blog posts, etc.
-- Install: Grab prebuilt binaries from the [Releases page](https://github.com/carvel-dev/kbld/releases) or [Homebrew Carvel tap](https://github.com/carvel-dev/homebrew)
-- Backlog: [See what we're up to](https://github.com/orgs/carvel-dev/projects/1/views/1?filterQuery=repo%3A%22carvel-dev%2Fkbld%22).
+- Install: Grab prebuilt binaries from the [Releases page](https://github.com/carvel-dev/carvel-kbld/releases) or [Homebrew Carvel tap](https://github.com/carvel-dev/homebrew)
+- Backlog: [See what we're up to](https://github.com/orgs/carvel-dev/projects/1/views/1?filterQuery=repo%3A%22vmware-tanzu%2Fcarvel-kbld%22).
 
 `kbld` (pronounced: `kei·bild`) seamlessly incorporates image building and image pushing into your development and deployment workflows.
 
@@ -22,7 +22,7 @@ Features:
 
 ![](docs/kbld-screenshot.png)
 
-See [building and deploying simple Go application to Kubernetes example](https://github.com/carvel-dev/simple-app-on-kubernetes#step-3-building-container-images-locally) that uses kbld.
+See [building and deploying simple Go application to Kubernetes example](https://github.com/carvel-dev/carvel-simple-app-on-kubernetes#step-3-building-container-images-locally) that uses kbld.
 
 ### Join the Community and Make Carvel Better
 Carvel is better because of our contributors and maintainers. It is because of you that we can bring great software to the community.
