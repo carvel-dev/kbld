@@ -9,7 +9,7 @@ require (
 	github.com/hashicorp/go-version v1.6.0
 	github.com/kisielk/errcheck v1.6.3
 	github.com/spf13/cobra v1.7.0
-	github.com/stretchr/testify v1.8.3
+	github.com/stretchr/testify v1.8.4
 	github.com/vmware-tanzu/carvel-imgpkg v0.37.1
 	github.com/vmware-tanzu/carvel-vendir v0.34.0
 	golang.org/x/sync v0.2.0
