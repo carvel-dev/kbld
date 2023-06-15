@@ -1,7 +1,7 @@
-FROM golang:1.19
+FROM golang:1.20
 
 RUN apt-get update -y
-RUN apt-get install docker.io apt-transport-https ca-certificates gnupg python -y
+RUN apt-get install docker.io apt-transport-https ca-certificates gnupg python-is-python3 -y
 
 RUN mkdir -p ~/.docker/cli-plugins/
 RUN curl -sLo ~/.docker/cli-plugins/docker-buildx https://github.com/docker/buildx/releases/download/v0.8.2/buildx-v0.8.2.linux-amd64
