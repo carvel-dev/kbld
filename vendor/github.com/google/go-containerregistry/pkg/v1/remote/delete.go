@@ -54,8 +54,4 @@ func Delete(ref name.Reference, options ...Option) error {
 	defer resp.Body.Close()
 
 	return transport.CheckError(resp, http.StatusOK, http.StatusAccepted)
-
-	// TODO(jason): If the manifest had a `subject`, and if the registry
-	// doesn't support Referrers, update the index pointed to by the
-	// subject's fallback tag to remove the descriptor for this manifest.
 }

@@ -19,7 +19,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
+	"io/ioutil"
 	"net"
 	"net/http"
 	"net/url"
@@ -87,9 +87,6 @@ func (bt *bearerTransport) RoundTrip(in *http.Request) (*http.Response, error) {
 
 	// If we hit a WWW-Authenticate challenge, it might be due to expired tokens or insufficient scope.
 	if challenges := authchallenge.ResponseChallenges(res); len(challenges) != 0 {
-		// close out old response, since we will not return it.
-		res.Body.Close()
-
 		newScopes := []string{}
 		for _, wac := range challenges {
 			// TODO(jonjohnsonjr): Should we also update "realm" or "service"?
@@ -268,13 +265,11 @@ func (bt *bearerTransport) refreshOauth(ctx context.Context) ([]byte, error) {
 	defer resp.Body.Close()
 
 	if err := CheckError(resp, http.StatusOK); err != nil {
-		if bt.basic == authn.Anonymous {
-			logs.Warn.Printf("No matching credentials were found for %q", bt.registry)
-		}
+		logs.Warn.Printf("No matching credentials were found for %q", bt.registry)
 		return nil, err
 	}
 
-	return io.ReadAll(resp.Body)
+	return ioutil.ReadAll(resp.Body)
 }
 
 // https://docs.docker.com/registry/spec/auth/token/
@@ -310,11 +305,9 @@ func (bt *bearerTransport) refreshBasic(ctx context.Context) ([]byte, error) {
 	defer resp.Body.Close()
 
 	if err := CheckError(resp, http.StatusOK); err != nil {
-		if bt.basic == authn.Anonymous {
-			logs.Warn.Printf("No matching credentials were found for %q", bt.registry)
-		}
+		logs.Warn.Printf("No matching credentials were found for %q", bt.registry)
 		return nil, err
 	}
 
-	return io.ReadAll(resp.Body)
+	return ioutil.ReadAll(resp.Body)
 }
