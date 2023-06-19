@@ -17,6 +17,7 @@ package remote
 import (
 	"bytes"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 	"sync"
@@ -44,15 +45,6 @@ type remoteImage struct {
 	config       []byte
 	mediaType    types.MediaType
 	descriptor   *v1.Descriptor
-}
-
-func (r *remoteImage) ArtifactType() (string, error) {
-	// kind of a hack, but RawManifest does appropriate locking/memoization
-	// and makes sure r.descriptor is populated.
-	if _, err := r.RawManifest(); err != nil {
-		return "", err
-	}
-	return r.descriptor.ArtifactType, nil
 }
 
 var _ partial.CompressedImageCore = (*remoteImage)(nil)
@@ -123,7 +115,7 @@ func (r *remoteImage) RawConfigFile() ([]byte, error) {
 	}
 	defer body.Close()
 
-	r.config, err = io.ReadAll(body)
+	r.config, err = ioutil.ReadAll(body)
 	if err != nil {
 		return nil, err
 	}
@@ -161,7 +153,7 @@ func (rl *remoteImageLayer) Compressed() (io.ReadCloser, error) {
 	}
 
 	if d.Data != nil {
-		return verify.ReadCloser(io.NopCloser(bytes.NewReader(d.Data)), d.Size, d.Digest)
+		return verify.ReadCloser(ioutil.NopCloser(bytes.NewReader(d.Data)), d.Size, d.Digest)
 	}
 
 	// We don't want to log binary layers -- this can break terminals.
