@@ -189,7 +189,7 @@ type tmpRefMatcher struct {
 
 var _ Matcher = tmpRefMatcher{}
 
-func (m tmpRefMatcher) Matches(key ctlres.Path, value interface{}) (bool, ctlconf.SearchRuleUpdateStrategy) {
+func (m tmpRefMatcher) Matches(_ ctlres.Path, value interface{}) (bool, ctlconf.SearchRuleUpdateStrategy) {
 	if valStr, ok := value.(string); ok {
 		return strings.HasPrefix(valStr, m.prefix), (ctlconf.SearchRule{}).UpdateStrategyWithDefaults()
 	}
