@@ -35,7 +35,7 @@ github.com/docker/docker/pkg/homedir
 ## explicit; go 1.18
 github.com/docker/docker-credential-helpers/client
 github.com/docker/docker-credential-helpers/credentials
-# github.com/go-logr/logr v1.2.3
+# github.com/go-logr/logr v1.2.4
 ## explicit; go 1.16
 github.com/go-logr/logr
 # github.com/gogo/protobuf v1.3.2
@@ -67,9 +67,10 @@ github.com/google/go-containerregistry/pkg/v1/remote/transport
 github.com/google/go-containerregistry/pkg/v1/stream
 github.com/google/go-containerregistry/pkg/v1/tarball
 github.com/google/go-containerregistry/pkg/v1/types
-# github.com/google/gofuzz v1.1.0
+# github.com/google/gofuzz v1.2.0
 ## explicit; go 1.12
 github.com/google/gofuzz
+github.com/google/gofuzz/bytesource
 # github.com/hashicorp/go-version v1.6.0
 ## explicit
 github.com/hashicorp/go-version
@@ -122,8 +123,6 @@ github.com/pkg/errors
 # github.com/pmezard/go-difflib v1.0.0
 ## explicit
 github.com/pmezard/go-difflib/difflib
-# github.com/rogpeppe/go-internal v1.10.0
-## explicit; go 1.19
 # github.com/sirupsen/logrus v1.9.0
 ## explicit; go 1.13
 github.com/sirupsen/logrus
@@ -153,7 +152,7 @@ github.com/vmware-tanzu/carvel-vendir/pkg/vendir/versions/v1alpha1
 # golang.org/x/mod v0.10.0
 ## explicit; go 1.17
 golang.org/x/mod/semver
-# golang.org/x/net v0.9.0
+# golang.org/x/net v0.13.0
 ## explicit; go 1.17
 golang.org/x/net/http/httpguts
 golang.org/x/net/http2
@@ -162,17 +161,17 @@ golang.org/x/net/idna
 # golang.org/x/sync v0.2.0
 ## explicit
 golang.org/x/sync/errgroup
-# golang.org/x/sys v0.8.0
+# golang.org/x/sys v0.10.0
 ## explicit; go 1.17
 golang.org/x/sys/execabs
 golang.org/x/sys/internal/unsafeheader
 golang.org/x/sys/plan9
 golang.org/x/sys/unix
 golang.org/x/sys/windows
-# golang.org/x/term v0.7.0
+# golang.org/x/term v0.10.0
 ## explicit; go 1.17
 golang.org/x/term
-# golang.org/x/text v0.9.0
+# golang.org/x/text v0.11.0
 ## explicit; go 1.17
 golang.org/x/text/secure/bidirule
 golang.org/x/text/transform
@@ -205,7 +204,7 @@ gopkg.in/yaml.v2
 # gopkg.in/yaml.v3 v3.0.1
 ## explicit
 gopkg.in/yaml.v3
-# k8s.io/apimachinery v0.27.3
+# k8s.io/apimachinery v0.28.0
 ## explicit; go 1.20
 k8s.io/apimachinery/pkg/api/resource
 k8s.io/apimachinery/pkg/apis/meta/v1
@@ -230,7 +229,7 @@ k8s.io/apimachinery/pkg/util/validation/field
 k8s.io/apimachinery/pkg/util/yaml
 k8s.io/apimachinery/pkg/watch
 k8s.io/apimachinery/third_party/forked/golang/reflect
-# k8s.io/klog/v2 v2.90.1
+# k8s.io/klog/v2 v2.100.1
 ## explicit; go 1.13
 k8s.io/klog/v2
 k8s.io/klog/v2/internal/buffer
@@ -238,7 +237,7 @@ k8s.io/klog/v2/internal/clock
 k8s.io/klog/v2/internal/dbg
 k8s.io/klog/v2/internal/serialize
 k8s.io/klog/v2/internal/severity
-# k8s.io/utils v0.0.0-20230209194617-a36077c30491
+# k8s.io/utils v0.0.0-20230406110748-d93618cff8a2
 ## explicit; go 1.18
 k8s.io/utils/internal/third_party/forked/golang/net
 k8s.io/utils/net
