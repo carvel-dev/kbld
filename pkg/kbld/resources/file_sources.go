@@ -5,7 +5,7 @@ package resources
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"os"
 )
@@ -24,7 +24,7 @@ func NewStdinSource() StdinSource { return StdinSource{} }
 func (s StdinSource) Description() string { return "stdin" }
 
 func (s StdinSource) Bytes() ([]byte, error) {
-	return ioutil.ReadAll(os.Stdin)
+	return io.ReadAll(os.Stdin)
 }
 
 type LocalFileSource struct {
@@ -40,7 +40,7 @@ func (s LocalFileSource) Description() string {
 }
 
 func (s LocalFileSource) Bytes() ([]byte, error) {
-	return ioutil.ReadFile(s.path)
+	return os.ReadFile(s.path)
 }
 
 type HTTPFileSource struct {
@@ -63,7 +63,7 @@ func (s HTTPFileSource) Bytes() ([]byte, error) {
 
 	defer resp.Body.Close()
 
-	result, err := ioutil.ReadAll(resp.Body)
+	result, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, fmt.Errorf("Reading URL '%s': %s", s.url, err)
 	}

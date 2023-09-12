@@ -6,7 +6,6 @@ package cmd
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"strings"
 
@@ -235,7 +234,7 @@ func (o *ResolveOptions) withImageMapConf(conf ctlconf.Conf) (ctlconf.Conf, erro
 		return conf, nil
 	}
 
-	bs, err := ioutil.ReadFile(o.ImageMapFile)
+	bs, err := os.ReadFile(o.ImageMapFile)
 	if err != nil {
 		return ctlconf.Conf{}, err
 	}

@@ -5,7 +5,7 @@ package config
 
 import (
 	"fmt"
-	"io/ioutil"
+	"os"
 
 	"carvel.dev/imgpkg/pkg/imgpkg/lockconfig"
 	versions "carvel.dev/vendir/pkg/vendir/versions/v1alpha1"
@@ -328,7 +328,7 @@ func (d Config) WriteToFile(path string) error {
 		return err
 	}
 
-	err = ioutil.WriteFile(path, bs, 0600)
+	err = os.WriteFile(path, bs, 0600)
 	if err != nil {
 		return fmt.Errorf("Writing lock config: %s", err)
 	}

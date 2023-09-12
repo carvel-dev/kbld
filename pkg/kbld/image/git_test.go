@@ -6,7 +6,6 @@ package image_test
 import (
 	"bytes"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"os/exec"
@@ -59,7 +58,7 @@ func TestGitRepoValidNonEmptyRepo(t *testing.T) {
 }
 
 func TestGitRepoValidNoCommit(t *testing.T) {
-	dir, err := ioutil.TempDir("", "kbld-git-repo")
+	dir, err := os.MkdirTemp("", "kbld-git-repo")
 	if err != nil {
 		t.Fatalf("Making tmp dir: %s", err)
 	}
@@ -91,7 +90,7 @@ func TestGitRepoValidNoCommit(t *testing.T) {
 }
 
 func TestGitRepoValidNotOnBranch(t *testing.T) {
-	dir, err := ioutil.TempDir("", "kbld-git-repo")
+	dir, err := os.MkdirTemp("", "kbld-git-repo")
 	if err != nil {
 		t.Fatalf("Making tmp dir: %s", err)
 	}
@@ -126,7 +125,7 @@ func TestGitRepoValidNotOnBranch(t *testing.T) {
 }
 
 func TestGitRepoValidSubDir(t *testing.T) {
-	dir, err := ioutil.TempDir("", "kbld-git-repo")
+	dir, err := os.MkdirTemp("", "kbld-git-repo")
 	if err != nil {
 		t.Fatalf("Making tmp dir: %s", err)
 	}
@@ -165,7 +164,7 @@ func TestGitRepoValidSubDir(t *testing.T) {
 }
 
 func TestGitRepoValidNonGit(t *testing.T) {
-	dir, err := ioutil.TempDir("", "kbld-git-repo")
+	dir, err := os.MkdirTemp("", "kbld-git-repo")
 	if err != nil {
 		t.Fatalf("Making tmp dir: %s", err)
 	}
@@ -195,7 +194,7 @@ func TestGitRepoValidNonGit(t *testing.T) {
 }
 
 func TestGitRepoRemoteURL(t *testing.T) {
-	dir, err := ioutil.TempDir("", "kbld-git-repo")
+	dir, err := os.MkdirTemp("", "kbld-git-repo")
 	if err != nil {
 		t.Fatalf("Making tmp dir: %s", err)
 	}
@@ -226,7 +225,7 @@ func TestGitRepoRemoteURL(t *testing.T) {
 }
 
 func TestGitRepoHeadSHA(t *testing.T) {
-	dir, err := ioutil.TempDir("", "kbld-git-repo")
+	dir, err := os.MkdirTemp("", "kbld-git-repo")
 	if err != nil {
 		t.Fatalf("Making tmp dir: %s", err)
 	}
@@ -258,7 +257,7 @@ func TestGitRepoHeadSHA(t *testing.T) {
 }
 
 func TestGitRepoIsDirty(t *testing.T) {
-	dir, err := ioutil.TempDir("", "kbld-git-repo")
+	dir, err := os.MkdirTemp("", "kbld-git-repo")
 	if err != nil {
 		t.Fatalf("Making tmp dir: %s", err)
 	}
