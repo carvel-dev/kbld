@@ -20,6 +20,12 @@ jobs:
     runs-on: ubuntu-latest
     environment: DockerHub E2E
     steps:
+    - name: Free Disk Space (Ubuntu)
+      uses: jlumbroso/free-disk-space@v1.3.0
+      with:
+        # this might remove tools that are actually needed,
+        # if set to "true" but frees about 6 GB
+        tool-cache: true
     - name: Set up Go 1.x
       uses: actions/setup-go@v3
       with:
