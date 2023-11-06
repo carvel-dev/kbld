@@ -12,7 +12,7 @@ require (
 	github.com/stretchr/testify v1.8.4
 	github.com/vmware-tanzu/carvel-imgpkg v0.38.2
 	github.com/vmware-tanzu/carvel-vendir v0.35.2
-	golang.org/x/sync v0.3.0
+	golang.org/x/sync v0.5.0
 	k8s.io/apimachinery v0.28.1
 	sigs.k8s.io/yaml v1.3.0
 )
