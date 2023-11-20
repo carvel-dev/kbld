@@ -62,7 +62,7 @@ func NewOriginsFromString(str string) ([]Origin, error) {
 	//   deploy than was used to package) there would likely be a flurry
 	//   of warnings. So, the feature would quickly need an enhancement
 	//   to de-dup such warnings. (read: added complexity)
-	// see also https://github.com/vmware-tanzu/carvel-kbld/issues/160
+	// see also https://carvel.dev/kbld/issues/160
 	err := yaml.Unmarshal([]byte(str), &origins)
 	if err != nil {
 		return []Origin{}, err

@@ -1,4 +1,4 @@
-module github.com/vmware-tanzu/carvel-kbld
+module carvel.dev/kbld
 
 go 1.21
 

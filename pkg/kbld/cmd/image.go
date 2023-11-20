@@ -7,7 +7,7 @@ import (
 	"reflect"
 	"strings"
 
-	ctlconf "github.com/vmware-tanzu/carvel-kbld/pkg/kbld/config"
+	ctlconf "carvel.dev/kbld/pkg/kbld/config"
 	"sigs.k8s.io/yaml"
 )
 

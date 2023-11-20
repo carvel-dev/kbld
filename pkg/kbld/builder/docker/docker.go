@@ -12,9 +12,9 @@ import (
 	"os/exec"
 	"strings"
 
+	ctlb "carvel.dev/kbld/pkg/kbld/builder"
+	ctllog "carvel.dev/kbld/pkg/kbld/logger"
 	regname "github.com/google/go-containerregistry/pkg/name"
-	ctlb "github.com/vmware-tanzu/carvel-kbld/pkg/kbld/builder"
-	ctllog "github.com/vmware-tanzu/carvel-kbld/pkg/kbld/logger"
 )
 
 type Docker struct {

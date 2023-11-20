@@ -6,12 +6,12 @@ package cmd
 import (
 	"fmt"
 
+	ctlimg "carvel.dev/kbld/pkg/kbld/image"
+	"carvel.dev/kbld/pkg/kbld/imagedesc"
+	ctllog "carvel.dev/kbld/pkg/kbld/logger"
+	ctlreg "carvel.dev/kbld/pkg/kbld/registry"
+	"carvel.dev/kbld/pkg/kbld/util"
 	regname "github.com/google/go-containerregistry/pkg/name"
-	ctlimg "github.com/vmware-tanzu/carvel-kbld/pkg/kbld/image"
-	"github.com/vmware-tanzu/carvel-kbld/pkg/kbld/imagedesc"
-	ctllog "github.com/vmware-tanzu/carvel-kbld/pkg/kbld/logger"
-	ctlreg "github.com/vmware-tanzu/carvel-kbld/pkg/kbld/registry"
-	"github.com/vmware-tanzu/carvel-kbld/pkg/kbld/util"
 )
 
 type ImageSet struct {

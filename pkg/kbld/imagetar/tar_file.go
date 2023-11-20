@@ -10,8 +10,8 @@ import (
 	"os"
 	"strings"
 
+	"carvel.dev/kbld/pkg/kbld/imagedesc"
 	regv1 "github.com/google/go-containerregistry/pkg/v1"
-	"github.com/vmware-tanzu/carvel-kbld/pkg/kbld/imagedesc"
 )
 
 type tarFile struct {

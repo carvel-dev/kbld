@@ -7,15 +7,15 @@ import (
 	"fmt"
 	"os"
 
+	ctlconf "carvel.dev/kbld/pkg/kbld/config"
+	ctllog "carvel.dev/kbld/pkg/kbld/logger"
+	ctlreg "carvel.dev/kbld/pkg/kbld/registry"
+	ctlres "carvel.dev/kbld/pkg/kbld/resources"
+	ctlser "carvel.dev/kbld/pkg/kbld/search"
+	"carvel.dev/kbld/pkg/kbld/version"
 	"github.com/cppforlife/go-cli-ui/ui"
 	regname "github.com/google/go-containerregistry/pkg/name"
 	"github.com/spf13/cobra"
-	ctlconf "github.com/vmware-tanzu/carvel-kbld/pkg/kbld/config"
-	ctllog "github.com/vmware-tanzu/carvel-kbld/pkg/kbld/logger"
-	ctlreg "github.com/vmware-tanzu/carvel-kbld/pkg/kbld/registry"
-	ctlres "github.com/vmware-tanzu/carvel-kbld/pkg/kbld/resources"
-	ctlser "github.com/vmware-tanzu/carvel-kbld/pkg/kbld/search"
-	"github.com/vmware-tanzu/carvel-kbld/pkg/kbld/version"
 	"sigs.k8s.io/yaml"
 )
 

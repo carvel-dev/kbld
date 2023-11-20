@@ -6,9 +6,9 @@ package search
 import (
 	"reflect"
 
-	ctlconf "github.com/vmware-tanzu/carvel-kbld/pkg/kbld/config"
-	ctlimg "github.com/vmware-tanzu/carvel-kbld/pkg/kbld/image"
-	ctlres "github.com/vmware-tanzu/carvel-kbld/pkg/kbld/resources"
+	ctlconf "carvel.dev/kbld/pkg/kbld/config"
+	ctlimg "carvel.dev/kbld/pkg/kbld/image"
+	ctlres "carvel.dev/kbld/pkg/kbld/resources"
 )
 
 type Matcher interface {

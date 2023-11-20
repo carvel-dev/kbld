@@ -10,7 +10,7 @@ VERSION="${1:-`get_latest_git_tag`}"
 
 # makes builds reproducible
 export CGO_ENABLED=0
-LDFLAGS="-X github.com/vmware-tanzu/carvel-kbld/pkg/kbld/version.Version=$VERSION"
+LDFLAGS="-X carvel.dev/kbld/pkg/kbld/version.Version=$VERSION"
 
 GOOS=darwin GOARCH=amd64 go build -ldflags="$LDFLAGS" -trimpath -o kbld-darwin-amd64 ./cmd/kbld/...
 GOOS=darwin GOARCH=arm64 go build -ldflags="$LDFLAGS" -trimpath -o kbld-darwin-arm64 ./cmd/kbld/...

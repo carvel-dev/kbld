@@ -6,9 +6,9 @@ package image_test
 import (
 	"testing"
 
+	ctlconf "carvel.dev/kbld/pkg/kbld/config"
+	ctlimg "carvel.dev/kbld/pkg/kbld/image"
 	v1 "github.com/google/go-containerregistry/pkg/v1"
-	ctlconf "github.com/vmware-tanzu/carvel-kbld/pkg/kbld/config"
-	ctlimg "github.com/vmware-tanzu/carvel-kbld/pkg/kbld/image"
 )
 
 // TestMatchesPlatform runs test cases on the matchesPlatform function which verifies

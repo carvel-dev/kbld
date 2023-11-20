@@ -12,9 +12,9 @@ import (
 	"sort"
 	"time"
 
+	"carvel.dev/kbld/pkg/kbld/imagedesc"
+	"carvel.dev/kbld/pkg/kbld/util"
 	regv1 "github.com/google/go-containerregistry/pkg/v1"
-	"github.com/vmware-tanzu/carvel-kbld/pkg/kbld/imagedesc"
-	"github.com/vmware-tanzu/carvel-kbld/pkg/kbld/util"
 )
 
 type Logger interface {

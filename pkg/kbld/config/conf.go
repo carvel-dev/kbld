@@ -7,7 +7,7 @@ import (
 	"reflect"
 
 	"carvel.dev/imgpkg/pkg/imgpkg/lockconfig"
-	ctlres "github.com/vmware-tanzu/carvel-kbld/pkg/kbld/resources"
+	ctlres "carvel.dev/kbld/pkg/kbld/resources"
 )
 
 type Conf struct {

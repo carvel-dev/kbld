@@ -8,10 +8,10 @@ import (
 	"os"
 
 	"carvel.dev/imgpkg/pkg/imgpkg/lockconfig"
+	ctlres "carvel.dev/kbld/pkg/kbld/resources"
+	"carvel.dev/kbld/pkg/kbld/version"
 	versions "carvel.dev/vendir/pkg/vendir/versions/v1alpha1"
 	semver "github.com/hashicorp/go-version"
-	ctlres "github.com/vmware-tanzu/carvel-kbld/pkg/kbld/resources"
-	"github.com/vmware-tanzu/carvel-kbld/pkg/kbld/version"
 	"sigs.k8s.io/yaml"
 )
 

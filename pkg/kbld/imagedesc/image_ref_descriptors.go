@@ -11,11 +11,11 @@ import (
 	"strings"
 	"sync"
 
+	"carvel.dev/kbld/pkg/kbld/util"
 	regname "github.com/google/go-containerregistry/pkg/name"
 	regv1 "github.com/google/go-containerregistry/pkg/v1"
 	regtran "github.com/google/go-containerregistry/pkg/v1/remote/transport"
 	regtypes "github.com/google/go-containerregistry/pkg/v1/types"
-	"github.com/vmware-tanzu/carvel-kbld/pkg/kbld/util"
 	"golang.org/x/sync/errgroup"
 )
 

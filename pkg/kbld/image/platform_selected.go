@@ -6,11 +6,11 @@ package image
 import (
 	"fmt"
 
+	ctlconf "carvel.dev/kbld/pkg/kbld/config"
+	ctlreg "carvel.dev/kbld/pkg/kbld/registry"
 	regname "github.com/google/go-containerregistry/pkg/name"
 	regv1 "github.com/google/go-containerregistry/pkg/v1"
 	regtypes "github.com/google/go-containerregistry/pkg/v1/types"
-	ctlconf "github.com/vmware-tanzu/carvel-kbld/pkg/kbld/config"
-	ctlreg "github.com/vmware-tanzu/carvel-kbld/pkg/kbld/registry"
 )
 
 // PlatformSelectedImage selects specific image matching arch/platform

@@ -4,12 +4,12 @@
 package cmd
 
 import (
+	ctlconf "carvel.dev/kbld/pkg/kbld/config"
+	ctlres "carvel.dev/kbld/pkg/kbld/resources"
+	ctlser "carvel.dev/kbld/pkg/kbld/search"
 	"github.com/cppforlife/go-cli-ui/ui"
 	uitable "github.com/cppforlife/go-cli-ui/ui/table"
 	"github.com/spf13/cobra"
-	ctlconf "github.com/vmware-tanzu/carvel-kbld/pkg/kbld/config"
-	ctlres "github.com/vmware-tanzu/carvel-kbld/pkg/kbld/resources"
-	ctlser "github.com/vmware-tanzu/carvel-kbld/pkg/kbld/search"
 )
 
 type InspectOptions struct {

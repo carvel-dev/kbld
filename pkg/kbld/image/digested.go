@@ -7,8 +7,8 @@ import (
 	"fmt"
 	"strings"
 
+	ctlconf "carvel.dev/kbld/pkg/kbld/config"
 	regname "github.com/google/go-containerregistry/pkg/name"
-	ctlconf "github.com/vmware-tanzu/carvel-kbld/pkg/kbld/config"
 )
 
 const digestSep = "@"

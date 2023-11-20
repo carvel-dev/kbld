@@ -7,15 +7,15 @@ import (
 	"fmt"
 	"os"
 
+	ctlconf "carvel.dev/kbld/pkg/kbld/config"
+	"carvel.dev/kbld/pkg/kbld/imagedesc"
+	ctllog "carvel.dev/kbld/pkg/kbld/logger"
+	ctlreg "carvel.dev/kbld/pkg/kbld/registry"
+	ctlres "carvel.dev/kbld/pkg/kbld/resources"
+	ctlser "carvel.dev/kbld/pkg/kbld/search"
 	"github.com/cppforlife/go-cli-ui/ui"
 	regname "github.com/google/go-containerregistry/pkg/name"
 	"github.com/spf13/cobra"
-	ctlconf "github.com/vmware-tanzu/carvel-kbld/pkg/kbld/config"
-	"github.com/vmware-tanzu/carvel-kbld/pkg/kbld/imagedesc"
-	ctllog "github.com/vmware-tanzu/carvel-kbld/pkg/kbld/logger"
-	ctlreg "github.com/vmware-tanzu/carvel-kbld/pkg/kbld/registry"
-	ctlres "github.com/vmware-tanzu/carvel-kbld/pkg/kbld/resources"
-	ctlser "github.com/vmware-tanzu/carvel-kbld/pkg/kbld/search"
 )
 
 type PackageOptions struct {

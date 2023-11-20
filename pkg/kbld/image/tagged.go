@@ -4,9 +4,9 @@
 package image
 
 import (
+	ctlconf "carvel.dev/kbld/pkg/kbld/config"
+	ctlreg "carvel.dev/kbld/pkg/kbld/registry"
 	regname "github.com/google/go-containerregistry/pkg/name"
-	ctlconf "github.com/vmware-tanzu/carvel-kbld/pkg/kbld/config"
-	ctlreg "github.com/vmware-tanzu/carvel-kbld/pkg/kbld/registry"
 )
 
 // TaggedImage represents an image that will be tagged when its URL is requested

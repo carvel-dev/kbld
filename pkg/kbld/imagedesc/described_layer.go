@@ -7,10 +7,10 @@ import (
 	"fmt"
 	"io"
 
+	"carvel.dev/kbld/pkg/kbld/imageutils/gzip"
+	"carvel.dev/kbld/pkg/kbld/imageutils/verify"
 	regv1 "github.com/google/go-containerregistry/pkg/v1"
 	"github.com/google/go-containerregistry/pkg/v1/types"
-	"github.com/vmware-tanzu/carvel-kbld/pkg/kbld/imageutils/gzip"
-	"github.com/vmware-tanzu/carvel-kbld/pkg/kbld/imageutils/verify"
 )
 
 type DescribedLayer struct {

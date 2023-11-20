@@ -4,9 +4,9 @@
 package cmd
 
 import (
+	ctlconf "carvel.dev/kbld/pkg/kbld/config"
+	ctlres "carvel.dev/kbld/pkg/kbld/resources"
 	"github.com/spf13/cobra"
-	ctlconf "github.com/vmware-tanzu/carvel-kbld/pkg/kbld/config"
-	ctlres "github.com/vmware-tanzu/carvel-kbld/pkg/kbld/resources"
 )
 
 type FileFlags struct {

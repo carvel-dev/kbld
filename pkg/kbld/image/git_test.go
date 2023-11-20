@@ -14,7 +14,7 @@ import (
 	"strings"
 	"testing"
 
-	ctlimg "github.com/vmware-tanzu/carvel-kbld/pkg/kbld/image"
+	ctlimg "carvel.dev/kbld/pkg/kbld/image"
 )
 
 func TestMain(m *testing.M) {
