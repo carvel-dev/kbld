@@ -6,7 +6,7 @@ package config
 import (
 	"reflect"
 
-	"github.com/vmware-tanzu/carvel-imgpkg/pkg/imgpkg/lockconfig"
+	"carvel.dev/imgpkg/pkg/imgpkg/lockconfig"
 	ctlres "github.com/vmware-tanzu/carvel-kbld/pkg/kbld/resources"
 )
 

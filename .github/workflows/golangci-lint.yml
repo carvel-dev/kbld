@@ -20,8 +20,8 @@ jobs:
         with:
           fetch-depth: '0'
       - name: golangci-lint
-        uses: golangci/golangci-lint-action@v3.4.0
+        uses: golangci/golangci-lint-action@v3
         with:
-          version: v1.52.2
+          version: v1.54
           args: -v
 

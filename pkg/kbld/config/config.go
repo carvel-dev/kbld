@@ -7,11 +7,11 @@ import (
 	"fmt"
 	"io/ioutil"
 
+	"carvel.dev/imgpkg/pkg/imgpkg/lockconfig"
+	versions "carvel.dev/vendir/pkg/vendir/versions/v1alpha1"
 	semver "github.com/hashicorp/go-version"
-	"github.com/vmware-tanzu/carvel-imgpkg/pkg/imgpkg/lockconfig"
 	ctlres "github.com/vmware-tanzu/carvel-kbld/pkg/kbld/resources"
 	"github.com/vmware-tanzu/carvel-kbld/pkg/kbld/version"
-	versions "github.com/vmware-tanzu/carvel-vendir/pkg/vendir/versions/v1alpha1"
 	"sigs.k8s.io/yaml"
 )
 
