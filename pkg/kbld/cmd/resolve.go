@@ -10,9 +10,9 @@ import (
 	"os"
 	"strings"
 
+	"carvel.dev/imgpkg/pkg/imgpkg/lockconfig"
 	"github.com/cppforlife/go-cli-ui/ui"
 	"github.com/spf13/cobra"
-	"github.com/vmware-tanzu/carvel-imgpkg/pkg/imgpkg/lockconfig"
 	ctlconf "github.com/vmware-tanzu/carvel-kbld/pkg/kbld/config"
 	ctlimg "github.com/vmware-tanzu/carvel-kbld/pkg/kbld/image"
 	ctllog "github.com/vmware-tanzu/carvel-kbld/pkg/kbld/logger"
