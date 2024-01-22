@@ -6,11 +6,11 @@ package image
 import (
 	"fmt"
 
+	"carvel.dev/vendir/pkg/vendir/versions"
+	"carvel.dev/vendir/pkg/vendir/versions/v1alpha1"
 	regname "github.com/google/go-containerregistry/pkg/name"
 	ctlconf "github.com/vmware-tanzu/carvel-kbld/pkg/kbld/config"
 	ctlreg "github.com/vmware-tanzu/carvel-kbld/pkg/kbld/registry"
-	"github.com/vmware-tanzu/carvel-vendir/pkg/vendir/versions"
-	"github.com/vmware-tanzu/carvel-vendir/pkg/vendir/versions/v1alpha1"
 )
 
 // TagSelectedImage represents an image that will be resolved into url+digest
