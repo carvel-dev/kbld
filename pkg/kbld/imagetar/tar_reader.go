@@ -4,7 +4,7 @@
 package imagetar
 
 import (
-	"io/ioutil"
+	"io"
 
 	"github.com/vmware-tanzu/carvel-kbld/pkg/kbld/imagedesc"
 )
@@ -25,7 +25,7 @@ func (r TarReader) Read() ([]imagedesc.ImageOrIndex, error) {
 		return nil, err
 	}
 
-	manifestBytes, err := ioutil.ReadAll(manifestFile)
+	manifestBytes, err := io.ReadAll(manifestFile)
 	if err != nil {
 		return nil, err
 	}
