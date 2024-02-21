@@ -10,7 +10,7 @@ require (
 	github.com/google/go-containerregistry v0.16.1
 	github.com/hashicorp/go-version v1.6.0
 	github.com/kisielk/errcheck v1.6.3
-	github.com/spf13/cobra v1.7.0
+	github.com/spf13/cobra v1.8.0
 	github.com/stretchr/testify v1.8.4
 	golang.org/x/sync v0.3.0
 	k8s.io/apimachinery v0.28.1
