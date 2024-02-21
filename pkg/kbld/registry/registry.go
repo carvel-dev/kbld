@@ -57,12 +57,16 @@ func (i Registry) Generic(ref regname.Reference) (regv1.Descriptor, error) {
 		return regv1.Descriptor{}, err
 	}
 
-	desc, err := regremote.Get(ref, i.opts...)
+	desc, err := regremote.Head(ref, i.opts...)
 	if err != nil {
-		return regv1.Descriptor{}, err
+		getDesc, err := regremote.Get(ref, i.opts...)
+		if err != nil {
+			return regv1.Descriptor{}, err
+		}
+		return getDesc.Descriptor, err
 	}
 
-	return desc.Descriptor, nil
+	return *desc, nil
 }
 
 func (i Registry) Image(ref regname.Reference) (regv1.Image, error) {
