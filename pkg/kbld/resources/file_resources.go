@@ -32,7 +32,7 @@ func NewFileResources(file string) ([]FileResource, error) {
 	default:
 		fileInfo, err := os.Stat(file)
 		if err != nil {
-			return nil, fmt.Errorf("Checking file '%s'", file)
+			return nil, fmt.Errorf("Unable to stat file: %s", err)
 		}
 
 		if fileInfo.IsDir() {
