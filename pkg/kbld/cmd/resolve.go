@@ -10,15 +10,15 @@ import (
 	"strings"
 
 	"carvel.dev/imgpkg/pkg/imgpkg/lockconfig"
+	ctlconf "carvel.dev/kbld/pkg/kbld/config"
+	ctlimg "carvel.dev/kbld/pkg/kbld/image"
+	ctllog "carvel.dev/kbld/pkg/kbld/logger"
+	ctlreg "carvel.dev/kbld/pkg/kbld/registry"
+	ctlres "carvel.dev/kbld/pkg/kbld/resources"
+	ctlser "carvel.dev/kbld/pkg/kbld/search"
+	"carvel.dev/kbld/pkg/kbld/version"
 	"github.com/cppforlife/go-cli-ui/ui"
 	"github.com/spf13/cobra"
-	ctlconf "github.com/vmware-tanzu/carvel-kbld/pkg/kbld/config"
-	ctlimg "github.com/vmware-tanzu/carvel-kbld/pkg/kbld/image"
-	ctllog "github.com/vmware-tanzu/carvel-kbld/pkg/kbld/logger"
-	ctlreg "github.com/vmware-tanzu/carvel-kbld/pkg/kbld/registry"
-	ctlres "github.com/vmware-tanzu/carvel-kbld/pkg/kbld/resources"
-	ctlser "github.com/vmware-tanzu/carvel-kbld/pkg/kbld/search"
-	"github.com/vmware-tanzu/carvel-kbld/pkg/kbld/version"
 	"sigs.k8s.io/yaml"
 )
 

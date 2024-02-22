@@ -4,8 +4,8 @@
 package search
 
 import (
-	ctlconf "github.com/vmware-tanzu/carvel-kbld/pkg/kbld/config"
-	ctlres "github.com/vmware-tanzu/carvel-kbld/pkg/kbld/resources"
+	ctlconf "carvel.dev/kbld/pkg/kbld/config"
+	ctlres "carvel.dev/kbld/pkg/kbld/resources"
 )
 
 type RulesMatcher struct {

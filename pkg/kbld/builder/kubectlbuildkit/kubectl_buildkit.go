@@ -10,10 +10,10 @@ import (
 	"os/exec"
 	"regexp"
 
+	ctlb "carvel.dev/kbld/pkg/kbld/builder"
+	ctlconf "carvel.dev/kbld/pkg/kbld/config"
+	ctllog "carvel.dev/kbld/pkg/kbld/logger"
 	regname "github.com/google/go-containerregistry/pkg/name"
-	ctlb "github.com/vmware-tanzu/carvel-kbld/pkg/kbld/builder"
-	ctlconf "github.com/vmware-tanzu/carvel-kbld/pkg/kbld/config"
-	ctllog "github.com/vmware-tanzu/carvel-kbld/pkg/kbld/logger"
 )
 
 var (

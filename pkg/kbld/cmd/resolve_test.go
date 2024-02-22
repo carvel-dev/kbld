@@ -7,9 +7,9 @@ import (
 	"fmt"
 	"testing"
 
+	ctlcmd "carvel.dev/kbld/pkg/kbld/cmd"
+	ctlconf "carvel.dev/kbld/pkg/kbld/config"
 	"github.com/stretchr/testify/assert"
-	ctlcmd "github.com/vmware-tanzu/carvel-kbld/pkg/kbld/cmd"
-	ctlconf "github.com/vmware-tanzu/carvel-kbld/pkg/kbld/config"
 )
 
 func TestNewPlatformSelection(t *testing.T) {

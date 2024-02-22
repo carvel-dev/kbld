@@ -6,9 +6,9 @@ package image_test
 import (
 	"testing"
 
+	ctlconf "carvel.dev/kbld/pkg/kbld/config"
+	. "carvel.dev/kbld/pkg/kbld/image"
 	"github.com/stretchr/testify/assert"
-	ctlconf "github.com/vmware-tanzu/carvel-kbld/pkg/kbld/config"
-	. "github.com/vmware-tanzu/carvel-kbld/pkg/kbld/image"
 )
 
 func TestPreResolvedOrigins(t *testing.T) {

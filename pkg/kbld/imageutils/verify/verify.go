@@ -25,8 +25,8 @@ import (
 	"hash"
 	"io"
 
+	"carvel.dev/kbld/pkg/kbld/imageutils/and"
 	v1 "github.com/google/go-containerregistry/pkg/v1"
-	"github.com/vmware-tanzu/carvel-kbld/pkg/kbld/imageutils/and"
 )
 
 type verifyReader struct {

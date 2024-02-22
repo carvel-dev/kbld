@@ -7,7 +7,7 @@ import (
 	"bytes"
 	"testing"
 
-	ctllog "github.com/vmware-tanzu/carvel-kbld/pkg/kbld/logger"
+	ctllog "carvel.dev/kbld/pkg/kbld/logger"
 )
 
 func TestLogger(t *testing.T) {
