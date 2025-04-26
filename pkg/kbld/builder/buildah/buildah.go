@@ -72,6 +72,9 @@ func (b Buildah) BuildAndPushImage(image, directory string, imgDst ctlconf.Image
 	if opts.Target != nil {
 		cmdArgs = append(cmdArgs, "--target="+*opts.Target)
 	}
+	if opts.RawOptions != nil {
+		cmdArgs = append(cmdArgs, *opts.RawOptions...)
+	}
 	// Use current directory as context
 	// cmdArgs = append(cmdArgs, "./")
 

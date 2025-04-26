@@ -15,4 +15,6 @@ type ContainerFileOpts struct {
 
 type SourceBuildahOpts struct {
 	ContainerFileOpts
+	// More options
+	RawOptions *[]string `json:"rawOptions"`
 }
