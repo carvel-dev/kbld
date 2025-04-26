@@ -9,7 +9,10 @@ type ContainerFileOpts struct {
 	// File containing instructions
 	// Docker will use "Dockerfile" as default
 	// Buildah can detect "Containerfile" or "Dockerfile" as default
-	File   *string
+	File *string
+	// Option "--build-arg=K=V"
+	BuildArgs map[string]string `json:"buildArgs"`
+	//
 	Target *string
 	//
 	Platforms []string

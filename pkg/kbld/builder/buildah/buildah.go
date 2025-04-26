@@ -69,6 +69,9 @@ func (b Buildah) BuildAndPushImage(image, directory string, imgDst ctlconf.Image
 	if opts.File != nil {
 		cmdArgs = append(cmdArgs, "--file="+*opts.File)
 	}
+	for arg, value := range opts.BuildArgs {
+		cmdArgs = append(cmdArgs, "--build-arg="+arg+"="+value)
+	}
 	if opts.Target != nil {
 		cmdArgs = append(cmdArgs, "--target="+*opts.Target)
 	}
