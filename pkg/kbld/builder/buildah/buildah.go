@@ -61,7 +61,7 @@ func (b Buildah) BuildAndPushImage(image, directory string, imgDst ctlconf.Image
 	prefixedLogger := b.logger.NewPrefixedWriter(image + " build | ")
 	prefixedLogger.Write([]byte(fmt.Sprintf("Start building using buildah\n")))
 
-	cmdArgs := []string{"build", "--tag", tagRef}
+	cmdArgs := []string{"build", "--manifest=" + tagRef}
 
 	if opts.Pull {
 		cmdArgs = append(cmdArgs, "--pull")
@@ -72,6 +72,10 @@ func (b Buildah) BuildAndPushImage(image, directory string, imgDst ctlconf.Image
 	if opts.Target != nil {
 		cmdArgs = append(cmdArgs, "--target="+*opts.Target)
 	}
+	if len(opts.Platforms) > 0 {
+		cmdArgs = append(cmdArgs, "--platform="+strings.Join(opts.Platforms, ","))
+	}
+
 	if opts.RawOptions != nil {
 		cmdArgs = append(cmdArgs, *opts.RawOptions...)
 	}
@@ -91,7 +95,7 @@ func (b Buildah) BuildAndPushImage(image, directory string, imgDst ctlconf.Image
 
 func (b Buildah) PushImage(image, tagRef string) error {
 	prefixedLogger := b.logger.NewPrefixedWriter(image + " push | ")
-	push_err := Launch("", "buildah", []string{"push", tagRef}, prefixedLogger)
+	push_err := Launch("", "buildah", []string{"manifest", "push", "--all", tagRef}, prefixedLogger)
 	if push_err != nil {
 		return push_err
 	}

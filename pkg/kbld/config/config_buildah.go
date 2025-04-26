@@ -11,6 +11,8 @@ type ContainerFileOpts struct {
 	// Buildah can detect "Containerfile" or "Dockerfile" as default
 	File   *string
 	Target *string
+	//
+	Platforms []string
 }
 
 type SourceBuildahOpts struct {
