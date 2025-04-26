@@ -7,6 +7,7 @@ import (
 	"fmt"
 
 	ctlbbz "carvel.dev/kbld/pkg/kbld/builder/bazel"
+	ctlbah "carvel.dev/kbld/pkg/kbld/builder/buildah"
 	ctlbdk "carvel.dev/kbld/pkg/kbld/builder/docker"
 	ctlbko "carvel.dev/kbld/pkg/kbld/builder/ko"
 	ctlbkb "carvel.dev/kbld/pkg/kbld/builder/kubectlbuildkit"
@@ -72,9 +73,10 @@ func (f Factory) New(url string) Image {
 		kubectlBuildkit := ctlbkb.NewKubectlBuildkit(f.logger)
 		ko := ctlbko.NewKo(f.logger)
 		bazel := ctlbbz.NewBazel(docker, f.logger)
+		buildah := ctlbah.New(f.logger)
 
 		var builtImg Image = NewBuiltImage(url, srcConf, imgDstConf,
-			docker, dockerBuildx, pack, kubectlBuildkit, ko, bazel)
+			docker, dockerBuildx, pack, kubectlBuildkit, ko, bazel, buildah)
 
 		if imgDstConf != nil {
 			builtImg = NewTaggedImage(builtImg, *imgDstConf, f.registry)
