@@ -4,6 +4,8 @@
 package image
 
 import (
+	"strings"
+
 	ctlconf "carvel.dev/kbld/pkg/kbld/config"
 	ctlreg "carvel.dev/kbld/pkg/kbld/registry"
 	regname "github.com/google/go-containerregistry/pkg/name"
@@ -26,7 +28,8 @@ func (i TaggedImage) URL() (string, []ctlconf.Origin, error) {
 		return "", nil, err
 	}
 
-	if len(i.imgDst.Tags) > 0 {
+	if len(i.imgDst.Tags) > 0 && strings.Contains(url, "@") {
+		// Configure new tags only if a digest is known
 		dstRef, err := regname.NewDigest(url, regname.WeakValidation)
 		if err != nil {
 			return "", nil, err

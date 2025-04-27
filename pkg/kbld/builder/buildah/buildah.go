@@ -34,34 +34,17 @@ func ensureDirectory(directory string) error {
 	return nil
 }
 
-func Launch(directory string, command string, cmdArgs []string, prefixedLogger *ctllog.PrefixWriter) error {
-	var stdoutBuf, stderrBuf bytes.Buffer
-	cmd := exec.Command("buildah", cmdArgs...)
-	cmd.Dir = directory
-	cmd.Stdout = io.MultiWriter(&stdoutBuf, prefixedLogger)
-	cmd.Stderr = io.MultiWriter(&stderrBuf, prefixedLogger)
-
-	err := cmd.Run()
-	if err != nil {
-		prefixedLogger.Write([]byte(fmt.Sprintf("error: %s\n", err)))
-		return err
-	}
-	return nil
-}
-
-func (b Buildah) BuildAndPushImage(image, directory string, imgDst ctlconf.ImageDestination, opts ctlconf.SourceBuildahOpts) (string, error) {
+func (b Buildah) BuildAndPushImage(image string, directory string, imgDst *ctlconf.ImageDestination, opts ctlconf.SourceBuildahOpts) (string, error) {
 
 	err := ensureDirectory(directory)
 	if err != nil {
 		return "", err
 	}
 
-	tagRef := imgDst.NewImage
-
 	prefixedLogger := b.logger.NewPrefixedWriter(image + " build | ")
 	prefixedLogger.Write([]byte(fmt.Sprintf("Start building using buildah\n")))
 
-	cmdArgs := []string{"build", "--manifest=" + tagRef}
+	cmdArgs := []string{"build", "--manifest=" + image}
 
 	if opts.Pull {
 		cmdArgs = append(cmdArgs, "--pull")
@@ -85,22 +68,58 @@ func (b Buildah) BuildAndPushImage(image, directory string, imgDst ctlconf.Image
 	// Use current directory as context
 	// cmdArgs = append(cmdArgs, "./")
 
-	build_err := Launch(directory, "buildah", cmdArgs, prefixedLogger)
-	if build_err != nil {
-		return "", build_err
+	{
+		cmd := exec.Command("buildah", cmdArgs...)
+		cmd.Dir = directory
+		cmd.Stdout = prefixedLogger
+
+		err := cmd.Run()
+		if err != nil {
+			prefixedLogger.Write([]byte(fmt.Sprintf("error: %s\n", err)))
+			return "", err
+		}
 	}
-	push_err := b.PushImage(image, tagRef)
+	remoteRef, push_err := b.PushImage(image, imgDst)
 	if push_err != nil {
-		return "", nil
+		return "", push_err
 	}
-	return tagRef, nil
+	prefixedLogger.WriteStr("Image build : " + remoteRef)
+	return remoteRef, nil
 }
 
-func (b Buildah) PushImage(image, tagRef string) error {
-	prefixedLogger := b.logger.NewPrefixedWriter(image + " push | ")
-	push_err := Launch("", "buildah", []string{"manifest", "push", "--all", tagRef}, prefixedLogger)
+func BuildahPush(src string, dest string, log *ctllog.PrefixWriter) error {
+	pushCommand := exec.Command("buildah", "manifest", "push", "--all", src, "docker://"+dest)
+	pushCommand.Stdout = log
+	push_err := pushCommand.Run()
 	if push_err != nil {
 		return push_err
 	}
 	return nil
-}
+} //// BuildahPush
+
+// Push built image to a remote registry
+// Return one of the remote image address
+func (b Buildah) PushImage(image string, imgDst *ctlconf.ImageDestination) (string, error) {
+	prefixedLogger := b.logger.NewPrefixedWriter(image + " push | ")
+	if imgDst == nil {
+		push_err := BuildahPush(image, image, prefixedLogger)
+		if push_err != nil {
+			return "", push_err
+		}
+		return image, nil
+	} else if len(imgDst.Tags) > 0 {
+		for _, tag := range imgDst.Tags {
+			push_err := BuildahPush(image, imgDst.NewImage+":"+tag, prefixedLogger)
+			if push_err != nil {
+				return "", push_err
+			}
+		}
+		return imgDst.NewImage + ":" + imgDst.Tags[0], nil
+	} else {
+		push_err := BuildahPush(image, imgDst.NewImage+":kbld", prefixedLogger)
+		if push_err != nil {
+			return "", push_err
+		}
+		return imgDst.NewImage + ":kbld", nil
+	}
+} //// PushImage

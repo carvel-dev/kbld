@@ -4,7 +4,6 @@
 package image
 
 import (
-	"fmt"
 	"path/filepath"
 
 	ctlbbz "carvel.dev/kbld/pkg/kbld/builder/bazel"
@@ -88,11 +87,7 @@ func (i BuiltImage) URL() (string, []ctlconf.Origin, error) {
 		return url, origins, err
 
 	case i.buildSource.Buildah != nil:
-		if i.imgDst == nil {
-			return "", nil, fmt.Errorf("Image destination is mandatory for buildah.")
-		}
-
-		tag, err := i.buildah.BuildAndPushImage(urlRepo, i.buildSource.Path, *i.imgDst, *i.buildSource.Buildah)
+		tag, err := i.buildah.BuildAndPushImage(urlRepo, i.buildSource.Path, i.imgDst, *i.buildSource.Buildah)
 		return tag, origins, err
 
 	// Fall back on Docker by default
