@@ -1,12 +1,12 @@
 package buildah
 
 import (
-	"bytes"
 	"fmt"
-	"io"
 	"os"
 	"os/exec"
+	"strings"
 
+	ctlb "carvel.dev/kbld/pkg/kbld/builder"
 	ctlconf "carvel.dev/kbld/pkg/kbld/config"
 	ctllog "carvel.dev/kbld/pkg/kbld/logger"
 )
@@ -87,39 +87,56 @@ func (b Buildah) BuildAndPushImage(image string, directory string, imgDst *ctlco
 	return remoteRef, nil
 }
 
-func BuildahPush(src string, dest string, log *ctllog.PrefixWriter) error {
-	pushCommand := exec.Command("buildah", "manifest", "push", "--all", src, "docker://"+dest)
+// Push the buildah manifest and return the digest
+func BuildahPush(src string, dest string, log *ctllog.PrefixWriter) (string, error) {
+	digest_file, digest_err := os.CreateTemp("", "buildah-")
+	if digest_err != nil {
+		return "", fmt.Errorf("cannot create digest file: %w", digest_err)
+	}
+	defer func() {
+		if err := digest_file.Close(); err != nil {
+			fmt.Printf("ERROR: Closing temp file %q: %v", digest_file.Name(), err)
+		}
+		if err := os.Remove(digest_file.Name()); err != nil {
+			fmt.Printf("ERROR: Removing temp file %q: %v", digest_file.Name(), err)
+		}
+	}()
+
+	// !!! with --digestfile, buildah will not return an error if an authentication is required.
+	pushCommand := exec.Command("buildah", "manifest", "push", "--all", "--digestfile="+digest_file.Name(), src, "docker://"+dest)
 	pushCommand.Stdout = log
 	push_err := pushCommand.Run()
 	if push_err != nil {
-		return push_err
+		return "", fmt.Errorf("error pushing to %q (check if you are authenticated) : %w", dest, push_err)
 	}
-	return nil
+
+	digest := make([]byte, 64+7)
+	digest_len, read_err := digest_file.Read(digest)
+	if read_err != nil {
+		return "", fmt.Errorf("cannot read digest in file %q (check if you are authenticated) : %w", digest_file.Name(), read_err)
+	}
+	return string(digest[0:digest_len]), nil
 } //// BuildahPush
 
 // Push built image to a remote registry
-// Return one of the remote image address
+// Return the image URL with digest
 func (b Buildah) PushImage(image string, imgDst *ctlconf.ImageDestination) (string, error) {
 	prefixedLogger := b.logger.NewPrefixedWriter(image + " push | ")
+	var remoteImg string
 	if imgDst == nil {
-		push_err := BuildahPush(image, image, prefixedLogger)
-		if push_err != nil {
-			return "", push_err
-		}
-		return image, nil
-	} else if len(imgDst.Tags) > 0 {
-		for _, tag := range imgDst.Tags {
-			push_err := BuildahPush(image, imgDst.NewImage+":"+tag, prefixedLogger)
-			if push_err != nil {
-				return "", push_err
-			}
-		}
-		return imgDst.NewImage + ":" + imgDst.Tags[0], nil
+		remoteImg = image
 	} else {
-		push_err := BuildahPush(image, imgDst.NewImage+":kbld", prefixedLogger)
-		if push_err != nil {
-			return "", push_err
+		tb := ctlb.TagBuilder{}
+		randSuffix, err := tb.RandomStr50()
+		if err != nil {
+			return "", fmt.Errorf("generating image dst suffix: %s", err)
 		}
-		return imgDst.NewImage + ":kbld", nil
+		remoteImg = imgDst.NewImage + ":kbld-" + randSuffix
 	}
+
+	digest, push_err := BuildahPush(image, remoteImg, prefixedLogger)
+	if push_err != nil {
+		return "", push_err
+	}
+	return remoteImg + "@" + digest, nil
 } //// PushImage
