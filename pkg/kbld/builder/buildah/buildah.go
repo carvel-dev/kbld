@@ -66,9 +66,9 @@ func (b Buildah) BuildAndPushImage(image string, directory string, imgDst *ctlco
 			return "", err
 		}
 	}
-	remoteRef, push_err := b.PushImage(image, imgDst)
-	if push_err != nil {
-		return "", push_err
+	remoteRef, pushErr := b.PushImage(image, imgDst)
+	if pushErr != nil {
+		return "", pushErr
 	}
 	prefixedLogger.WriteStr("Image build : " + remoteRef)
 	return remoteRef, nil
@@ -76,34 +76,34 @@ func (b Buildah) BuildAndPushImage(image string, directory string, imgDst *ctlco
 
 // Push the buildah manifest and return the digest
 func BuildahPush(src string, dest string, log *ctllog.PrefixWriter) (string, error) {
-	digest_file, digest_err := os.CreateTemp("", "buildah-")
-	if digest_err != nil {
-		return "", fmt.Errorf("cannot create digest file: %w", digest_err)
+	digestFile, digestErr := os.CreateTemp("", "buildah-")
+	if digestErr != nil {
+		return "", fmt.Errorf("cannot create digest file: %w", digestErr)
 	}
 	defer func() {
-		if err := digest_file.Close(); err != nil {
-			fmt.Printf("ERROR: Closing temp file %q: %v", digest_file.Name(), err)
+		if err := digestFile.Close(); err != nil {
+			fmt.Printf("ERROR: Closing temp file %q: %v", digestFile.Name(), err)
 		}
-		if err := os.Remove(digest_file.Name()); err != nil {
-			fmt.Printf("ERROR: Removing temp file %q: %v", digest_file.Name(), err)
+		if err := os.Remove(digestFile.Name()); err != nil {
+			fmt.Printf("ERROR: Removing temp file %q: %v", digestFile.Name(), err)
 		}
 	}()
 
 	// !!! with --digestfile, buildah will not return an error if an authentication is required.
-	log.WriteStr("=> buildah manifest push --all --digestfile=" + digest_file.Name() + " " + src + " docker://" + dest)
-	pushCommand := exec.Command("buildah", "manifest", "push", "--all", "--digestfile="+digest_file.Name(), src, "docker://"+dest)
+	log.WriteStr("=> buildah manifest push --all --digestfile=" + digestFile.Name() + " " + src + " docker://" + dest)
+	pushCommand := exec.Command("buildah", "manifest", "push", "--all", "--digestfile="+digestFile.Name(), src, "docker://"+dest)
 	pushCommand.Stdout = log
-	push_err := pushCommand.Run()
-	if push_err != nil {
-		return "", fmt.Errorf("error pushing to %q (check if you are authenticated) : %w", dest, push_err)
+	pushErr := pushCommand.Run()
+	if pushErr != nil {
+		return "", fmt.Errorf("error pushing to %q (check if you are authenticated) : %w", dest, pushErr)
 	}
 
 	digest := make([]byte, 64+7)
-	digest_len, read_err := digest_file.Read(digest)
-	if read_err != nil {
-		return "", fmt.Errorf("cannot read digest in file %q (check if you are authenticated) : %w", digest_file.Name(), read_err)
+	digestLen, readErr := digestFile.Read(digest)
+	if readErr != nil {
+		return "", fmt.Errorf("cannot read digest in file %q (check if you are authenticated) : %w", digestFile.Name(), readErr)
 	}
-	return string(digest[0:digest_len]), nil
+	return string(digest[0:digestLen]), nil
 } //// BuildahPush
 
 // Push built image to a remote registry
@@ -122,9 +122,9 @@ func (b Buildah) PushImage(image string, imgDst *ctlconf.ImageDestination) (stri
 		remoteImg = imgDst.NewImage + ":kbld-" + randSuffix
 	}
 
-	digest, push_err := BuildahPush(image, remoteImg, prefixedLogger)
-	if push_err != nil {
-		return "", push_err
+	digest, pushErr := BuildahPush(image, remoteImg, prefixedLogger)
+	if pushErr != nil {
+		return "", pushErr
 	}
 	return remoteImg + "@" + digest, nil
 } //// PushImage
