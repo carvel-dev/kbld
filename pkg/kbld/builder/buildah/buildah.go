@@ -104,7 +104,7 @@ func BuildahPush(src string, dest string, log *ctllog.PrefixWriter) (string, err
 		return "", fmt.Errorf("cannot read digest in file %q (check if you are authenticated) : %w", digestFile.Name(), readErr)
 	}
 	return string(digest[0:digestLen]), nil
-} //// BuildahPush
+} // BuildahPush
 
 // Push built image to a remote registry
 // Return the image URL with digest
@@ -127,4 +127,4 @@ func (b Buildah) PushImage(image string, imgDst *ctlconf.ImageDestination) (stri
 		return "", pushErr
 	}
 	return remoteImg + "@" + digest, nil
-} //// PushImage
+} // PushImage
