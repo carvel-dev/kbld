@@ -46,25 +46,11 @@ func (b Buildah) BuildAndPushImage(image string, directory string, imgDst *ctlco
 
 	cmdArgs := []string{"build", "--manifest=" + image}
 
-	if opts.Pull {
-		cmdArgs = append(cmdArgs, "--pull")
-	}
 	if opts.File != nil {
 		cmdArgs = append(cmdArgs, "--file="+*opts.File)
 	}
-	for arg, value := range opts.BuildArgs {
-		cmdArgs = append(cmdArgs, "--build-arg="+arg+"="+value)
-	}
-	if opts.Target != nil {
-		cmdArgs = append(cmdArgs, "--target="+*opts.Target)
-	}
-	if len(opts.Platforms) > 0 {
-		cmdArgs = append(cmdArgs, "--platform="+strings.Join(opts.Platforms, ","))
-	}
+	cmdArgs = append(cmdArgs, opts.Args()...)
 
-	if opts.RawOptions != nil {
-		cmdArgs = append(cmdArgs, *opts.RawOptions...)
-	}
 	// Use current directory as context
 	// cmdArgs = append(cmdArgs, "./")
 
