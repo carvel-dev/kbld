@@ -34,7 +34,33 @@ func ensureDirectory(directory string) error {
 	return nil
 }
 
+// Generate a name to send the image to the server
+func remoteImageName(imgDst ctlconf.ImageDestination) string {
+	if len(imgDst.Tags) == 0 {
+		tb := ctlb.TagBuilder{}
+		randSuffix, err := tb.RandomStr50()
+		if err != nil {
+			return imgDst.NewImage + ":kbld"
+		}
+		return imgDst.NewImage + ":kbld-" + randSuffix
+	} else {
+		return imgDst.NewImage + ":" + imgDst.Tags[0]
+	}
+}
+
+// Generate a name to store the image in local
+func localImageName(configImageName string, imgDest *ctlconf.ImageDestination) string {
+	if imgDest == nil {
+		return configImageName
+	} else {
+		return remoteImageName(*imgDest)
+	}
+}
+
 func (b Buildah) BuildAndPushImage(image string, directory string, imgDst *ctlconf.ImageDestination, opts ctlconf.SourceBuildahOpts) (string, error) {
+	if imgDst == nil {
+		return "", fmt.Errorf("a destination is required to store the built image")
+	}
 
 	err := ensureDirectory(directory)
 	if err != nil {
@@ -44,7 +70,8 @@ func (b Buildah) BuildAndPushImage(image string, directory string, imgDst *ctlco
 	prefixedLogger := b.logger.NewPrefixedWriter(image + " build | ")
 	prefixedLogger.Write([]byte(fmt.Sprintf("Start building using buildah\n")))
 
-	cmdArgs := []string{"build", "--manifest=" + image}
+	localName := localImageName(image, imgDst)
+	cmdArgs := []string{"build", "--manifest=" + localName}
 
 	if opts.File != nil {
 		cmdArgs = append(cmdArgs, "--file="+*opts.File)
@@ -67,12 +94,16 @@ func (b Buildah) BuildAndPushImage(image string, directory string, imgDst *ctlco
 			return "", err
 		}
 	}
-	remoteRef, pushErr := b.PushImage(image, imgDst)
+
+	pushLogger := b.logger.NewPrefixedWriter(image + " push | ")
+	remoteName := localName
+	digest, pushErr := BuildahPush(localName, remoteName, pushLogger)
 	if pushErr != nil {
 		return "", pushErr
 	}
-	prefixedLogger.WriteStr("Image build : " + remoteRef)
-	return remoteRef, nil
+	remoteName = remoteName + "@" + digest
+	prefixedLogger.WriteStr("Image build : " + remoteName)
+	return remoteName, nil
 }
 
 // Push the buildah manifest and return the digest
@@ -107,26 +138,3 @@ func BuildahPush(src string, dest string, log *ctllog.PrefixWriter) (string, err
 	}
 	return string(digest[0:digestLen]), nil
 } // BuildahPush
-
-// Push built image to a remote registry
-// Return the image URL with digest
-func (b Buildah) PushImage(image string, imgDst *ctlconf.ImageDestination) (string, error) {
-	prefixedLogger := b.logger.NewPrefixedWriter(image + " push | ")
-	var remoteImg string
-	if imgDst == nil {
-		remoteImg = image
-	} else {
-		tb := ctlb.TagBuilder{}
-		randSuffix, err := tb.RandomStr50()
-		if err != nil {
-			return "", fmt.Errorf("generating image dst suffix: %s", err)
-		}
-		remoteImg = imgDst.NewImage + ":kbld-" + randSuffix
-	}
-
-	digest, pushErr := BuildahPush(image, remoteImg, prefixedLogger)
-	if pushErr != nil {
-		return "", pushErr
-	}
-	return remoteImg + "@" + digest, nil
-} // PushImage
