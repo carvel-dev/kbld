@@ -59,6 +59,7 @@ func (b Buildah) BuildAndPushImage(image string, directory string, imgDst *ctlco
 		cmd := exec.Command("buildah", cmdArgs...)
 		cmd.Dir = directory
 		cmd.Stdout = prefixedLogger
+		cmd.Stderr = prefixedLogger
 
 		err := cmd.Run()
 		if err != nil {
@@ -93,6 +94,7 @@ func BuildahPush(src string, dest string, log *ctllog.PrefixWriter) (string, err
 	log.WriteStr("=> buildah manifest push --all --digestfile=" + digestFile.Name() + " " + src + " docker://" + dest)
 	pushCommand := exec.Command("buildah", "manifest", "push", "--all", "--digestfile="+digestFile.Name(), src, "docker://"+dest)
 	pushCommand.Stdout = log
+	pushCommand.Stderr = log
 	pushErr := pushCommand.Run()
 	if pushErr != nil {
 		return "", fmt.Errorf("error pushing to %q (check if you are authenticated) : %w", dest, pushErr)
