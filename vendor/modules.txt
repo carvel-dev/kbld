@@ -1,8 +1,8 @@
-# carvel.dev/imgpkg v0.45.0
-## explicit; go 1.23.6
+# carvel.dev/imgpkg v0.46.1
+## explicit; go 1.23.8
 carvel.dev/imgpkg/pkg/imgpkg/lockconfig
-# carvel.dev/vendir v0.43.2
-## explicit; go 1.23.7
+# carvel.dev/vendir v0.44.0
+## explicit; go 1.23.8
 carvel.dev/vendir/pkg/vendir/versions
 carvel.dev/vendir/pkg/vendir/versions/v1alpha1
 # github.com/carvel-dev/semver/v4 v4.0.1-0.20240402203627-beb83fbf25e4
@@ -164,7 +164,7 @@ golang.org/x/net/internal/httpcommon
 # golang.org/x/sync v0.14.0
 ## explicit; go 1.23.0
 golang.org/x/sync/errgroup
-# golang.org/x/sys v0.31.0
+# golang.org/x/sys v0.32.0
 ## explicit; go 1.23.0
 golang.org/x/sys/plan9
 golang.org/x/sys/unix

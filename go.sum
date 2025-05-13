@@ -1,7 +1,7 @@
-carvel.dev/imgpkg v0.45.0 h1:HlSB2EJz8GnFGx25pkXH4jbtOWx/sHB1fX0XaA2dh8o=
-carvel.dev/imgpkg v0.45.0/go.mod h1:8ZDJPu4/XaHVZm7u7XBe4IdG3LTYjGDbkVCqvHILyGM=
-carvel.dev/vendir v0.43.2 h1:aNLR+bPyPAicSDX+EQ58BB2H32s2sZs/40V/QLu4/VA=
-carvel.dev/vendir v0.43.2/go.mod h1:eI3EsFa0GTzX4RKTQel+ghV2lf2x7EgbHO0PXaO69sc=
+carvel.dev/imgpkg v0.46.1 h1:UOYaPllQJRsbzSl61IiNvmDZA5z4951i/KaSROAC1W0=
+carvel.dev/imgpkg v0.46.1/go.mod h1:Q1E+7tpoiPbVNjb7HSmLZP7E1j0w6mWFzDarOXW1HiI=
+carvel.dev/vendir v0.44.0 h1:vfq5KgGbbLlxHrE0prY7gZgiEQpjwo4lS2akCaVkcxA=
+carvel.dev/vendir v0.44.0/go.mod h1:gslrJ0HPiy8gtJYsQZHzIVuGfOG0nfDKDupEm7uBWVQ=
 github.com/carvel-dev/semver/v4 v4.0.1-0.20240402203627-beb83fbf25e4 h1:F4rZiMGZyC66j9VB7doVOE4tFHF1yNEihQlOuht4jmM=
 github.com/carvel-dev/semver/v4 v4.0.1-0.20240402203627-beb83fbf25e4/go.mod h1:4cFTBLAr/U11ykiEEQMccu4uJ1i0GS+atJmeETHCFtI=
 github.com/containerd/stargz-snapshotter/estargz v0.16.3 h1:7evrXtoh1mSbGj/pfRccTampEyKpjpOnS3CyiV1Ebr8=
@@ -158,8 +158,8 @@ golang.org/x/sys v0.0.0-20200930185726-fdedc70b468f/go.mod h1:h1NjWce9XRLGQEsW7w
 golang.org/x/sys v0.0.0-20210615035016-665e8c7367d1/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/sys v0.0.0-20220715151400-c0bba94af5f8/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/sys v0.6.0/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
-golang.org/x/sys v0.31.0 h1:ioabZlmFYtWhL+TRYpcnNlLwhyxaM9kWTDEmfnprqik=
-golang.org/x/sys v0.31.0/go.mod h1:BJP2sWEmIv4KK5OTEluFJCKSidICx8ciO85XgH3Ak8k=
+golang.org/x/sys v0.32.0 h1:s77OFDvIQeibCmezSnk/q6iAfkdiQaJi4VzroCFrN20=
+golang.org/x/sys v0.32.0/go.mod h1:BJP2sWEmIv4KK5OTEluFJCKSidICx8ciO85XgH3Ak8k=
 golang.org/x/term v0.0.0-20220411215600-e5f449aeb171/go.mod h1:jbD1KX2456YbFQfuXm/mYQcufACuNUgVhRMnK/tPxf8=
 golang.org/x/term v0.30.0 h1:PQ39fJZ+mfadBm0y5WlL4vlM7Sx1Hgf13sMIY2+QS9Y=
 golang.org/x/term v0.30.0/go.mod h1:NYYFdzHoI5wRh/h5tDMdMqCqPJZEuNqVR5xJLd/n67g=

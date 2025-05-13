@@ -1,10 +1,10 @@
 module carvel.dev/kbld
 
-go 1.23.7
+go 1.23.8
 
 require (
-	carvel.dev/imgpkg v0.45.0
-	carvel.dev/vendir v0.43.2
+	carvel.dev/imgpkg v0.46.1
+	carvel.dev/vendir v0.44.0
 	github.com/cppforlife/cobrautil v0.0.0-20221021151949-d60711905d65
 	github.com/cppforlife/go-cli-ui v0.0.0-20220428182907-73db60c7611a
 	github.com/google/go-containerregistry v0.20.3
@@ -48,7 +48,7 @@ require (
 	github.com/x448/float16 v0.8.4 // indirect
 	golang.org/x/mod v0.22.0 // indirect
 	golang.org/x/net v0.38.0 // indirect
-	golang.org/x/sys v0.31.0 // indirect
+	golang.org/x/sys v0.32.0 // indirect
 	golang.org/x/term v0.30.0 // indirect
 	golang.org/x/text v0.23.0 // indirect
 	golang.org/x/tools v0.29.0 // indirect
