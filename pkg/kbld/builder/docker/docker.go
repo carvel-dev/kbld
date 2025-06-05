@@ -6,6 +6,7 @@ package docker
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -192,6 +193,12 @@ func (d Docker) Push(tmpRef TmpRef, imageDst string) (ImageDigest, error) {
 		imageDstTagged, err = regname.NewTag(imageDst+":"+imageDstTag, regname.WeakValidation)
 		if err != nil {
 			return ImageDigest{}, fmt.Errorf("Generating image dst tag '%s': %s", imageDst, err)
+		}
+	} else if errors.Is(err, &regname.ErrBadName{}) {
+		imageDstTagged, err = regname.NewTag(strings.ToLower(imageDst))
+		if err != nil {
+			err := fmt.Errorf("Lower casing repository still failed: %s", err)
+			return ImageDigest{}, err
 		}
 	}
 
