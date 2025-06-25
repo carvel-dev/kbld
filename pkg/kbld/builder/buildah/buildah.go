@@ -6,7 +6,6 @@ import (
 	"os/exec"
 	"strings"
 
-	ctlb "carvel.dev/kbld/pkg/kbld/builder"
 	ctlconf "carvel.dev/kbld/pkg/kbld/config"
 	ctllog "carvel.dev/kbld/pkg/kbld/logger"
 )
@@ -37,12 +36,7 @@ func ensureDirectory(directory string) error {
 // Generate a name to send the image to the server
 func remoteImageName(imgDst ctlconf.ImageDestination) string {
 	if len(imgDst.Tags) == 0 {
-		tb := ctlb.TagBuilder{}
-		randSuffix, err := tb.RandomStr50()
-		if err != nil {
-			return imgDst.NewImage + ":kbld"
-		}
-		return imgDst.NewImage + ":kbld-" + randSuffix
+		return imgDst.NewImage + ":latest"
 	} else {
 		return imgDst.NewImage + ":" + imgDst.Tags[0]
 	}
