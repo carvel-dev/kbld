@@ -4,6 +4,7 @@
 package image
 
 import (
+	"carvel.dev/kbld/pkg/kbld/builder/maven"
 	"path/filepath"
 
 	ctlbbz "carvel.dev/kbld/pkg/kbld/builder/bazel"
@@ -25,13 +26,14 @@ type BuiltImage struct {
 	kubectlBuildkit ctlbkb.KubectlBuildkit
 	ko              ctlbko.Ko
 	bazel           ctlbbz.Bazel
+	maven           maven.Jib
 }
 
 func NewBuiltImage(url string, buildSource ctlconf.Source, imgDst *ctlconf.ImageDestination,
 	docker ctlbdk.Docker, dockerBuildx ctlbdk.Buildx, pack ctlbpk.Pack,
-	kubectlBuildkit ctlbkb.KubectlBuildkit, ko ctlbko.Ko, bazel ctlbbz.Bazel) BuiltImage {
+	kubectlBuildkit ctlbkb.KubectlBuildkit, ko ctlbko.Ko, bazel ctlbbz.Bazel, maven maven.Jib) BuiltImage {
 
-	return BuiltImage{url, buildSource, imgDst, docker, dockerBuildx, pack, kubectlBuildkit, ko, bazel}
+	return BuiltImage{url, buildSource, imgDst, docker, dockerBuildx, pack, kubectlBuildkit, ko, bazel, maven}
 }
 
 func (i BuiltImage) URL() (string, []ctlconf.Origin, error) {
@@ -83,6 +85,14 @@ func (i BuiltImage) URL() (string, []ctlconf.Origin, error) {
 		url, err := i.dockerBuildx.BuildAndOptionallyPush(
 			urlRepo, i.buildSource.Path, i.imgDst, *i.buildSource.Docker.Buildx)
 		return url, origins, err
+
+	case i.buildSource.Maven != nil:
+		dockerTmpRef, err := i.maven.Run(urlRepo, i.buildSource.Path, i.buildSource.Maven.Run)
+		if err != nil {
+			return "", nil, err
+		}
+
+		return i.optionalPushWithDocker(dockerTmpRef, origins)
 
 	// Fall back on Docker by default
 	default:

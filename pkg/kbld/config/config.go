@@ -61,6 +61,7 @@ type Source struct {
 	KubectlBuildkit *SourceKubectlBuildkitOpts
 	Ko              *SourceKoOpts
 	Bazel           *SourceBazelOpts
+	Maven           *SourceJibOpts
 }
 
 type ImageOverride struct {
