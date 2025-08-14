@@ -10,4 +10,5 @@ type SourceJibOpts struct {
 type SourceJibRunOpts struct {
 	Target     *string   `json:"target"`
 	RawOptions *[]string `json:"rawOptions"`
+	Tag        *string   `json:"tag,omitempty"`
 }

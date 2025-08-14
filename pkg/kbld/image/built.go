@@ -4,7 +4,7 @@
 package image
 
 import (
-	"carvel.dev/kbld/pkg/kbld/builder/maven"
+	maven "carvel.dev/kbld/pkg/kbld/builder/maven"
 	"path/filepath"
 
 	ctlbbz "carvel.dev/kbld/pkg/kbld/builder/bazel"
