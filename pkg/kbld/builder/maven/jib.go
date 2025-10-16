@@ -28,8 +28,8 @@ func (b *Jib) Run(image, directory string, opts config.SourceJibRunOpts) (ctlbdk
 
 	prefixedLogger := b.logger.NewPrefixedWriter(image + " | ")
 
-	prefixedLogger.Write([]byte(fmt.Sprintf("starting build (using bazel): %s\n", directory)))
-	defer prefixedLogger.Write([]byte("finished build (using bazel)\n"))
+	prefixedLogger.Write([]byte(fmt.Sprintf("starting build (using kbld jib build): %s\n", directory)))
+	defer prefixedLogger.Write([]byte("finished build (using kbld jib build)\n"))
 
 	tag := opts.Tag
 	if tag == nil {
@@ -48,6 +48,7 @@ func (b *Jib) Run(image, directory string, opts config.SourceJibRunOpts) (ctlbdk
 		"compile",
 		"jib:dockerBuild",
 		"-Dimage=" + targetImage,
+		"-Djib.allowInsecureRegistries=true",
 	}
 
 	if opts.RawOptions != nil {
