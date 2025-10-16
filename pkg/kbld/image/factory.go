@@ -4,6 +4,7 @@
 package image
 
 import (
+	maven2 "carvel.dev/kbld/pkg/kbld/builder/maven"
 	"fmt"
 
 	ctlbbz "carvel.dev/kbld/pkg/kbld/builder/bazel"
@@ -72,9 +73,10 @@ func (f Factory) New(url string) Image {
 		kubectlBuildkit := ctlbkb.NewKubectlBuildkit(f.logger)
 		ko := ctlbko.NewKo(f.logger)
 		bazel := ctlbbz.NewBazel(docker, f.logger)
+		maven := maven2.NewMavenJib(docker, f.logger)
 
 		var builtImg Image = NewBuiltImage(url, srcConf, imgDstConf,
-			docker, dockerBuildx, pack, kubectlBuildkit, ko, bazel)
+			docker, dockerBuildx, pack, kubectlBuildkit, ko, bazel, maven)
 
 		if imgDstConf != nil {
 			builtImg = NewTaggedImage(builtImg, *imgDstConf, f.registry)
