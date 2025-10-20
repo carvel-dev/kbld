@@ -9,11 +9,9 @@ import (
 	"io"
 	"os/exec"
 	"path/filepath"
-	"regexp"
 )
 
 var defaultImageTag = "latest"
-var ImageID = regexp.MustCompile("(sha256:)([0-9a-z]+)")
 
 type Jib struct {
 	docker ctlbdk.Docker

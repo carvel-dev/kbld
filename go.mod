@@ -1,4 +1,4 @@
-module vishrantgupta/kbld
+module carvel.dev/kbld
 
 go 1.23.8
 
