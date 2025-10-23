@@ -1,7 +1,7 @@
-carvel.dev/imgpkg v0.46.1 h1:UOYaPllQJRsbzSl61IiNvmDZA5z4951i/KaSROAC1W0=
-carvel.dev/imgpkg v0.46.1/go.mod h1:Q1E+7tpoiPbVNjb7HSmLZP7E1j0w6mWFzDarOXW1HiI=
-carvel.dev/vendir v0.44.0 h1:vfq5KgGbbLlxHrE0prY7gZgiEQpjwo4lS2akCaVkcxA=
-carvel.dev/vendir v0.44.0/go.mod h1:gslrJ0HPiy8gtJYsQZHzIVuGfOG0nfDKDupEm7uBWVQ=
+carvel.dev/imgpkg v0.43.1 h1:AjvY2Rpz7FIRd1jxOHMyAZwAV6MiqKOLyjT+gzhznbI=
+carvel.dev/imgpkg v0.43.1/go.mod h1:mLKnJumG8xtUY4ItDHZCj8XFfCwCdIr26pyxSvP3EPo=
+carvel.dev/vendir v0.40.0 h1:JdhCp/EjAPGI8F5zoAVYwZHf1sPEFee19RpgGb3ciT8=
+carvel.dev/vendir v0.40.0/go.mod h1:XPdluJu7322RZNx05AA4gYnV52aKywBdh7Ma12GuM2Q=
 github.com/carvel-dev/semver/v4 v4.0.1-0.20240402203627-beb83fbf25e4 h1:F4rZiMGZyC66j9VB7doVOE4tFHF1yNEihQlOuht4jmM=
 github.com/carvel-dev/semver/v4 v4.0.1-0.20240402203627-beb83fbf25e4/go.mod h1:4cFTBLAr/U11ykiEEQMccu4uJ1i0GS+atJmeETHCFtI=
 github.com/containerd/stargz-snapshotter/estargz v0.16.3 h1:7evrXtoh1mSbGj/pfRccTampEyKpjpOnS3CyiV1Ebr8=
