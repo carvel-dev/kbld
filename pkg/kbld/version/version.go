@@ -5,6 +5,7 @@ package version
 
 import (
 	"runtime/debug"
+	"strings"
 )
 
 var (
@@ -33,7 +34,10 @@ func version() string {
 	// Anything else.
 	for _, dep := range info.Deps {
 		if dep.Path == moduleName {
-			return dep.Version
+			// The minimumRequiredVersion field in kbld config is populated
+			// from this version. Since the validation logic doesn't allow
+			// minimumRequiredVersion to have a 'v' prefix, we remove it here.
+			return strings.TrimPrefix(dep.Version, "v")
 		}
 	}
 

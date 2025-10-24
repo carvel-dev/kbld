@@ -496,25 +496,25 @@ func TestResolveSuccessfulWithPlatformSelectionConfig(t *testing.T) {
 	input := `
 kind: Object
 spec:
-- image: nginx-arm64
-- image: nginx-amd64
-- image: nginx-all
+- image: pause-arm64
+- image: pause-amd64
+- image: pause-all
 ---
 apiVersion: kbld.k14s.io/v1alpha1
 kind: ImageOverrides
 overrides:
-- image: nginx-arm64
-  newImage: index.docker.io/library/nginx:1.14.2
+- image: pause-arm64
+  newImage: gcr.io/google-containers/pause:3.2
   platformSelection:
     os: linux
     architecture: arm64
-- image: nginx-amd64
-  newImage: index.docker.io/library/nginx:1.14.2
+- image: pause-amd64
+  newImage: gcr.io/google-containers/pause:3.2
   platformSelection:
     os: linux
     architecture: amd64
-- image: nginx-all
-  newImage: index.docker.io/library/nginx:1.14.2
+- image: pause-all
+  newImage: gcr.io/google-containers/pause:3.2
 `
 
 	out, _ := kbld.RunWithOpts([]string{"-f", "-"}, RunOpts{
@@ -528,31 +528,31 @@ metadata:
     kbld.k14s.io/images: |
       - origins:
         - resolved:
-            tag: 1.14.2
-            url: index.docker.io/library/nginx:1.14.2
-        - platformSelected:
-            architecture: amd64
-            index: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
-            os: linux
-        url: index.docker.io/library/nginx@sha256:706446e9c6667c0880d5da3f39c09a6c7d2114f5a5d6b74a2fafd24ae30d2078
-      - origins:
-        - resolved:
-            tag: 1.14.2
-            url: index.docker.io/library/nginx:1.14.2
+            tag: "3.2"
+            url: gcr.io/google-containers/pause:3.2
         - platformSelected:
             architecture: arm64
-            index: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
+            index: gcr.io/google-containers/pause@sha256:927d98197ec1141a368550822d18fa1c60bdae27b78b0c004f705f548c07814f
             os: linux
-        url: index.docker.io/library/nginx@sha256:d58b3e481b8588c080b42e5d7427f2c2061decbf9194f06e2adce641822e282a
+        url: gcr.io/google-containers/pause@sha256:31d3efd12022ffeffb3146bc10ae8beb890c80ed2f07363515580add7ed47636
       - origins:
         - resolved:
-            tag: 1.14.2
-            url: index.docker.io/library/nginx:1.14.2
-        url: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
+            tag: "3.2"
+            url: gcr.io/google-containers/pause:3.2
+        - platformSelected:
+            architecture: amd64
+            index: gcr.io/google-containers/pause@sha256:927d98197ec1141a368550822d18fa1c60bdae27b78b0c004f705f548c07814f
+            os: linux
+        url: gcr.io/google-containers/pause@sha256:4a1c4b21597c1b4415bdbecb28a3296c6b5e23ca4f9feeb599860a1dac6a0108
+      - origins:
+        - resolved:
+            tag: "3.2"
+            url: gcr.io/google-containers/pause:3.2
+        url: gcr.io/google-containers/pause@sha256:927d98197ec1141a368550822d18fa1c60bdae27b78b0c004f705f548c07814f
 spec:
-- image: index.docker.io/library/nginx@sha256:d58b3e481b8588c080b42e5d7427f2c2061decbf9194f06e2adce641822e282a
-- image: index.docker.io/library/nginx@sha256:706446e9c6667c0880d5da3f39c09a6c7d2114f5a5d6b74a2fafd24ae30d2078
-- image: index.docker.io/library/nginx@sha256:f7988fb6c02e0ce69257d9bd9cf37ae20a60f1df7563c3a2a6abe24160306b8d
+- image: gcr.io/google-containers/pause@sha256:31d3efd12022ffeffb3146bc10ae8beb890c80ed2f07363515580add7ed47636
+- image: gcr.io/google-containers/pause@sha256:4a1c4b21597c1b4415bdbecb28a3296c6b5e23ca4f9feeb599860a1dac6a0108
+- image: gcr.io/google-containers/pause@sha256:927d98197ec1141a368550822d18fa1c60bdae27b78b0c004f705f548c07814f
 `
 
 	require.YAMLEq(t, expectedOut, out)
