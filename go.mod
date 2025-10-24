@@ -10,7 +10,7 @@ require (
 	github.com/google/go-containerregistry v0.20.3
 	github.com/hashicorp/go-version v1.6.0
 	github.com/kisielk/errcheck v1.8.0
-	github.com/spf13/cobra v1.9.1
+	github.com/spf13/cobra v1.10.1
 	github.com/stretchr/testify v1.10.0
 	golang.org/x/sync v0.14.0
 	k8s.io/apimachinery v0.32.1
@@ -42,7 +42,7 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
-	github.com/spf13/pflag v1.0.6 // indirect
+	github.com/spf13/pflag v1.0.9 // indirect
 	github.com/vbatts/tar-split v0.11.6 // indirect
 	github.com/vito/go-interact v1.0.1 // indirect
 	github.com/x448/float16 v0.8.4 // indirect
