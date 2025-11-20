@@ -171,7 +171,7 @@ searchRules:
 
 	bs, err := ioutil.ReadFile(path)
 	if err != nil {
-		t.Fatalf("Failed while reading " + path)
+		t.Fatalf("Failed while reading %s", path)
 	}
 
 	if string(bs) != expectedFileContents {
@@ -236,7 +236,7 @@ images:
 
 	bs, err := ioutil.ReadFile(path)
 	if err != nil {
-		t.Fatalf("Failed while reading " + path)
+		t.Fatalf("Failed while reading %s", path)
 	}
 
 	if string(bs) != imgLockWithResolvedOrigins {
@@ -352,7 +352,7 @@ metadata:
 
 	bs, err := ioutil.ReadFile(path)
 	if err != nil {
-		t.Fatalf("Failed while reading " + path)
+		t.Fatalf("Failed while reading %s", path)
 	}
 
 	if string(bs) != imgLockWithBuiltAndPreresolvedOrigins {
@@ -388,7 +388,7 @@ images:
 
 	bs, err := ioutil.ReadFile(path)
 	if err != nil {
-		t.Fatalf("Failed while reading " + path)
+		t.Fatalf("Failed while reading %s", path)
 	}
 
 	// For Digest references, Image Lock should not have origins since there is no image metadata
