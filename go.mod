@@ -11,7 +11,7 @@ require (
 	github.com/hashicorp/go-version v1.7.0
 	github.com/kisielk/errcheck v1.9.0
 	github.com/spf13/cobra v1.10.1
-	github.com/stretchr/testify v1.10.0
+	github.com/stretchr/testify v1.11.1
 	golang.org/x/sync v0.18.0
 	k8s.io/apimachinery v0.32.1
 	sigs.k8s.io/yaml v1.4.0
