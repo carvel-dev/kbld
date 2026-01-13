@@ -1,6 +1,6 @@
 module carvel.dev/kbld
 
-go 1.24.9
+go 1.25.5
 
 require (
 	carvel.dev/imgpkg v0.47.0
