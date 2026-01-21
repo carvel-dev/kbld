@@ -80,7 +80,7 @@ func (b Buildah) BuildAndPushImage(image string, directory string, imgDst *ctlco
 		cmd := exec.Command("buildah", cmdArgs...)
 		cmd.Dir = directory
 		cmd.Stdout = prefixedLogger
-		cmd.Stderr = prefixedLogger
+		cmd.Stderr = os.Stderr
 
 		err := cmd.Run()
 		if err != nil {
