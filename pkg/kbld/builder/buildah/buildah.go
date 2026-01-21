@@ -6,6 +6,7 @@ import (
 	"os/exec"
 	"strings"
 
+	ctlb "carvel.dev/kbld/pkg/kbld/builder"
 	ctlconf "carvel.dev/kbld/pkg/kbld/config"
 	ctllog "carvel.dev/kbld/pkg/kbld/logger"
 )
@@ -34,7 +35,10 @@ func ensureDirectory(directory string) error {
 }
 
 // Generate a name to send the image to the server
-func remoteImageName(imgDst ctlconf.ImageDestination) string {
+func remoteImageName(configImageName string, imgDst *ctlconf.ImageDestination) string {
+	if imgDst == nil {
+		return configImageName
+	}
 	if len(imgDst.Tags) == 0 {
 		return imgDst.NewImage + ":latest"
 	} else {
@@ -43,12 +47,17 @@ func remoteImageName(imgDst ctlconf.ImageDestination) string {
 }
 
 // Generate a name to store the image in local
+// The local name is always new and random. The manifest is new each time and do not accumulate images.
 func localImageName(configImageName string, imgDest *ctlconf.ImageDestination) string {
-	if imgDest == nil {
-		return configImageName
-	} else {
-		return remoteImageName(*imgDest)
+	if imgDest != nil {
+		configImageName = imgDest.NewImage
 	}
+	tb := ctlb.TagBuilder{}
+	randSuffix, err := tb.RandomStr50()
+	if err != nil {
+		return configImageName + ":kbld"
+	}
+	return configImageName + ":kbld-" + randSuffix
 }
 
 func (b Buildah) BuildAndPushImage(image string, directory string, imgDst *ctlconf.ImageDestination, opts ctlconf.SourceBuildahOpts) (string, error) {
@@ -90,7 +99,7 @@ func (b Buildah) BuildAndPushImage(image string, directory string, imgDst *ctlco
 	}
 
 	pushLogger := b.logger.NewPrefixedWriter(image + " push | ")
-	remoteName := localName
+	remoteName := remoteImageName(image, imgDst)
 	digest, pushErr := BuildahPush(localName, remoteName, pushLogger)
 	if pushErr != nil {
 		return "", pushErr
