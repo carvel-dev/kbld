@@ -105,9 +105,12 @@ func (d Docker) Build(image, directory string, opts BuildOpts) (TmpRef, error) {
 		cmd.Stdout = io.MultiWriter(&stdoutBuf, prefixedLogger)
 		cmd.Stderr = io.MultiWriter(&stderrBuf, prefixedLogger)
 
+		cmdEnv := os.Environ()
+		cmdEnv = append(cmdEnv, "DOCKER_API_VERSION=1.52")
 		if opts.Buildkit != nil {
-			cmd.Env = append(os.Environ(), "DOCKER_BUILDKIT=1")
+			cmdEnv = append(cmdEnv, "DOCKER_BUILDKIT=1")
 		}
+		cmd.Env = cmdEnv
 
 		err := cmd.Run()
 		if err != nil {

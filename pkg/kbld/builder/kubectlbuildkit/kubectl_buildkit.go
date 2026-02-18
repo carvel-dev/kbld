@@ -7,8 +7,10 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"os"
 	"os/exec"
 	"regexp"
+	"strings"
 
 	ctlb "carvel.dev/kbld/pkg/kbld/builder"
 	ctlconf "carvel.dev/kbld/pkg/kbld/config"
@@ -86,6 +88,15 @@ func (d KubectlBuildkit) BuildAndPush(image, directory string,
 
 	cmd := exec.Command("kubectl", cmdArgs...)
 	cmd.Dir = directory
+	var newEnv []string
+	for _, envVar := range os.Environ() {
+		if !strings.HasPrefix(envVar, "DOCKER_API_VERSION=") {
+			newEnv = append(newEnv, envVar)
+		}
+	}
+
+	newEnv = append(os.Environ(), "DOCKER_API_VERSION=1.52")
+	cmd.Env = newEnv
 	cmd.Stdout = io.MultiWriter(&stdoutBuf, prefixedLogger)
 	cmd.Stderr = io.MultiWriter(&stderrBuf, prefixedLogger)
 

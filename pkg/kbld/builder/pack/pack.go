@@ -7,6 +7,7 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"os"
 	"os/exec"
 	"regexp"
 
@@ -72,6 +73,7 @@ func (d Pack) Build(image, directory string, opts PackBuildOpts) (ctlbdk.TmpRef,
 
 		cmd := exec.Command("pack", cmdArgs...)
 		cmd.Dir = directory
+		cmd.Env = append(os.Environ(), "DOCKER_API_VERSION=1.52")
 		cmd.Stdout = io.MultiWriter(&stdoutBuf, prefixedLogger)
 		cmd.Stderr = io.MultiWriter(&stderrBuf, prefixedLogger)
 

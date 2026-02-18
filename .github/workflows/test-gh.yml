@@ -18,6 +18,8 @@ jobs:
   test-all:
     name: Test GH
     runs-on: ubuntu-latest
+    env:
+      DOCKER_API_VERSION: "1.52"
     environment: DockerHub E2E
     steps:
     - name: Free Disk Space (Ubuntu)
@@ -40,6 +42,22 @@ jobs:
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         only: ytt, kapp
+        
+    - name: Check Default Docker Version
+      run: |
+        echo "=== Version before update ==="
+        docker version || echo "docker-version not found"
+
+    - name: Install Latest Docker Compose
+      uses: docker/setup-compose-action@v1
+      with:
+        version: latest
+
+    - name: Verify New Docker Version
+      run: |
+        echo "=== Version after update ==="
+        docker version
+    
     - name: Run Tests
       env:
         DOCKERHUB_USERNAME: k8slt
@@ -50,6 +68,7 @@ jobs:
         minikube start --driver=docker --wait=all --mount --mount-string "$HOME:$HOME"
         eval $(minikube docker-env --shell=bash)
 
+        export DOCKER_API_VERSION=1.52
         # when this workflow runs of a pull request based on a fork, secrets are unavailable
         # https://docs.github.com/en/actions/reference/encrypted-secrets#using-encrypted-secrets-in-a-workflow
         if [[ "${DOCKERHUB_ACCESS_TOKEN}" != "" ]]; then
