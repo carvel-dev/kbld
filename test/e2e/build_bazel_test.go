@@ -6,6 +6,8 @@
 package e2e
 
 import (
+	"fmt"
+	"os/exec"
 	"regexp"
 	"strings"
 	"testing"
@@ -14,7 +16,13 @@ import (
 func TestBazelBuildAndPushSuccessful(t *testing.T) {
 	env := BuildEnv(t)
 	kbld := Kbld{t, env.KbldBinaryPath, Logger{}}
-	input := env.WithRegistries(`
+
+	assetPath := "assets/simple-app"
+	secondAssetPath := "assets/simple-app-2"
+	exec.Command("cp", "-r", assetPath, secondAssetPath).Run()
+	defer exec.Command("rm", "-rf", secondAssetPath).Run()
+
+	input := env.WithRegistries(fmt.Sprintf(`
 kind: Object
 spec:
 - image: docker.io/*username*/kbld-e2e-tests-build
@@ -24,12 +32,12 @@ apiVersion: kbld.k14s.io/v1alpha1
 kind: Sources
 sources:
 - image: docker.io/*username*/kbld-e2e-tests-build
-  path: assets/simple-app
+  path: %s
   bazel:
     run:
       target: :simple-app
 - image: docker.io/*username*/kbld-e2e-tests-build2
-  path: assets/simple-app
+  path: %s
   bazel:
     run:
       target: :simple-app
@@ -39,7 +47,7 @@ kind: ImageDestinations
 destinations:
 - image: docker.io/*username*/kbld-e2e-tests-build
 - image: docker.io/*username*/kbld-e2e-tests-build2
-`)
+`, assetPath, secondAssetPath))
 
 	out, _ := kbld.RunWithOpts([]string{"-f", "-", "--images-annotation=false"}, RunOpts{
 		StdinReader: strings.NewReader(input),
