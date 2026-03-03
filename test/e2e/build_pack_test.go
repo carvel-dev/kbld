@@ -20,8 +20,15 @@ func TestPackBuildAndPushSuccessful(t *testing.T) {
 	// Copy asset to avoid parallel build interference
 	assetPath := "assets/simple-app"
 	secondAssetPath := "assets/simple-app-2"
-	exec.Command("cp", "-r", assetPath, secondAssetPath).Run()
-	defer exec.Command("rm", "-rf", secondAssetPath).Run()
+	copyCmd := exec.Command("cp", "-r", assetPath, secondAssetPath)
+	if err := copyCmd.Run(); err != nil {
+		t.Fatalf("failed to copy asset from %s to %s: %v", assetPath, secondAssetPath, err)
+	}
+	defer func() {
+		if err := exec.Command("rm", "-rf", secondAssetPath).Run(); err != nil {
+			t.Logf("failed to remove temporary asset path %s: %v", secondAssetPath, err)
+		}
+	}()
 
 	input := env.WithRegistries(fmt.Sprintf(`
 kind: Object
