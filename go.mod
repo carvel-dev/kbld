@@ -3,8 +3,8 @@ module carvel.dev/kbld
 go 1.25.7
 
 require (
-	carvel.dev/imgpkg v0.47.1
-	carvel.dev/vendir v0.45.1
+	carvel.dev/imgpkg v0.47.2
+	carvel.dev/vendir v0.45.2
 	github.com/cppforlife/cobrautil v0.0.0-20221021151949-d60711905d65
 	github.com/cppforlife/go-cli-ui v0.0.0-20220428182907-73db60c7611a
 	github.com/google/go-containerregistry v0.20.6
