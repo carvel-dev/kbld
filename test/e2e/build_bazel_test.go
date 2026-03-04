@@ -22,7 +22,11 @@ func TestBazelBuildAndPushSuccessful(t *testing.T) {
 	if err := exec.Command("cp", "-r", assetPath, secondAssetPath).Run(); err != nil {
 		t.Fatalf("failed to copy %s to %s: %v", assetPath, secondAssetPath, err)
 	}
-	defer exec.Command("rm", "-rf", secondAssetPath).Run()
+	defer func() {
+		if err := exec.Command("rm", "-rf", secondAssetPath).Run(); err != nil {
+			t.Logf("failed to remove %s: %v", secondAssetPath, err)
+		}
+	}()
 
 	input := env.WithRegistries(fmt.Sprintf(`
 kind: Object
