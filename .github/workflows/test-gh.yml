@@ -19,6 +19,8 @@ jobs:
     name: Test GH
     runs-on: ubuntu-latest
     environment: DockerHub E2E
+    env:
+      DOCKER_API_VERSION: "1.44"
     steps:
     - name: Free Disk Space (Ubuntu)
       uses: jlumbroso/free-disk-space@v1.3.0
@@ -40,6 +42,10 @@ jobs:
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         only: ytt, kapp
+    - name: Check Default Docker Version
+      run: |
+        echo "=== Docker version ==="
+        docker version || echo "docker-version not found"
     - name: Run Tests
       env:
         DOCKERHUB_USERNAME: k8slt
@@ -48,6 +54,13 @@ jobs:
         set -e -x
 
         minikube start --driver=docker --wait=all --mount --mount-string "$HOME:$HOME"
+
+        # RELAX THE API REQUIREMENT
+        # This reaches inside the minikube node, updates the daemon config, and restarts Docker
+        minikube ssh "sudo mkdir -p /etc/docker && echo '{\"min-api-version\": \"1.38\"}' | sudo tee /etc/docker/daemon.json && sudo systemctl restart docker"
+        # Wait a few seconds for the internal docker to come back up
+        sleep 5
+
         eval $(minikube docker-env --shell=bash)
 
         # when this workflow runs of a pull request based on a fork, secrets are unavailable
