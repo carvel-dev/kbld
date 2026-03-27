@@ -194,11 +194,10 @@ func (d Docker) Push(tmpRef TmpRef, imageDst string) (ImageDigest, error) {
 		if err != nil {
 			return ImageDigest{}, fmt.Errorf("Generating image dst tag '%s': %s", imageDst, err)
 		}
-	} else if errors.Is(err, &regname.ErrBadName{}) {
-		imageDstTagged, err = regname.NewTag(strings.ToLower(imageDst))
+	} else if badNameErr := (*regname.ErrBadName)(nil); errors.As(err, &badNameErr) {
+		imageDstTagged, err = regname.NewTag(lowerCaseRepository(imageDst))
 		if err != nil {
-			err := fmt.Errorf("Lower casing repository still failed: %s", err)
-			return ImageDigest{}, err
+			return ImageDigest{}, fmt.Errorf("Lower casing repository '%s' still failed: %w", imageDst, err)
 		}
 	}
 
@@ -332,4 +331,27 @@ func (d Docker) Inspect(ref string) (InspectData, error) {
 	}
 
 	return data[0], nil
+}
+
+// lowerCaseRepository lowercases the registry and repository portions of ref
+// while preserving the tag (tags are case-sensitive in Docker registries).
+func lowerCaseRepository(ref string) string {
+	// Walk slash-separated segments to identify the final component.
+	// The tag separator ':' can only appear in the last segment, never in the host.
+	var prefix string
+	tail := ref
+	for {
+		seg, rest, found := strings.Cut(tail, "/")
+		if !found {
+			break
+		}
+		prefix += seg + "/"
+		tail = rest
+	}
+	// tail is now the final path segment (e.g. "myimage" or "myimage:mytag")
+	name, tag, hasTag := strings.Cut(tail, ":")
+	if !hasTag {
+		return strings.ToLower(ref)
+	}
+	return strings.ToLower(prefix+name) + ":" + tag
 }
