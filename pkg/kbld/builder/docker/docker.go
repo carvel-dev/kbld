@@ -6,6 +6,7 @@ package docker
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -181,6 +182,7 @@ func (d Docker) Push(tmpRef TmpRef, imageDst string) (ImageDigest, error) {
 	// TODO we are technically polluting registry with new tags.
 	// Unfortunately we do not know digest upfront so cannot use kbld-sha256-... format.
 	imageDstTagged, err := regname.NewTag(imageDst, regname.WeakValidation)
+	badNameErr := (*regname.ErrBadName)(nil)
 	if err == nil {
 		randSuffix, err := tb.RandomStr50()
 		if err != nil {
@@ -191,7 +193,15 @@ func (d Docker) Push(tmpRef TmpRef, imageDst string) (ImageDigest, error) {
 
 		imageDstTagged, err = regname.NewTag(imageDst+":"+imageDstTag, regname.WeakValidation)
 		if err != nil {
-			return ImageDigest{}, fmt.Errorf("Generating image dst tag '%s': %s", imageDst, err)
+			return ImageDigest{}, fmt.Errorf(
+				"Generating image dst tag '%s': %s", imageDst, err)
+		}
+	} else if errors.As(err, &badNameErr) {
+		imageDstTagged, err = regname.NewTag(lowerCaseRepository(imageDst))
+		if err != nil {
+			newError := fmt.Errorf(
+				"Lower casing repository '%s' still failed: %w", imageDst, err)
+			return ImageDigest{}, newError
 		}
 	}
 
@@ -325,4 +335,28 @@ func (d Docker) Inspect(ref string) (InspectData, error) {
 	}
 
 	return data[0], nil
+}
+
+// lowerCaseRepository lowercases the registry and repository portions of ref
+// while preserving the tag (tags are case-sensitive in Docker registries).
+func lowerCaseRepository(ref string) string {
+	// Walk slash-separated segments to identify the final component.
+	// The tag separator ':' can only appear in the last segment,
+	// never in the host.
+	var prefix string
+	tail := ref
+	for {
+		seg, rest, found := strings.Cut(tail, "/")
+		if !found {
+			break
+		}
+		prefix += seg + "/"
+		tail = rest
+	}
+	// tail is now the final path segment (e.g. "myimage" or "myimage:mytag")
+	name, tag, hasTag := strings.Cut(tail, ":")
+	if !hasTag {
+		return strings.ToLower(ref)
+	}
+	return strings.ToLower(prefix+name) + ":" + tag
 }
