@@ -182,6 +182,7 @@ func (d Docker) Push(tmpRef TmpRef, imageDst string) (ImageDigest, error) {
 	// TODO we are technically polluting registry with new tags.
 	// Unfortunately we do not know digest upfront so cannot use kbld-sha256-... format.
 	imageDstTagged, err := regname.NewTag(imageDst, regname.WeakValidation)
+	badNameErr := (*regname.ErrBadName)(nil)
 	if err == nil {
 		randSuffix, err := tb.RandomStr50()
 		if err != nil {
@@ -192,12 +193,15 @@ func (d Docker) Push(tmpRef TmpRef, imageDst string) (ImageDigest, error) {
 
 		imageDstTagged, err = regname.NewTag(imageDst+":"+imageDstTag, regname.WeakValidation)
 		if err != nil {
-			return ImageDigest{}, fmt.Errorf("Generating image dst tag '%s': %s", imageDst, err)
+			return ImageDigest{}, fmt.Errorf(
+				"Generating image dst tag '%s': %s", imageDst, err)
 		}
-	} else if badNameErr := (*regname.ErrBadName)(nil); errors.As(err, &badNameErr) {
+	} else if errors.As(err, &badNameErr) {
 		imageDstTagged, err = regname.NewTag(lowerCaseRepository(imageDst))
 		if err != nil {
-			return ImageDigest{}, fmt.Errorf("Lower casing repository '%s' still failed: %w", imageDst, err)
+			newError := fmt.Errorf(
+				"Lower casing repository '%s' still failed: %w", imageDst, err)
+			return ImageDigest{}, newError
 		}
 	}
 
@@ -337,7 +341,8 @@ func (d Docker) Inspect(ref string) (InspectData, error) {
 // while preserving the tag (tags are case-sensitive in Docker registries).
 func lowerCaseRepository(ref string) string {
 	// Walk slash-separated segments to identify the final component.
-	// The tag separator ':' can only appear in the last segment, never in the host.
+	// The tag separator ':' can only appear in the last segment,
+	// never in the host.
 	var prefix string
 	tail := ref
 	for {
