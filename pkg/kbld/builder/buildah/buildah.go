@@ -92,8 +92,7 @@ func (b Buildah) BuildAndPushImage(image string, directory string,
 	// Use current directory as context
 	// cmdArgs = append(cmdArgs, "./")
 
-	prefixedLogger.WriteStr(
-		fmt.Sprintf("=> buildah " + strings.Join(cmdArgs, " ")))
+	prefixedLogger.WriteStr("=> buildah %s", strings.Join(cmdArgs, " "))
 	{
 		cmd := exec.Command("buildah", cmdArgs...)
 		cmd.Dir = directory
