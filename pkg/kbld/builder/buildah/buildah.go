@@ -92,7 +92,8 @@ func (b Buildah) BuildAndPushImage(image string, directory string,
 	// Use current directory as context
 	// cmdArgs = append(cmdArgs, "./")
 
-	prefixedLogger.WriteStr("=> buildah " + strings.Join(cmdArgs, " "))
+	prefixedLogger.WriteStr(
+		fmt.Sprintf("=> buildah " + strings.Join(cmdArgs, " ")))
 	{
 		cmd := exec.Command("buildah", cmdArgs...)
 		cmd.Dir = directory
@@ -121,7 +122,7 @@ func (b Buildah) BuildAndPushImage(image string, directory string,
 		return "", pushErr
 	}
 	remoteName := fmt.Sprintf("%s@%s", imgDst.NewImage, digest)
-	prefixedLogger.WriteStr("Image build : " + remoteName)
+	prefixedLogger.WriteStr("Image build : %s", remoteName)
 	return remoteName, nil
 }
 
@@ -148,8 +149,9 @@ func Push(src string, dest string,
 
 	// !!! with --digestfile, buildah will not return an error
 	// even if an authentication is required.
-	log.WriteStr("=> buildah manifest push --all --digestfile=" +
-		digestFile.Name() + " " + src + " docker://" + dest)
+	log.WriteStr(
+		"=> buildah manifest push --all --digestfile=%s %s docker://%s",
+		digestFile.Name(), src, dest)
 	pushCommand := exec.Command("buildah", "manifest", "push", "--all",
 		"--digestfile="+digestFile.Name(), src, "docker://"+dest)
 	pushCommand.Stdout = log
