@@ -7,11 +7,16 @@ package e2e
 
 import (
 	"regexp"
+	"runtime"
 	"strings"
 	"testing"
 )
 
 func TestBuildahBuildAndPush(t *testing.T) {
+	if runtime.GOOS != "linux" {
+		t.Skip("Buildah is only available for linux, so we are skipping this test")
+	}
+
 	env := BuildEnv(t)
 	kbld := Kbld{t, env.KbldBinaryPath, Logger{}}
 
