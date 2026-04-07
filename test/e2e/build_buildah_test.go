@@ -1,3 +1,8 @@
+//go:build e2e
+
+// Copyright 2026 The Carvel Authors.
+// SPDX-License-Identifier: Apache-2.0
+
 package e2e
 
 import (
@@ -43,14 +48,16 @@ destinations:
 		StdinReader: strings.NewReader(input),
 	})
 
-	out = strings.Replace(out, regexp.MustCompile("sha256:[a-z0-9]{64}").FindString(out), "SHA256-REPLACED1", -1)
-	out = strings.Replace(out, regexp.MustCompile("sha256:[a-z0-9]{64}").FindString(out), "SHA256-REPLACED2", -1)
+	out = strings.Replace(out, regexp.MustCompile(
+		"sha256:[a-z0-9]{64}").FindString(out), "SHA256-REPLACED1", -1)
+	out = strings.Replace(out, regexp.MustCompile(
+		"sha256:[a-z0-9]{64}").FindString(out), "SHA256-REPLACED2", -1)
 
 	expectedOut := env.WithRegistries(`---
 kind: Object
 spec:
-- image: index.docker.io/*username*/kbld-e2e-tests-build:latest@SHA256-REPLACED1
-- image: index.docker.io/*username*/kbld-e2e-tests-build2:test@SHA256-REPLACED2
+- image: index.docker.io/*username*/kbld-e2e-tests-build@SHA256-REPLACED1
+- image: index.docker.io/*username*/kbld-e2e-tests-build2@SHA256-REPLACED2
 `)
 
 	if out != expectedOut {

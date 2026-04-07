@@ -1,9 +1,18 @@
+// Copyright 2026 The Carvel Authors.
+// SPDX-License-Identifier: Apache-2.0
+
+// Package buildah enable
 package buildah
 
 import (
+	"crypto/rand"
+	"encoding/hex"
+	"errors"
 	"fmt"
+	"io"
 	"os"
 	"os/exec"
+	"regexp"
 	"strings"
 
 	ctlb "carvel.dev/kbld/pkg/kbld/builder"
@@ -11,10 +20,12 @@ import (
 	ctllog "carvel.dev/kbld/pkg/kbld/logger"
 )
 
+// Buildah struct to define the Builder
 type Buildah struct {
 	logger ctllog.Logger
 }
 
+// New create a new Buildah builder
 func New(logger ctllog.Logger) Buildah {
 	return Buildah{logger}
 }
@@ -22,33 +33,26 @@ func New(logger ctllog.Logger) Buildah {
 func ensureDirectory(directory string) error {
 	stat, err := os.Stat(directory)
 	if err != nil {
-		return fmt.Errorf("Checking if path '%s' is a directory: %s", directory, err)
+		return fmt.Errorf(
+			"Checking if path '%s' is a directory: %s", directory, err)
 	}
 
-	// Provide explicit directory check error message because otherwise docker CLI
-	// outputs confusing msg 'error: fork/exec /usr/local/bin/docker: not a directory'
+	// Provide explicit directory check error message because otherwise
+	// docker CLI outputs confusing msg
+	//   'error: fork/exec /usr/local/bin/docker: not a directory'
 	if !stat.IsDir() {
-		return fmt.Errorf("Expected path '%s' to be a directory, but was not", directory)
+		return fmt.Errorf(
+			"Expected path '%s' to be a directory, but was not", directory)
 	}
 
 	return nil
 }
 
-// Generate a name to send the image to the server
-func remoteImageName(configImageName string, imgDst *ctlconf.ImageDestination) string {
-	if imgDst == nil {
-		return configImageName
-	}
-	if len(imgDst.Tags) == 0 {
-		return imgDst.NewImage + ":latest"
-	} else {
-		return imgDst.NewImage + ":" + imgDst.Tags[0]
-	}
-}
-
 // Generate a name to store the image in local
-// The local name is always new and random. The manifest is new each time and do not accumulate images.
-func localImageName(configImageName string, imgDest *ctlconf.ImageDestination) string {
+// The local name is always new and random.
+// The manifest is new each time and do not accumulate images.
+func localImageName(configImageName string,
+	imgDest *ctlconf.ImageDestination) string {
 	if imgDest != nil {
 		configImageName = imgDest.NewImage
 	}
@@ -60,9 +64,13 @@ func localImageName(configImageName string, imgDest *ctlconf.ImageDestination) s
 	return configImageName + ":kbld-" + randSuffix
 }
 
-func (b Buildah) BuildAndPushImage(image string, directory string, imgDst *ctlconf.ImageDestination, opts ctlconf.SourceBuildahOpts) (string, error) {
+// BuildAndPushImage builds and pushed the images to the registry
+func (b Buildah) BuildAndPushImage(image string, directory string,
+	imgDst *ctlconf.ImageDestination,
+	opts ctlconf.SourceBuildahOpts) (string, error) {
 	if imgDst == nil {
-		return "", fmt.Errorf("a destination is required to store the built image")
+		return "", errors.New(
+			"a destination is required to store the built image")
 	}
 
 	err := ensureDirectory(directory)
@@ -71,7 +79,7 @@ func (b Buildah) BuildAndPushImage(image string, directory string, imgDst *ctlco
 	}
 
 	prefixedLogger := b.logger.NewPrefixedWriter(image + " build | ")
-	prefixedLogger.Write([]byte(fmt.Sprintf("Start building using buildah\n")))
+	prefixedLogger.Write([]byte("Start building using buildah\n"))
 
 	localName := localImageName(image, imgDst)
 	cmdArgs := []string{"build", "--manifest=" + localName}
@@ -89,7 +97,7 @@ func (b Buildah) BuildAndPushImage(image string, directory string, imgDst *ctlco
 		cmd := exec.Command("buildah", cmdArgs...)
 		cmd.Dir = directory
 		cmd.Stdout = prefixedLogger
-		cmd.Stderr = os.Stderr
+		cmd.Stderr = io.MultiWriter(os.Stderr, prefixedLogger)
 
 		err := cmd.Run()
 		if err != nil {
@@ -99,45 +107,85 @@ func (b Buildah) BuildAndPushImage(image string, directory string, imgDst *ctlco
 	}
 
 	pushLogger := b.logger.NewPrefixedWriter(image + " push | ")
-	remoteName := remoteImageName(image, imgDst)
-	digest, pushErr := BuildahPush(localName, remoteName, pushLogger)
+	// Push using a temporary, random tag,
+	// and return a canonical digest reference.
+	tempTagBytes := make([]byte, 8)
+	if _, err := rand.Read(tempTagBytes); err != nil {
+		return "", fmt.Errorf("generating temporary tag: %w", err)
+	}
+	tempTag := hex.EncodeToString(tempTagBytes)
+	tempRemoteName := fmt.Sprintf("%s:%s", imgDst.NewImage, tempTag)
+	digest, pushErr := Push(localName, tempRemoteName, pushLogger)
+
 	if pushErr != nil {
 		return "", pushErr
 	}
-	remoteName = remoteName + "@" + digest
+	remoteName := fmt.Sprintf("%s@%s", imgDst.NewImage, digest)
 	prefixedLogger.WriteStr("Image build : " + remoteName)
 	return remoteName, nil
 }
 
 // Push the buildah manifest and return the digest
-func BuildahPush(src string, dest string, log *ctllog.PrefixWriter) (string, error) {
+func Push(src string, dest string,
+	log *ctllog.PrefixWriter) (string, error) {
 	digestFile, digestErr := os.CreateTemp("", "buildah-")
 	if digestErr != nil {
-		return "", fmt.Errorf("cannot create digest file: %w", digestErr)
+		return "", fmt.Errorf(
+			"cannot create digest file: %w", digestErr)
 	}
 	defer func() {
 		if err := digestFile.Close(); err != nil {
-			fmt.Printf("ERROR: Closing temp file %q: %v", digestFile.Name(), err)
+			//revive:disable-next-line:unhandled-error
+			fmt.Printf(
+				"ERROR: Closing temp file %q: %v", digestFile.Name(), err)
 		}
 		if err := os.Remove(digestFile.Name()); err != nil {
-			fmt.Printf("ERROR: Removing temp file %q: %v", digestFile.Name(), err)
+			//revive:disable-next-line:unhandled-error
+			fmt.Printf(
+				"ERROR: Removing temp file %q: %v", digestFile.Name(), err)
 		}
 	}()
 
-	// !!! with --digestfile, buildah will not return an error if an authentication is required.
-	log.WriteStr("=> buildah manifest push --all --digestfile=" + digestFile.Name() + " " + src + " docker://" + dest)
-	pushCommand := exec.Command("buildah", "manifest", "push", "--all", "--digestfile="+digestFile.Name(), src, "docker://"+dest)
+	// !!! with --digestfile, buildah will not return an error
+	// even if an authentication is required.
+	log.WriteStr("=> buildah manifest push --all --digestfile=" +
+		digestFile.Name() + " " + src + " docker://" + dest)
+	pushCommand := exec.Command("buildah", "manifest", "push", "--all",
+		"--digestfile="+digestFile.Name(), src, "docker://"+dest)
 	pushCommand.Stdout = log
 	pushCommand.Stderr = log
 	pushErr := pushCommand.Run()
 	if pushErr != nil {
-		return "", fmt.Errorf("error pushing to %q (check if you are authenticated) : %w", dest, pushErr)
+		return "", fmt.Errorf(
+			"error pushing to %q (check if you are authenticated) : %w",
+			dest, pushErr)
 	}
 
-	digest := make([]byte, 64+7)
-	digestLen, readErr := digestFile.Read(digest)
-	if readErr != nil {
-		return "", fmt.Errorf("cannot read digest in file %q (check if you are authenticated) : %w", digestFile.Name(), readErr)
+	digest, err := calculateDigest(digestFile)
+	if err != nil {
+		return "", err
 	}
-	return string(digest[0:digestLen]), nil
-} // BuildahPush
+	return digest, nil
+}
+
+func calculateDigest(digestFile *os.File) (string, error) {
+	digestBytes, readErr := os.ReadFile(digestFile.Name())
+	if readErr != nil {
+		//revive:disable-next-line:line-length-limit
+		return "", fmt.Errorf("cannot read digest in file %q (check if you are authenticated) : %w",
+			digestFile.Name(), readErr)
+	}
+
+	digest := strings.TrimSpace(string(digestBytes))
+	if digest == "" {
+		return "", fmt.Errorf(
+			"no digest found in file %q (check if you are authenticated)",
+			digestFile.Name())
+	}
+	digestPattern := regexp.MustCompile(`^sha256:[0-9a-f]{64}$`)
+	if !digestPattern.MatchString(digest) {
+		return "", fmt.Errorf(
+			"invalid digest format %q in file %q", digest, digestFile.Name())
+	}
+	return digest, nil
+}

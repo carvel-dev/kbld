@@ -31,9 +31,10 @@ type BuiltImage struct {
 
 func NewBuiltImage(url string, buildSource ctlconf.Source, imgDst *ctlconf.ImageDestination,
 	docker ctlbdk.Docker, dockerBuildx ctlbdk.Buildx, pack ctlbpk.Pack,
-	kubectlBuildkit ctlbkb.KubectlBuildkit, ko ctlbko.Ko, bazel ctlbbz.Bazel, buildah ctlbah.Buildah) BuiltImage {
-
-	return BuiltImage{url, buildSource, imgDst, docker, dockerBuildx, pack, kubectlBuildkit, ko, bazel, buildah}
+	kubectlBuildkit ctlbkb.KubectlBuildkit, ko ctlbko.Ko, bazel ctlbbz.Bazel,
+	buildah ctlbah.Buildah) BuiltImage {
+	return BuiltImage{url, buildSource, imgDst, docker, dockerBuildx, pack,
+		kubectlBuildkit, ko, bazel, buildah}
 }
 
 func (i BuiltImage) URL() (string, []ctlconf.Origin, error) {
@@ -87,8 +88,9 @@ func (i BuiltImage) URL() (string, []ctlconf.Origin, error) {
 		return url, origins, err
 
 	case i.buildSource.Buildah != nil:
-		tag, err := i.buildah.BuildAndPushImage(urlRepo, i.buildSource.Path, i.imgDst, *i.buildSource.Buildah)
-		return tag, origins, err
+		url, err := i.buildah.BuildAndPushImage(urlRepo,
+			i.buildSource.Path, i.imgDst, *i.buildSource.Buildah)
+		return url, origins, err
 
 	// Fall back on Docker by default
 	default:
