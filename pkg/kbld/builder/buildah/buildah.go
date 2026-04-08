@@ -81,7 +81,7 @@ func (b Buildah) BuildAndPushImage(image string, directory string,
 	}
 
 	prefixedLogger := b.logger.NewPrefixedWriter(image + " build | ")
-	prefixedLogger.Write([]byte("Start building using buildah\n"))
+	prefixedLogger.WriteStr("Start building using buildah")
 
 	localName := localImageName(image, imgDst)
 	cmdArgs := []string{"build", "--manifest=" + localName}
@@ -103,7 +103,7 @@ func (b Buildah) BuildAndPushImage(image string, directory string,
 
 		err := cmd.Run()
 		if err != nil {
-			prefixedLogger.Write([]byte(fmt.Sprintf("error: %s\n", err)))
+			prefixedLogger.WriteStr("error: %s", err)
 			return "", err
 		}
 	}
