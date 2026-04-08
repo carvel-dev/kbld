@@ -1,7 +1,7 @@
 // Copyright 2026 The Carvel Authors.
 // SPDX-License-Identifier: Apache-2.0
 
-// Package buildah enable
+// Package buildah provides a builder implementation using Buildah.
 package buildah
 
 import (
@@ -19,6 +19,8 @@ import (
 	ctlconf "carvel.dev/kbld/pkg/kbld/config"
 	ctllog "carvel.dev/kbld/pkg/kbld/logger"
 )
+
+var digestPattern = regexp.MustCompile(`^sha256:[0-9a-f]{64}$`)
 
 // Buildah struct to define the Builder
 type Buildah struct {
@@ -135,14 +137,12 @@ func Push(src string, dest string,
 	}
 	defer func() {
 		if err := digestFile.Close(); err != nil {
-			//revive:disable-next-line:unhandled-error
-			fmt.Printf(
-				"ERROR: Closing temp file %q: %v", digestFile.Name(), err)
+			log.WriteStr("ERROR: Closing temp file %q: %v",
+				digestFile.Name(), err)
 		}
 		if err := os.Remove(digestFile.Name()); err != nil {
-			//revive:disable-next-line:unhandled-error
-			fmt.Printf(
-				"ERROR: Removing temp file %q: %v", digestFile.Name(), err)
+			log.WriteStr("ERROR: Removing temp file %q: %v",
+				digestFile.Name(), err)
 		}
 	}()
 
@@ -172,18 +172,17 @@ func Push(src string, dest string,
 func calculateDigest(digestFile *os.File) (string, error) {
 	digestBytes, readErr := os.ReadFile(digestFile.Name())
 	if readErr != nil {
-		//revive:disable-next-line:line-length-limit
-		return "", fmt.Errorf("cannot read digest in file %q (check if you are authenticated) : %w",
+		return "", fmt.Errorf(
+			"cannot read digest from temporary file %q: %w",
 			digestFile.Name(), readErr)
 	}
 
 	digest := strings.TrimSpace(string(digestBytes))
 	if digest == "" {
 		return "", fmt.Errorf(
-			"no digest found in file %q (check if you are authenticated)",
+			"no digest found in file %q",
 			digestFile.Name())
 	}
-	digestPattern := regexp.MustCompile(`^sha256:[0-9a-f]{64}$`)
 	if !digestPattern.MatchString(digest) {
 		return "", fmt.Errorf(
 			"invalid digest format %q in file %q", digest, digestFile.Name())
