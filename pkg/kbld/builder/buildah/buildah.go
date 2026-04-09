@@ -1,9 +1,16 @@
 // Copyright 2026 The Carvel Authors.
 // SPDX-License-Identifier: Apache-2.0
 
+// Package buildah use Buildah to build container images
+//
+// Buildah will consume a directory as context and a Dockerfile/Containerfile as instructions.
+// To support multiples architectures at once, buildah create and push manifests.
+//
+// https://github.com/containers/buildah
 package buildah
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"os/exec"
@@ -14,10 +21,12 @@ import (
 	ctllog "carvel.dev/kbld/pkg/kbld/logger"
 )
 
+// Buildah is the builder class using the buildah tool
 type Buildah struct {
 	logger ctllog.Logger
 }
 
+// New creates a new Buildah builder
 func New(logger ctllog.Logger) Buildah {
 	return Buildah{logger}
 }
@@ -28,8 +37,7 @@ func ensureDirectory(directory string) error {
 		return fmt.Errorf("Checking if path '%s' is a directory: %s", directory, err)
 	}
 
-	// Provide explicit directory check error message because otherwise docker CLI
-	// outputs confusing msg 'error: fork/exec /usr/local/bin/docker: not a directory'
+	// Buildah requires a directory as context
 	if !stat.IsDir() {
 		return fmt.Errorf("Expected path '%s' to be a directory, but was not", directory)
 	}
@@ -38,15 +46,15 @@ func ensureDirectory(directory string) error {
 }
 
 // Generate a name to send the image to the server
+// This name is not random to avoid cluttering the server with an endless stream of persistent tags
 func remoteImageName(configImageName string, imgDst *ctlconf.ImageDestination) string {
 	if imgDst == nil {
 		return configImageName
 	}
 	if len(imgDst.Tags) == 0 {
 		return imgDst.NewImage + ":latest"
-	} else {
-		return imgDst.NewImage + ":" + imgDst.Tags[0]
 	}
+	return imgDst.NewImage + ":" + imgDst.Tags[0]
 }
 
 // Generate a name to store the image in local
@@ -63,18 +71,20 @@ func localImageName(configImageName string, imgDest *ctlconf.ImageDestination) s
 	return configImageName + ":kbld-" + randSuffix
 }
 
+// BuildAndPushImage builds an image using a directory and some options, send the result to a remote server and return the tag with hash.
 func (b Buildah) BuildAndPushImage(image string, directory string, imgDst *ctlconf.ImageDestination, opts ctlconf.SourceBuildahOpts) (string, error) {
+	const noName = ""
 	if imgDst == nil {
-		return "", fmt.Errorf("a destination is required to store the built image")
+		return noName, errors.New("a destination is required to store the built image")
 	}
 
 	err := ensureDirectory(directory)
 	if err != nil {
-		return "", err
+		return noName, err
 	}
 
 	prefixedLogger := b.logger.NewPrefixedWriter(image + " build | ")
-	prefixedLogger.Write([]byte(fmt.Sprintf("Start building using buildah\n")))
+	prefixedLogger.Write([]byte("Start building using buildah\n"))
 
 	localName := localImageName(image, imgDst)
 	cmdArgs := []string{"build", "--manifest=" + localName}
@@ -97,23 +107,23 @@ func (b Buildah) BuildAndPushImage(image string, directory string, imgDst *ctlco
 		err := cmd.Run()
 		if err != nil {
 			prefixedLogger.Write([]byte(fmt.Sprintf("error: %s\n", err)))
-			return "", err
+			return noName, err
 		}
 	}
 
 	pushLogger := b.logger.NewPrefixedWriter(image + " push | ")
 	remoteName := remoteImageName(image, imgDst)
-	digest, pushErr := BuildahPush(localName, remoteName, pushLogger)
+	digest, pushErr := Push(localName, remoteName, pushLogger)
 	if pushErr != nil {
-		return "", pushErr
+		return noName, pushErr
 	}
 	remoteName = remoteName + "@" + digest
 	prefixedLogger.WriteStr("Image build : " + remoteName)
 	return remoteName, nil
 }
 
-// Push the buildah manifest and return the digest
-func BuildahPush(src string, dest string, log *ctllog.PrefixWriter) (string, error) {
+// Push sends the buildah manifest to a remote server and return the digest
+func Push(src string, dest string, log *ctllog.PrefixWriter) (string, error) {
 	digestFile, digestErr := os.CreateTemp("", "buildah-")
 	if digestErr != nil {
 		return "", fmt.Errorf("cannot create digest file: %w", digestErr)

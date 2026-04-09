@@ -5,7 +5,7 @@ package config
 
 import "strings"
 
-// Options for builds using Containerfiles
+// ContainerFileOpts stores options for all build systems using Containerfiles.
 //
 // see https://github.com/containers/common/blob/main/docs/Containerfile.5.md
 type ContainerFileOpts struct {
@@ -23,12 +23,14 @@ type ContainerFileOpts struct {
 	Platforms []string
 }
 
+// SourceBuildahOpts stores options for buildah only.
 type SourceBuildahOpts struct {
 	ContainerFileOpts
 	// More options
 	RawOptions *[]string `json:"rawOptions"`
 }
 
+// Args create the `buildah build` command arguments from options.
 func (opts SourceBuildahOpts) Args() []string {
 	args := []string{}
 

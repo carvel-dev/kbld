@@ -1,3 +1,5 @@
+//go:build e2e
+
 // Copyright 2026 The Carvel Authors.
 // SPDX-License-Identifier: Apache-2.0
 
