@@ -17,8 +17,8 @@ if [ "$(ko version)" != "0.8.0" ]; then
   exit 1
 fi
 
-if [ "$(bazel --version | grep -o '4.2.0')" != "4.2.0" ]; then
-    echo "Please install 'bazel' from https://github.com/bazelbuild/bazel/releases/tag/4.2.0"
+if [ "$(bazel --version | grep -o '6.4.0')" != "6.4.0" ]; then
+    echo "Please install 'bazel' from https://github.com/bazelbuild/bazel/releases/tag/6.4.0"
     exit 1
 fi
 
