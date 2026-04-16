@@ -4,7 +4,7 @@ go 1.25.7
 
 require (
 	carvel.dev/imgpkg v0.47.2
-	carvel.dev/vendir v0.45.2
+	carvel.dev/vendir v0.45.3
 	github.com/cppforlife/cobrautil v0.0.0-20221021151949-d60711905d65
 	github.com/cppforlife/go-cli-ui v0.0.0-20220428182907-73db60c7611a
 	github.com/google/go-containerregistry v0.20.6
@@ -18,7 +18,7 @@ require (
 )
 
 require (
-	github.com/carvel-dev/semver/v4 v4.0.1-0.20240402203627-beb83fbf25e4 // indirect
+	github.com/carvel-dev/semver/v4 v4.0.1-0.20260413160702-f136b2e8bf02 // indirect
 	github.com/containerd/stargz-snapshotter/estargz v0.16.3 // indirect
 	github.com/cppforlife/color v1.9.1-0.20200716202919-6706ac40b835 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
