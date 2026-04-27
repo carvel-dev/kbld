@@ -3,8 +3,9 @@
 
 // Package buildah use Buildah to build container images
 //
-// Buildah will consume a directory as context and a Dockerfile/Containerfile as instructions.
-// To support multiples architectures at once, buildah create and push manifests.
+// Buildah will consume a directory as context and a Dockerfile as instructions.
+// To support multiples architectures at once, buildah create and push
+// manifests instead of simple images.
 //
 // https://github.com/containers/buildah
 package buildah
@@ -34,20 +35,24 @@ func New(logger ctllog.Logger) Buildah {
 func ensureDirectory(directory string) error {
 	stat, err := os.Stat(directory)
 	if err != nil {
-		return fmt.Errorf("Checking if path '%s' is a directory: %s", directory, err)
+		return fmt.Errorf("checking if path '%s' is a directory: %s",
+			directory, err)
 	}
 
 	// Buildah requires a directory as context
 	if !stat.IsDir() {
-		return fmt.Errorf("Expected path '%s' to be a directory, but was not", directory)
+		return fmt.Errorf("expected path '%s' to be a directory, but was not",
+			directory)
 	}
 
 	return nil
 }
 
 // Generate a name to send the image to the server
-// This name is not random to avoid cluttering the server with an endless stream of persistent tags
-func remoteImageName(configImageName string, imgDst *ctlconf.ImageDestination) string {
+// This name is not random to avoid cluttering the server with an endless
+// stream of persistent tags
+func remoteImageName(configImageName string,
+	imgDst *ctlconf.ImageDestination) string {
 	if imgDst == nil {
 		return configImageName
 	}
@@ -58,8 +63,10 @@ func remoteImageName(configImageName string, imgDst *ctlconf.ImageDestination) s
 }
 
 // Generate a name to store the image in local
-// The local name is always new and random. The manifest is new each time and do not accumulate images.
-func localImageName(configImageName string, imgDest *ctlconf.ImageDestination) string {
+// The local name is always new and random.
+// The manifest is new each time and do not accumulate images.
+func localImageName(configImageName string,
+	imgDest *ctlconf.ImageDestination) string {
 	if imgDest != nil {
 		configImageName = imgDest.NewImage
 	}
@@ -71,11 +78,15 @@ func localImageName(configImageName string, imgDest *ctlconf.ImageDestination) s
 	return configImageName + ":kbld-" + randSuffix
 }
 
-// BuildAndPushImage builds an image using a directory and some options, send the result to a remote server and return the tag with hash.
-func (b Buildah) BuildAndPushImage(image string, directory string, imgDst *ctlconf.ImageDestination, opts ctlconf.SourceBuildahOpts) (string, error) {
+// BuildAndPushImage builds an image using a directory and some options,
+// send the result to a remote server and return the tag with hash.
+func (b Buildah) BuildAndPushImage(image string, directory string,
+	imgDst *ctlconf.ImageDestination,
+	opts ctlconf.SourceBuildahOpts) (string, error) {
 	const noName = ""
 	if imgDst == nil {
-		return noName, errors.New("a destination is required to store the built image")
+		return noName, errors.New(
+			"a destination is required to store the built image")
 	}
 
 	err := ensureDirectory(directory)
@@ -130,27 +141,37 @@ func Push(src string, dest string, log *ctllog.PrefixWriter) (string, error) {
 	}
 	defer func() {
 		if err := digestFile.Close(); err != nil {
-			fmt.Printf("ERROR: Closing temp file %q: %v", digestFile.Name(), err)
+			fmt.Printf(
+				"ERROR: Closing temporary file %q: %v", digestFile.Name(), err)
 		}
 		if err := os.Remove(digestFile.Name()); err != nil {
-			fmt.Printf("ERROR: Removing temp file %q: %v", digestFile.Name(), err)
+			fmt.Printf(
+				"ERROR: Deleting temporary file %q: %v", digestFile.Name(), err)
 		}
 	}()
 
-	// !!! with --digestfile, buildah will not return an error if an authentication is required.
-	log.Write([]byte("=> buildah manifest push --all --digestfile=" + digestFile.Name() + " " + src + " docker://" + dest))
-	pushCommand := exec.Command("buildah", "manifest", "push", "--all", "--digestfile="+digestFile.Name(), src, "docker://"+dest)
+	// !!! with --digestfile, buildah will not return an error if an
+	// authentication is required but the file will be empty.
+	log.WriteStr(
+		"=> buildah manifest push --all --digestfile=%s %s docker://%s",
+		digestFile.Name(), src, dest)
+	pushCommand := exec.Command("buildah", "manifest", "push", "--all",
+		"--digestfile="+digestFile.Name(), src, "docker://"+dest)
 	pushCommand.Stdout = log
 	pushCommand.Stderr = log
 	pushErr := pushCommand.Run()
 	if pushErr != nil {
-		return "", fmt.Errorf("error pushing to %q (check if you are authenticated) : %w", dest, pushErr)
+		return "", fmt.Errorf(
+			"error pushing to %q (check if you are authenticated) : %w",
+			dest, pushErr)
 	}
 
 	digest := make([]byte, 64+7)
 	digestLen, readErr := digestFile.Read(digest)
 	if readErr != nil {
-		return "", fmt.Errorf("cannot read digest in file %q (check if you are authenticated) : %w", digestFile.Name(), readErr)
+		return "", fmt.Errorf(
+			"cannot read digest in file %q (you may not be authenticated) : %w",
+			digestFile.Name(), readErr)
 	}
 	return string(digest[0:digestLen]), nil
 } // BuildahPush
