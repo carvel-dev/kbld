@@ -19,7 +19,7 @@ RUN chmod +x /usr/local/bin/bazel
 RUN curl -sLo /usr/local/bin/kapp https://github.com/carvel-dev/kapp/releases/download/v0.65.2/kapp-linux-amd64
 RUN chmod +x /usr/local/bin/kapp
 
-RUN curl -sLo /usr/local/bin/ytt https://github.com/carvel-dev/ytt/releases/download/v0.55.0/ytt-linux-amd64
+RUN curl -sLo /usr/local/bin/ytt https://github.com/carvel-dev/ytt/releases/download/v0.55.1/ytt-linux-amd64
 RUN chmod +x /usr/local/bin/ytt
 
 RUN echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
