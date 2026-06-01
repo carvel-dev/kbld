@@ -4,7 +4,7 @@
 package image
 
 import (
-	maven "carvel.dev/kbld/pkg/kbld/builder/maven"
+	"carvel.dev/kbld/pkg/kbld/builder/maven"
 	"path/filepath"
 
 	ctlbbz "carvel.dev/kbld/pkg/kbld/builder/bazel"
@@ -26,14 +26,20 @@ type BuiltImage struct {
 	kubectlBuildkit ctlbkb.KubectlBuildkit
 	ko              ctlbko.Ko
 	bazel           ctlbbz.Bazel
-	maven           maven.Jib
+	jib             maven.Jib
 }
 
-func NewBuiltImage(url string, buildSource ctlconf.Source, imgDst *ctlconf.ImageDestination,
-	docker ctlbdk.Docker, dockerBuildx ctlbdk.Buildx, pack ctlbpk.Pack,
-	kubectlBuildkit ctlbkb.KubectlBuildkit, ko ctlbko.Ko, bazel ctlbbz.Bazel, maven maven.Jib) BuiltImage {
+func NewBuiltImage(url string, buildSource ctlconf.Source,
+	imgDst *ctlconf.ImageDestination, docker ctlbdk.Docker,
+	dockerBuildx ctlbdk.Buildx, pack ctlbpk.Pack,
+	kubectlBuildkit ctlbkb.KubectlBuildkit, ko ctlbko.Ko,
+	bazel ctlbbz.Bazel, jib maven.Jib) BuiltImage {
 
-	return BuiltImage{url, buildSource, imgDst, docker, dockerBuildx, pack, kubectlBuildkit, ko, bazel, maven}
+	return BuiltImage{
+		url, buildSource, imgDst,
+		docker, dockerBuildx, pack,
+		kubectlBuildkit, ko, bazel, jib,
+	}
 }
 
 func (i BuiltImage) URL() (string, []ctlconf.Origin, error) {
@@ -87,7 +93,8 @@ func (i BuiltImage) URL() (string, []ctlconf.Origin, error) {
 		return url, origins, err
 
 	case i.buildSource.Maven != nil:
-		dockerTmpRef, err := i.maven.Run(urlRepo, i.buildSource.Path, i.buildSource.Maven.Run)
+		dockerTmpRef, err := i.jib.Run(
+			urlRepo, i.buildSource.Path, i.buildSource.Maven.Run)
 		if err != nil {
 			return "", nil, err
 		}

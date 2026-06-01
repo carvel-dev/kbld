@@ -1,6 +1,7 @@
 // Copyright 2024 The Carvel Authors.
 // SPDX-License-Identifier: Apache-2.0
 
+// Package maven implements a builder using Maven/Jib.
 package maven
 
 import (
@@ -12,27 +13,32 @@ import (
 	"io"
 	"os/exec"
 	"path/filepath"
-	"regexp"
 )
 
 var defaultImageTag = "latest"
-var ImageID = regexp.MustCompile("(sha256:)([0-9a-z]+)")
 
+// Jib represents a Maven Jib builder.
 type Jib struct {
 	docker ctlbdk.Docker
 	logger ctllog.Logger
 }
 
+// NewMavenJib creates a new Jib builder.
 func NewMavenJib(docker ctlbdk.Docker, logger ctllog.Logger) Jib {
 	return Jib{docker: docker, logger: logger}
 }
 
+// Run executes the Maven Jib build.
 func (b *Jib) Run(image, directory string, opts config.SourceJibRunOpts) (ctlbdk.TmpRef, error) {
 
 	prefixedLogger := b.logger.NewPrefixedWriter(image + " | ")
 
-	prefixedLogger.Write([]byte(fmt.Sprintf("starting build (using kbld jib build): %s\n", directory)))
-	defer prefixedLogger.Write([]byte("finished build (using kbld jib build)\n"))
+	_, _ = prefixedLogger.Write([]byte(fmt.Sprintf(
+		"starting build (using kbld jib build): %s\n", directory)))
+	defer func() {
+		_, _ = prefixedLogger.Write([]byte(
+			"finished build (using kbld jib build)\n"))
+	}()
 
 	tag := opts.Tag
 	if tag == nil {
@@ -43,7 +49,8 @@ func (b *Jib) Run(image, directory string, opts config.SourceJibRunOpts) (ctlbdk
 	var stdoutBuf, stderrBuf bytes.Buffer
 
 	if opts.Target == nil {
-		return ctlbdk.TmpRef{}, fmt.Errorf("Expected target to be specified, but was not")
+		return ctlbdk.TmpRef{},
+			fmt.Errorf("Expected target to be specified, but was not")
 	}
 
 	// Base arguments for the Maven Jib command.
@@ -64,20 +71,25 @@ func (b *Jib) Run(image, directory string, opts config.SourceJibRunOpts) (ctlbdk
 	cmd.Stdout = io.MultiWriter(&stdoutBuf, prefixedLogger)
 	cmd.Stderr = io.MultiWriter(&stderrBuf, prefixedLogger)
 
-	prefixedLogger.Write([]byte(fmt.Sprintf("running command: %s\n", cmd)))
+	_, _ = prefixedLogger.Write([]byte(fmt.Sprintf(
+		"running command: %s\n", cmd)))
 
 	if err := cmd.Run(); err != nil {
-		prefixedLogger.Write([]byte(fmt.Sprintf("error: %s\n", err)))
+		_, _ = prefixedLogger.Write([]byte(fmt.Sprintf(
+			"error: %s\n", err)))
 		return ctlbdk.TmpRef{}, err
 	}
 
 	inspectData, err := b.docker.Inspect(targetImage)
 	if err != nil {
-		prefixedLogger.Write([]byte(fmt.Sprintf("inspect error: %s\n", err)))
+		_, _ = prefixedLogger.Write([]byte(fmt.Sprintf(
+			"inspect error: %s\n", err)))
 		return ctlbdk.TmpRef{}, err
 	}
 
-	prefixedLogger.Write([]byte(fmt.Sprintf("digest: %s, id: %s\n", inspectData.RepoDigests, inspectData.ID)))
+	_, _ = prefixedLogger.Write([]byte(fmt.Sprintf(
+		"digest: %s, id: %s\n", inspectData.RepoDigests, inspectData.ID)))
 
-	return b.docker.RetagStable(ctlbdk.NewTmpRef(inspectData.ID), image, inspectData.ID, prefixedLogger)
+	return b.docker.RetagStable(
+		ctlbdk.NewTmpRef(inspectData.ID), image, inspectData.ID, prefixedLogger)
 }
