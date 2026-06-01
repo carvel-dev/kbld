@@ -23,14 +23,14 @@ func TestMain(m *testing.M) {
 		log.Fatalf("err creating tmpDir: %v", err)
 	}
 	defer os.RemoveAll(tmpDir)
-	os.Setenv("HOME", tmpDir)
-	os.Setenv("XDG_CONFIG_HOME", tmpDir)
+	_ = os.Setenv("HOME", tmpDir)
+	_ = os.Setenv("XDG_CONFIG_HOME", tmpDir)
 	gitConfig, err := os.Create(path.Join(tmpDir, ".gitconfig"))
 	if err != nil {
 		log.Fatalf("err creating gitconfig: %v", err)
 	}
 	fmt.Fprintf(gitConfig, "[user]\n\t name = kbld\n\temail = foo@example.com")
-	gitConfig.Close()
+	_ = gitConfig.Close()
 	os.Exit(m.Run())
 }
 
