@@ -30,7 +30,8 @@ func NewMavenJib(docker ctlbdk.Docker, logger ctllog.Logger) Jib {
 }
 
 // Run executes the Maven Jib build.
-func (b *Jib) Run(image, directory string, opts config.SourceJibRunOpts) (ctlbdk.TmpRef, error) {
+func (b *Jib) Run(image, directory string,
+	opts config.SourceJibRunOpts) (ctlbdk.TmpRef, error) {
 	prefixedLogger := b.logger.NewPrefixedWriter(image + " | ")
 
 	_, _ = prefixedLogger.Write([]byte(fmt.Sprintf(
