@@ -9,6 +9,7 @@ import (
 	ctlbdk "carvel.dev/kbld/pkg/kbld/builder/docker"
 	"carvel.dev/kbld/pkg/kbld/config"
 	ctllog "carvel.dev/kbld/pkg/kbld/logger"
+	"errors"
 	"fmt"
 	"io"
 	"os/exec"
@@ -30,7 +31,6 @@ func NewMavenJib(docker ctlbdk.Docker, logger ctllog.Logger) Jib {
 
 // Run executes the Maven Jib build.
 func (b *Jib) Run(image, directory string, opts config.SourceJibRunOpts) (ctlbdk.TmpRef, error) {
-
 	prefixedLogger := b.logger.NewPrefixedWriter(image + " | ")
 
 	_, _ = prefixedLogger.Write([]byte(fmt.Sprintf(
@@ -50,7 +50,7 @@ func (b *Jib) Run(image, directory string, opts config.SourceJibRunOpts) (ctlbdk
 
 	if opts.Target == nil {
 		return ctlbdk.TmpRef{},
-			fmt.Errorf("Expected target to be specified, but was not")
+			errors.New("Expected target to be specified, but was not")
 	}
 
 	// Base arguments for the Maven Jib command.

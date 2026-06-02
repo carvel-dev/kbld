@@ -29,12 +29,12 @@ type BuiltImage struct {
 	jib             maven.Jib
 }
 
+// NewBuiltImage creates a new BuiltImage.
 func NewBuiltImage(url string, buildSource ctlconf.Source,
 	imgDst *ctlconf.ImageDestination, docker ctlbdk.Docker,
 	dockerBuildx ctlbdk.Buildx, pack ctlbpk.Pack,
 	kubectlBuildkit ctlbkb.KubectlBuildkit, ko ctlbko.Ko,
 	bazel ctlbbz.Bazel, jib maven.Jib) BuiltImage {
-
 	return BuiltImage{
 		url, buildSource, imgDst,
 		docker, dockerBuildx, pack,
