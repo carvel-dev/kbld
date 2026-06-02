@@ -75,8 +75,17 @@ func (f Factory) New(url string) Image {
 		bazel := ctlbbz.NewBazel(docker, f.logger)
 		maven := maven2.NewMavenJib(docker, f.logger)
 
-		var builtImg Image = NewBuiltImage(url, srcConf, imgDstConf,
-			docker, dockerBuildx, pack, kubectlBuildkit, ko, bazel, maven)
+		builders := BuildersOpts{
+			Docker:          docker,
+			DockerBuildx:    dockerBuildx,
+			Pack:            pack,
+			KubectlBuildkit: kubectlBuildkit,
+			Ko:              ko,
+			Bazel:           bazel,
+			Jib:             maven,
+		}
+
+		var builtImg Image = NewBuiltImage(url, srcConf, imgDstConf, builders)
 
 		if imgDstConf != nil {
 			builtImg = NewTaggedImage(builtImg, *imgDstConf, f.registry)

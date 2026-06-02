@@ -29,16 +29,24 @@ type BuiltImage struct {
 	jib             maven.Jib
 }
 
+// BuildersOpts contains all the builders used to construct a BuiltImage.
+type BuildersOpts struct {
+	Docker          ctlbdk.Docker
+	DockerBuildx    ctlbdk.Buildx
+	Pack            ctlbpk.Pack
+	KubectlBuildkit ctlbkb.KubectlBuildkit
+	Ko              ctlbko.Ko
+	Bazel           ctlbbz.Bazel
+	Jib             maven.Jib
+}
+
 // NewBuiltImage creates a new BuiltImage.
 func NewBuiltImage(url string, buildSource ctlconf.Source,
-	imgDst *ctlconf.ImageDestination, docker ctlbdk.Docker,
-	dockerBuildx ctlbdk.Buildx, pack ctlbpk.Pack,
-	kubectlBuildkit ctlbkb.KubectlBuildkit, ko ctlbko.Ko,
-	bazel ctlbbz.Bazel, jib maven.Jib) BuiltImage {
+	imgDst *ctlconf.ImageDestination, builders BuildersOpts) BuiltImage {
 	return BuiltImage{
 		url, buildSource, imgDst,
-		docker, dockerBuildx, pack,
-		kubectlBuildkit, ko, bazel, jib,
+		builders.Docker, builders.DockerBuildx, builders.Pack,
+		builders.KubectlBuildkit, builders.Ko, builders.Bazel, builders.Jib,
 	}
 }
 
