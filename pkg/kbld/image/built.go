@@ -4,13 +4,13 @@
 package image
 
 import (
-	"carvel.dev/kbld/pkg/kbld/builder/maven"
 	"path/filepath"
 
 	ctlbbz "carvel.dev/kbld/pkg/kbld/builder/bazel"
 	ctlbdk "carvel.dev/kbld/pkg/kbld/builder/docker"
 	ctlbko "carvel.dev/kbld/pkg/kbld/builder/ko"
 	ctlbkb "carvel.dev/kbld/pkg/kbld/builder/kubectlbuildkit"
+	ctlbmvn "carvel.dev/kbld/pkg/kbld/builder/maven"
 	ctlbpk "carvel.dev/kbld/pkg/kbld/builder/pack"
 	ctlconf "carvel.dev/kbld/pkg/kbld/config"
 )
@@ -26,7 +26,7 @@ type BuiltImage struct {
 	kubectlBuildkit ctlbkb.KubectlBuildkit
 	ko              ctlbko.Ko
 	bazel           ctlbbz.Bazel
-	jib             maven.Jib
+	jib             ctlbmvn.Jib
 }
 
 // BuildersOpts contains all the builders used to construct a BuiltImage.
@@ -37,7 +37,7 @@ type BuildersOpts struct {
 	KubectlBuildkit ctlbkb.KubectlBuildkit
 	Ko              ctlbko.Ko
 	Bazel           ctlbbz.Bazel
-	Jib             maven.Jib
+	Jib             ctlbmvn.Jib
 }
 
 // NewBuiltImage creates a new BuiltImage.

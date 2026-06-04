@@ -1,4 +1,4 @@
-// Copyright 2024 The Carvel Authors.
+// Copyright 2026 The Carvel Authors.
 // SPDX-License-Identifier: Apache-2.0
 
 // Package maven implements a builder using Maven/Jib.
@@ -6,14 +6,15 @@ package maven
 
 import (
 	"bytes"
-	ctlbdk "carvel.dev/kbld/pkg/kbld/builder/docker"
-	"carvel.dev/kbld/pkg/kbld/config"
-	ctllog "carvel.dev/kbld/pkg/kbld/logger"
 	"errors"
 	"fmt"
 	"io"
 	"os/exec"
 	"path/filepath"
+
+	ctlbdk "carvel.dev/kbld/pkg/kbld/builder/docker"
+	"carvel.dev/kbld/pkg/kbld/config"
+	ctllog "carvel.dev/kbld/pkg/kbld/logger"
 )
 
 var defaultImageTag = "latest"
@@ -41,11 +42,11 @@ func (b *Jib) Run(image, directory string,
 			"finished build (using kbld jib build)\n"))
 	}()
 
-	tag := opts.Tag
-	if tag == nil {
-		tag = &defaultImageTag
+	tag := defaultImageTag
+	if opts.Tag != nil {
+		tag = *opts.Tag
 	}
-	targetImage := fmt.Sprintf("%s:%s", image, *tag)
+	targetImage := fmt.Sprintf("%s:%s", image, tag)
 
 	var stdoutBuf, stderrBuf bytes.Buffer
 

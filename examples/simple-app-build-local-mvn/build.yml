@@ -1,15 +1,15 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: kbld-simple-app-build-local-bazel
+  name: kbld-simple-app-build-local-mvn
 spec:
   selector:
     matchLabels:
-      app: kbld-simple-app-build-local-bazel
+      app: kbld-simple-app-build-local-mvn
   template:
     metadata:
       labels:
-        app: kbld-simple-app-build-local-bazel
+        app: kbld-simple-app-build-local-mvn
     spec:
       containers:
       - name: my-app
@@ -23,4 +23,3 @@ sources:
   maven:
     run:
       target: helloworld
-      name: simple-app
