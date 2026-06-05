@@ -19,7 +19,8 @@ func TestMavenJibBuildSuccessful(t *testing.T) {
 
 	assetPath := "assets/simple-app"
 	secondAssetPath := "assets/simple-app-2"
-	if err := exec.Command("cp", "-r", assetPath, secondAssetPath).Run(); err != nil {
+	if err := exec.Command("cp", "-r",
+		assetPath, secondAssetPath).Run(); err != nil {
 		t.Fatalf("failed to copy %s to %s: %v", assetPath, secondAssetPath, err)
 	}
 	defer func() {
@@ -49,13 +50,16 @@ sources:
       target: helloworld
 `, assetPath, secondAssetPath))
 
-	out, _ := kbld.RunWithOpts([]string{"-f", "-", "--images-annotation=false"}, RunOpts{
-		StdinReader: strings.NewReader(input),
-	})
+	out, _ := kbld.RunWithOpts(
+		[]string{"-f", "-", "--images-annotation=false"},
+		RunOpts{StdinReader: strings.NewReader(input)},
+	)
 
-	// Format to be independent of platform tags/hashes
-	out = regexp.MustCompile("sha256\\-[a-z0-9]{64}").ReplaceAllString(out, "SHA256-REPLACED")
-	out = regexp.MustCompile("kbld:(.+)-kbld-e2e(\\-.*)-SHA256-REPLACED").ReplaceAllString(out, "kbld:img-title-SHA256-REPLACED")
+	reSHA := regexp.MustCompile("sha256\\-[a-z0-9]{64}")
+	out = reSHA.ReplaceAllString(out, "SHA256-REPLACED")
+	reKbld := regexp.MustCompile(
+		"kbld:(.+)-kbld-e2e(\\-.*)-SHA256-REPLACED")
+	out = reKbld.ReplaceAllString(out, "kbld:img-title-SHA256-REPLACED")
 
 	expectedOut := `---
 kind: Object
@@ -75,7 +79,8 @@ func TestMavenJibBuildAndPushSuccessful(t *testing.T) {
 
 	assetPath := "assets/simple-app"
 	secondAssetPath := "assets/simple-app-2"
-	if err := exec.Command("cp", "-r", assetPath, secondAssetPath).Run(); err != nil {
+	if err := exec.Command("cp", "-r",
+		assetPath, secondAssetPath).Run(); err != nil {
 		t.Fatalf("failed to copy %s to %s: %v", assetPath, secondAssetPath, err)
 	}
 	defer func() {
@@ -111,11 +116,14 @@ destinations:
 - image: docker.io/*username*/kbld-e2e-tests-build2
 `, assetPath, secondAssetPath))
 
-	out, _ := kbld.RunWithOpts([]string{"-f", "-", "--images-annotation=false"}, RunOpts{
-		StdinReader: strings.NewReader(input),
-	})
+	out, _ := kbld.RunWithOpts(
+		[]string{"-f", "-", "--images-annotation=false"},
+		RunOpts{StdinReader: strings.NewReader(input)},
+	)
 
-	out = strings.Replace(out, regexp.MustCompile("sha256:[a-z0-9]{64}").FindString(out), "SHA256-REPLACED", -1)
+	reSHACol := regexp.MustCompile("sha256:[a-z0-9]{64}")
+	shaStr := reSHACol.FindString(out)
+	out = strings.Replace(out, shaStr, "SHA256-REPLACED", -1)
 
 	expectedOut := env.WithRegistries(`---
 kind: Object
