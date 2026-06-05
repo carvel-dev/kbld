@@ -23,3 +23,5 @@ sources:
   maven:
     run:
       target: helloworld
+      # Optional: custom tag to apply to the built image in the local Docker daemon (defaults to 'latest')
+      tag: latest

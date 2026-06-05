@@ -12,6 +12,7 @@ import (
 	"os/exec"
 	"path/filepath"
 
+	ctlb "carvel.dev/kbld/pkg/kbld/builder"
 	ctlbdk "carvel.dev/kbld/pkg/kbld/builder/docker"
 	"carvel.dev/kbld/pkg/kbld/config"
 	ctllog "carvel.dev/kbld/pkg/kbld/logger"
@@ -48,12 +49,67 @@ func (b *Jib) Run(image, directory string,
 	}
 	targetImage := fmt.Sprintf("%s:%s", image, tag)
 
-	var stdoutBuf, stderrBuf bytes.Buffer
+	tmpRef, err := b.tmpRef(image)
+	if err != nil {
+		return ctlbdk.TmpRef{}, err
+	}
 
 	if opts.Target == nil {
 		return ctlbdk.TmpRef{},
 			errors.New("Expected target to be specified, but was not")
 	}
+
+	err = b.runMaven(directory, tmpRef.AsString(), opts, prefixedLogger)
+	if err != nil {
+		_, _ = prefixedLogger.Write([]byte(fmt.Sprintf(
+			"error: %s\n", err)))
+		return ctlbdk.TmpRef{}, err
+	}
+
+	inspectData, err := b.docker.Inspect(tmpRef.AsString())
+	if err != nil {
+		_, _ = prefixedLogger.Write([]byte(fmt.Sprintf(
+			"inspect error: %s\n", err)))
+		return ctlbdk.TmpRef{}, err
+	}
+
+	_, _ = prefixedLogger.Write([]byte(fmt.Sprintf(
+		"digest: %s, id: %s\n", inspectData.RepoDigests, inspectData.ID)))
+
+	stableTmpRef, err := b.docker.RetagStable(
+		tmpRef, image, inspectData.ID, prefixedLogger)
+	if err != nil {
+		return ctlbdk.TmpRef{}, err
+	}
+
+	err = b.tagTarget(stableTmpRef, targetImage, prefixedLogger)
+	if err != nil {
+		_, _ = prefixedLogger.Write([]byte(fmt.Sprintf(
+			"target tag error: %s\n", err)))
+		return ctlbdk.TmpRef{}, err
+	}
+
+	return stableTmpRef, nil
+}
+
+func (_ *Jib) tmpRef(image string) (ctlbdk.TmpRef, error) {
+	tb := ctlb.TagBuilder{}
+	randPrefix50, err := tb.RandomStr50()
+	if err != nil {
+		return ctlbdk.TmpRef{},
+			fmt.Errorf("Generating tmp image suffix: %s", err)
+	}
+
+	return ctlbdk.NewTmpRef("kbld:" + tb.CheckTagLen128(fmt.Sprintf(
+		"%s-%s",
+		randPrefix50,
+		tb.TrimStr(tb.CleanStr(image), 50),
+	))), nil
+}
+
+func (_ *Jib) runMaven(directory string, targetImage string,
+	opts config.SourceJibRunOpts, prefixedLogger *ctllog.PrefixWriter) error {
+	var stdoutBuf, stderrBuf bytes.Buffer
 
 	// Base arguments for the Maven Jib command.
 	cmdArgs := []string{
@@ -68,7 +124,6 @@ func (b *Jib) Run(image, directory string,
 	}
 
 	cmd := exec.Command("mvn", cmdArgs...)
-
 	cmd.Dir = filepath.Join(directory, *opts.Target)
 	cmd.Stdout = io.MultiWriter(&stdoutBuf, prefixedLogger)
 	cmd.Stderr = io.MultiWriter(&stderrBuf, prefixedLogger)
@@ -76,22 +131,17 @@ func (b *Jib) Run(image, directory string,
 	_, _ = prefixedLogger.Write([]byte(fmt.Sprintf(
 		"running command: %s\n", cmd)))
 
-	if err := cmd.Run(); err != nil {
-		_, _ = prefixedLogger.Write([]byte(fmt.Sprintf(
-			"error: %s\n", err)))
-		return ctlbdk.TmpRef{}, err
-	}
+	return cmd.Run()
+}
 
-	inspectData, err := b.docker.Inspect(targetImage)
-	if err != nil {
-		_, _ = prefixedLogger.Write([]byte(fmt.Sprintf(
-			"inspect error: %s\n", err)))
-		return ctlbdk.TmpRef{}, err
-	}
+func (_ *Jib) tagTarget(stableTmpRef ctlbdk.TmpRef, targetImage string,
+	prefixedLogger *ctllog.PrefixWriter) error {
+	var stdoutBuf, stderrBuf bytes.Buffer
 
-	_, _ = prefixedLogger.Write([]byte(fmt.Sprintf(
-		"digest: %s, id: %s\n", inspectData.RepoDigests, inspectData.ID)))
+	cmd := exec.Command("docker", "tag",
+		stableTmpRef.AsString(), targetImage)
+	cmd.Stdout = io.MultiWriter(&stdoutBuf, prefixedLogger)
+	cmd.Stderr = io.MultiWriter(&stderrBuf, prefixedLogger)
 
-	return b.docker.RetagStable(
-		ctlbdk.NewTmpRef(inspectData.ID), image, inspectData.ID, prefixedLogger)
+	return cmd.Run()
 }
