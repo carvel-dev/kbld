@@ -17,8 +17,8 @@ func TestMavenJibBuildSuccessful(t *testing.T) {
 	env := BuildEnv(t)
 	kbld := Kbld{t, env.KbldBinaryPath, Logger{}}
 
-	assetPath := "assets/simple-app"
-	secondAssetPath := "assets/simple-app-2"
+	assetPath := "assets/maven-app"
+	secondAssetPath := "assets/maven-app-2"
 	if err := exec.Command("cp", "-r",
 		assetPath, secondAssetPath).Run(); err != nil {
 		t.Fatalf("failed to copy %s to %s: %v", assetPath, secondAssetPath, err)
@@ -42,12 +42,12 @@ sources:
   path: %s
   maven:
     run:
-      target: helloworld
+      target: .
 - image: docker.io/*username*/kbld-e2e-tests-build2
   path: %s
   maven:
     run:
-      target: helloworld
+      target: .
 `, assetPath, secondAssetPath))
 
 	out, _ := kbld.RunWithOpts(
@@ -77,8 +77,8 @@ func TestMavenJibBuildAndPushSuccessful(t *testing.T) {
 	env := BuildEnv(t)
 	kbld := Kbld{t, env.KbldBinaryPath, Logger{}}
 
-	assetPath := "assets/simple-app"
-	secondAssetPath := "assets/simple-app-2"
+	assetPath := "assets/maven-app"
+	secondAssetPath := "assets/maven-app-2"
 	if err := exec.Command("cp", "-r",
 		assetPath, secondAssetPath).Run(); err != nil {
 		t.Fatalf("failed to copy %s to %s: %v", assetPath, secondAssetPath, err)
@@ -102,12 +102,12 @@ sources:
   path: %s
   maven:
     run:
-      target: helloworld
+      target: .
 - image: docker.io/*username*/kbld-e2e-tests-build2
   path: %s
   maven:
     run:
-      target: helloworld
+      target: .
 ---
 apiVersion: kbld.k14s.io/v1alpha1
 kind: ImageDestinations

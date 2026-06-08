@@ -19,9 +19,9 @@ apiVersion: kbld.k14s.io/v1alpha1
 kind: Config
 sources:
 - image: simple-app
-  path: test/e2e/assets/simple-app
+  path: test/e2e/assets/maven-app
   maven:
     run:
-      target: helloworld
+      target: .
       # Optional: custom tag to apply to the built image in the local Docker daemon (defaults to 'latest')
       tag: latest
