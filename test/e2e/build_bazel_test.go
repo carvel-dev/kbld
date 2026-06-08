@@ -19,7 +19,8 @@ func TestBazelBuildAndPushSuccessful(t *testing.T) {
 
 	assetPath := "assets/simple-app"
 	secondAssetPath := "assets/simple-app-2"
-	if err := exec.Command("cp", "-r", assetPath, secondAssetPath).Run(); err != nil {
+	if err := exec.Command("cp", "-r",
+		assetPath, secondAssetPath).Run(); err != nil {
 		t.Fatalf("failed to copy %s to %s: %v", assetPath, secondAssetPath, err)
 	}
 	defer func() {
