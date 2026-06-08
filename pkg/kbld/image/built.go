@@ -44,9 +44,16 @@ type BuildersOpts struct {
 func NewBuiltImage(url string, buildSource ctlconf.Source,
 	imgDst *ctlconf.ImageDestination, builders BuildersOpts) BuiltImage {
 	return BuiltImage{
-		url, buildSource, imgDst,
-		builders.Docker, builders.DockerBuildx, builders.Pack,
-		builders.KubectlBuildkit, builders.Ko, builders.Bazel, builders.Jib,
+		url:             url,
+		buildSource:     buildSource,
+		imgDst:          imgDst,
+		docker:          builders.Docker,
+		dockerBuildx:    builders.DockerBuildx,
+		pack:            builders.Pack,
+		kubectlBuildkit: builders.KubectlBuildkit,
+		ko:              builders.Ko,
+		bazel:           builders.Bazel,
+		jib:             builders.Jib,
 	}
 }
 

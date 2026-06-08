@@ -319,7 +319,7 @@ func (d Docker) Inspect(ref string) (InspectData, error) {
 	cmd.Stderr = &stderrBuf
 
 	_, _ = d.logger.NewPrefixedWriter(ref + " | ").Write(
-		[]byte(fmt.Sprintf("running command: %s\n", cmd)))
+		[]byte(fmt.Sprintf("running command: %v\n", cmd)))
 
 	err := cmd.Run()
 	if err != nil {

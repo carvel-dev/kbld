@@ -6,7 +6,6 @@ package image_test
 import (
 	"bytes"
 	"fmt"
-	"log"
 	"os"
 	"os/exec"
 	"path"
@@ -20,17 +19,23 @@ import (
 func TestMain(m *testing.M) {
 	tmpDir, err := os.MkdirTemp("", "kbld-git")
 	if err != nil {
-		log.Fatalf("err creating tmpDir: %v", err)
+		panic(fmt.Errorf("err creating tmpDir: %v", err))
 	}
 	defer os.RemoveAll(tmpDir)
-	_ = os.Setenv("HOME", tmpDir)
-	_ = os.Setenv("XDG_CONFIG_HOME", tmpDir)
+	if err := os.Setenv("HOME", tmpDir); err != nil {
+		panic(fmt.Errorf("err setting HOME: %v", err))
+	}
+	if err := os.Setenv("XDG_CONFIG_HOME", tmpDir); err != nil {
+		panic(fmt.Errorf("err setting XDG_CONFIG_HOME: %v", err))
+	}
 	gitConfig, err := os.Create(path.Join(tmpDir, ".gitconfig"))
 	if err != nil {
-		log.Fatalf("err creating gitconfig: %v", err)
+		panic(fmt.Errorf("err creating gitconfig: %v", err))
 	}
 	fmt.Fprintf(gitConfig, "[user]\n\t name = kbld\n\temail = foo@example.com")
-	_ = gitConfig.Close()
+	if err := gitConfig.Close(); err != nil {
+		panic(fmt.Errorf("err closing gitconfig: %v", err))
+	}
 	os.Exit(m.Run())
 }
 

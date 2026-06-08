@@ -32,7 +32,7 @@
         <version>${jib-maven-plugin.version}</version>
         <configuration>
           <from>
-            <image>gcr.io/distroless/java</image>
+            <image>gcr.io/distroless/java:17</image>
           </from>
           <to>
             <image>image-built-with-jib</image>

@@ -92,7 +92,7 @@ func (b *Jib) Run(image, directory string,
 	return stableTmpRef, nil
 }
 
-func (_ *Jib) tmpRef(image string) (ctlbdk.TmpRef, error) {
+func (*Jib) tmpRef(image string) (ctlbdk.TmpRef, error) {
 	tb := ctlb.TagBuilder{}
 	randPrefix50, err := tb.RandomStr50()
 	if err != nil {
@@ -107,7 +107,7 @@ func (_ *Jib) tmpRef(image string) (ctlbdk.TmpRef, error) {
 	))), nil
 }
 
-func (_ *Jib) runMaven(directory string, targetImage string,
+func (*Jib) runMaven(directory string, targetImage string,
 	opts config.SourceJibRunOpts, prefixedLogger *ctllog.PrefixWriter) error {
 	var stdoutBuf, stderrBuf bytes.Buffer
 
@@ -129,12 +129,12 @@ func (_ *Jib) runMaven(directory string, targetImage string,
 	cmd.Stderr = io.MultiWriter(&stderrBuf, prefixedLogger)
 
 	_, _ = prefixedLogger.Write([]byte(fmt.Sprintf(
-		"running command: %s\n", cmd)))
+		"running command: %v\n", cmd)))
 
 	return cmd.Run()
 }
 
-func (_ *Jib) tagTarget(stableTmpRef ctlbdk.TmpRef, targetImage string,
+func (*Jib) tagTarget(stableTmpRef ctlbdk.TmpRef, targetImage string,
 	prefixedLogger *ctllog.PrefixWriter) error {
 	var stdoutBuf, stderrBuf bytes.Buffer
 
