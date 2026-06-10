@@ -45,12 +45,12 @@ sources:
   path: %s
   pack: &pack
     build:
-      builder: index.docker.io/cloudfoundry/cnb@sha256:17ea21162ba8c7717d3ead3ee3836a368aced7f02f2e59658e52029bd6d149e7
+      builder: index.docker.io/cloudfoundry/cnb@sha256:83270cf59e8944be0c544e45fd45a5a1f4526d7936d488d2de8937730341618d
 - image: docker.io/*username*/kbld-e2e-tests-build2
   path: %s
   pack: &pack
     build:
-      builder: index.docker.io/cloudfoundry/cnb@sha256:17ea21162ba8c7717d3ead3ee3836a368aced7f02f2e59658e52029bd6d149e7
+      builder: index.docker.io/cloudfoundry/cnb@sha256:83270cf59e8944be0c544e45fd45a5a1f4526d7936d488d2de8937730341618d
 ---
 apiVersion: kbld.k14s.io/v1alpha1
 kind: ImageDestinations
