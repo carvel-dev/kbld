@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kbld-simple-app-build-local-mvn
+spec:
+  selector:
+    matchLabels:
+      app: kbld-simple-app-build-local-mvn
+  template:
+    metadata:
+      labels:
+        app: kbld-simple-app-build-local-mvn
+    spec:
+      containers:
+      - name: my-app
+        image: simple-app
+---
+apiVersion: kbld.k14s.io/v1alpha1
+kind: Config
+sources:
+- image: simple-app
+  path: test/e2e/assets/maven-app
+  maven:
+    run:
+      target: .
+      # Optional: custom tag to apply to the built image in the local Docker daemon (defaults to 'latest')
+      tag: latest

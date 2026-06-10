@@ -10,6 +10,7 @@ import (
 	ctlbdk "carvel.dev/kbld/pkg/kbld/builder/docker"
 	ctlbko "carvel.dev/kbld/pkg/kbld/builder/ko"
 	ctlbkb "carvel.dev/kbld/pkg/kbld/builder/kubectlbuildkit"
+	ctlbmvn "carvel.dev/kbld/pkg/kbld/builder/maven"
 	ctlbpk "carvel.dev/kbld/pkg/kbld/builder/pack"
 	ctlconf "carvel.dev/kbld/pkg/kbld/config"
 	ctllog "carvel.dev/kbld/pkg/kbld/logger"
@@ -72,9 +73,19 @@ func (f Factory) New(url string) Image {
 		kubectlBuildkit := ctlbkb.NewKubectlBuildkit(f.logger)
 		ko := ctlbko.NewKo(f.logger)
 		bazel := ctlbbz.NewBazel(docker, f.logger)
+		maven := ctlbmvn.NewMavenJib(docker, f.logger)
 
-		var builtImg Image = NewBuiltImage(url, srcConf, imgDstConf,
-			docker, dockerBuildx, pack, kubectlBuildkit, ko, bazel)
+		builders := BuildersOpts{
+			Docker:          docker,
+			DockerBuildx:    dockerBuildx,
+			Pack:            pack,
+			KubectlBuildkit: kubectlBuildkit,
+			Ko:              ko,
+			Bazel:           bazel,
+			Jib:             maven,
+		}
+
+		var builtImg Image = NewBuiltImage(url, srcConf, imgDstConf, builders)
 
 		if imgDstConf != nil {
 			builtImg = NewTaggedImage(builtImg, *imgDstConf, f.registry)
