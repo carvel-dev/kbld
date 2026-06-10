@@ -27,6 +27,10 @@ image_name=$(build_test_deps)
 tempConfigFile=$(mktemp)
 trap "rm -f $tempConfigFile" EXIT
 
+# Ensure the host kernel (Minikube VM) is configured to run cross-platform binaries.
+# This is required for Buildah to execute steps (like RUN) for linux/arm64 on an amd64 host.
+docker run --privileged --rm tonistiigi/binfmt --install all
+
 minikube docker-env | while read env; do
   echo $env | grep -E 'export*' | awk '{print $2}' | sed 's/"//g'
 done > $tempConfigFile
