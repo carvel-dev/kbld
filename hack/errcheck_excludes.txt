@@ -1,6 +1,6 @@
 os.RemoveAll
-(*carvel.dev/kbld/pkg/kbld/logger.LoggerPrefixWriter).Write
-(*carvel.dev/kbld/pkg/kbld/logger.LoggerPrefixWriter).WriteStr
+(*carvel.dev/kbld/pkg/kbld/logger.PrefixWriter).Write
+(*carvel.dev/kbld/pkg/kbld/logger.PrefixWriter).WriteStr
 (carvel.dev/kbld/pkg/kbld/imagetar.Logger).WriteStr
 (io.Closer).Close
 (*archive/tar.Writer).Close

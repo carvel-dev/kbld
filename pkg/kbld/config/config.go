@@ -62,6 +62,7 @@ type Source struct {
 	Ko              *SourceKoOpts
 	Bazel           *SourceBazelOpts
 	Buildah         *SourceBuildahOpts
+	Maven           *SourceJibOpts
 }
 
 type ImageOverride struct {

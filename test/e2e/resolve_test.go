@@ -532,27 +532,35 @@ metadata:
             url: gcr.io/google-containers/pause:3.2
         - platformSelected:
             architecture: arm64
-            index: gcr.io/google-containers/pause@sha256:927d98197ec1141a368550822d18fa1c60bdae27b78b0c004f705f548c07814f
+            index: gcr.io/google-containers/` +
+`pause@sha256:927d98197ec1141a368550822d18fa1c60bdae27b78b0c004f705f548c07814f
             os: linux
-        url: gcr.io/google-containers/pause@sha256:31d3efd12022ffeffb3146bc10ae8beb890c80ed2f07363515580add7ed47636
+        url: gcr.io/google-containers/` +
+`pause@sha256:31d3efd12022ffeffb3146bc10ae8beb890c80ed2f07363515580add7ed47636
       - origins:
         - resolved:
             tag: "3.2"
             url: gcr.io/google-containers/pause:3.2
         - platformSelected:
             architecture: amd64
-            index: gcr.io/google-containers/pause@sha256:927d98197ec1141a368550822d18fa1c60bdae27b78b0c004f705f548c07814f
+            index: gcr.io/google-containers/` +
+`pause@sha256:927d98197ec1141a368550822d18fa1c60bdae27b78b0c004f705f548c07814f
             os: linux
-        url: gcr.io/google-containers/pause@sha256:4a1c4b21597c1b4415bdbecb28a3296c6b5e23ca4f9feeb599860a1dac6a0108
+        url: gcr.io/google-containers/` +
+`pause@sha256:4a1c4b21597c1b4415bdbecb28a3296c6b5e23ca4f9feeb599860a1dac6a0108
       - origins:
         - resolved:
             tag: "3.2"
             url: gcr.io/google-containers/pause:3.2
-        url: gcr.io/google-containers/pause@sha256:927d98197ec1141a368550822d18fa1c60bdae27b78b0c004f705f548c07814f
+        url: gcr.io/google-containers/` +
+`pause@sha256:927d98197ec1141a368550822d18fa1c60bdae27b78b0c004f705f548c07814f
 spec:
-- image: gcr.io/google-containers/pause@sha256:31d3efd12022ffeffb3146bc10ae8beb890c80ed2f07363515580add7ed47636
-- image: gcr.io/google-containers/pause@sha256:4a1c4b21597c1b4415bdbecb28a3296c6b5e23ca4f9feeb599860a1dac6a0108
-- image: gcr.io/google-containers/pause@sha256:927d98197ec1141a368550822d18fa1c60bdae27b78b0c004f705f548c07814f
+- image: gcr.io/google-containers/` +
+`pause@sha256:31d3efd12022ffeffb3146bc10ae8beb890c80ed2f07363515580add7ed47636
+- image: gcr.io/google-containers/` +
+`pause@sha256:4a1c4b21597c1b4415bdbecb28a3296c6b5e23ca4f9feeb599860a1dac6a0108
+- image: gcr.io/google-containers/` +
+`pause@sha256:927d98197ec1141a368550822d18fa1c60bdae27b78b0c004f705f548c07814f
 `
 
 	require.YAMLEq(t, expectedOut, out)

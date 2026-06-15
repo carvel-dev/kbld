@@ -11,6 +11,7 @@ import (
 	ctlbdk "carvel.dev/kbld/pkg/kbld/builder/docker"
 	ctlbko "carvel.dev/kbld/pkg/kbld/builder/ko"
 	ctlbkb "carvel.dev/kbld/pkg/kbld/builder/kubectlbuildkit"
+	ctlbmvn "carvel.dev/kbld/pkg/kbld/builder/maven"
 	ctlbpk "carvel.dev/kbld/pkg/kbld/builder/pack"
 	ctlconf "carvel.dev/kbld/pkg/kbld/config"
 )
@@ -27,14 +28,37 @@ type BuiltImage struct {
 	ko              ctlbko.Ko
 	bazel           ctlbbz.Bazel
 	buildah         ctlbah.Buildah
+	jib             ctlbmvn.Jib
 }
 
-func NewBuiltImage(url string, buildSource ctlconf.Source, imgDst *ctlconf.ImageDestination,
-	docker ctlbdk.Docker, dockerBuildx ctlbdk.Buildx, pack ctlbpk.Pack,
-	kubectlBuildkit ctlbkb.KubectlBuildkit, ko ctlbko.Ko, bazel ctlbbz.Bazel,
-	buildah ctlbah.Buildah) BuiltImage {
-	return BuiltImage{url, buildSource, imgDst,
-		docker, dockerBuildx, pack, kubectlBuildkit, ko, bazel, buildah}
+// BuildersOpts contains all the builders used to construct a BuiltImage.
+type BuildersOpts struct {
+	Docker          ctlbdk.Docker
+	DockerBuildx    ctlbdk.Buildx
+	Pack            ctlbpk.Pack
+	KubectlBuildkit ctlbkb.KubectlBuildkit
+	Ko              ctlbko.Ko
+	Bazel           ctlbbz.Bazel
+	Buildah         ctlbah.Buildah
+	Jib             ctlbmvn.Jib
+}
+
+// NewBuiltImage creates a new BuiltImage.
+func NewBuiltImage(url string, buildSource ctlconf.Source,
+	imgDst *ctlconf.ImageDestination, builders BuildersOpts) BuiltImage {
+	return BuiltImage{
+		url:             url,
+		buildSource:     buildSource,
+		imgDst:          imgDst,
+		docker:          builders.Docker,
+		dockerBuildx:    builders.DockerBuildx,
+		pack:            builders.Pack,
+		kubectlBuildkit: builders.KubectlBuildkit,
+		ko:              builders.Ko,
+		bazel:           builders.Bazel,
+		buildah:         builders.Buildah,
+		jib:             builders.Jib,
+	}
 }
 
 func (i BuiltImage) URL() (string, []ctlconf.Origin, error) {
@@ -91,6 +115,15 @@ func (i BuiltImage) URL() (string, []ctlconf.Origin, error) {
 		tag, err := i.buildah.BuildAndPushImage(
 			urlRepo, i.buildSource.Path, i.imgDst, *i.buildSource.Buildah)
 		return tag, origins, err
+
+	case i.buildSource.Maven != nil:
+		dockerTmpRef, err := i.jib.Run(
+			urlRepo, i.buildSource.Path, i.buildSource.Maven.Run)
+		if err != nil {
+			return "", nil, err
+		}
+
+		return i.optionalPushWithDocker(dockerTmpRef, origins)
 
 	// Fall back on Docker by default
 	default:

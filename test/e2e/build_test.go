@@ -114,7 +114,8 @@ overrides:
 		StdinReader: strings.NewReader(input),
 	})
 
-	out = regexp.MustCompile("sha256:[a-z0-9]{64}").ReplaceAllString(out, "SHA256-REPLACED")
+	reSHA := regexp.MustCompile("sha256:[a-z0-9]{64}")
+	out = reSHA.ReplaceAllString(out, "SHA256-REPLACED")
 
 	expectedOut := env.WithRegistries(`---
 kind: Object

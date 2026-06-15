@@ -22,11 +22,13 @@ func TestPackBuildAndPushSuccessful(t *testing.T) {
 	secondAssetPath := "assets/simple-app-2"
 	copyCmd := exec.Command("cp", "-r", assetPath, secondAssetPath)
 	if err := copyCmd.Run(); err != nil {
-		t.Fatalf("failed to copy asset from %s to %s: %v", assetPath, secondAssetPath, err)
+		t.Fatalf("failed to copy asset from %s to %s: %v",
+			assetPath, secondAssetPath, err)
 	}
 	defer func() {
 		if err := exec.Command("rm", "-rf", secondAssetPath).Run(); err != nil {
-			t.Logf("failed to remove temporary asset path %s: %v", secondAssetPath, err)
+			t.Logf("failed to remove temporary asset path %s: %v",
+				secondAssetPath, err)
 		}
 	}()
 

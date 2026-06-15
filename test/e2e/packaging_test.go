@@ -211,11 +211,15 @@ overrides:
 - image: eirini/opi@sha256:2e0b84c5fcb1e6e5cdb07a70210f2e462aa52119f7a330660a7444a938deefbb
   newImage: index.docker.io/eirini/opi@sha256:2e0b84c5fcb1e6e5cdb07a70210f2e462aa52119f7a330660a7444a938deefbb
   preresolved: true
-- image: ghcr.io/buildpacks-community/kpack/controller@sha256:80e71f484f0aa5f54eb549f5d5e015ac5373c9bc616f12891d676a7e1dfb80bd
-  newImage: ghcr.io/buildpacks-community/kpack/controller@sha256:80e71f484f0aa5f54eb549f5d5e015ac5373c9bc616f12891d676a7e1dfb80bd
+- image: ghcr.io/buildpacks-community/kpack/controller` +
+`@sha256:80e71f484f0aa5f54eb549f5d5e015ac5373c9bc616f12891d676a7e1dfb80bd
+  newImage: ghcr.io/buildpacks-community/kpack/controller` +
+`@sha256:80e71f484f0aa5f54eb549f5d5e015ac5373c9bc616f12891d676a7e1dfb80bd
   preresolved: true
-- image: ghcr.io/buildpacks-community/kpack/webhook@sha256:43fc8706c744f4686cc81d10dddc0ab9cd222d7d885904f3d6cc9c184a73cd84
-  newImage: ghcr.io/buildpacks-community/kpack/webhook@sha256:43fc8706c744f4686cc81d10dddc0ab9cd222d7d885904f3d6cc9c184a73cd84
+- image: ghcr.io/buildpacks-community/kpack/webhook` +
+`@sha256:43fc8706c744f4686cc81d10dddc0ab9cd222d7d885904f3d6cc9c184a73cd84
+  newImage: ghcr.io/buildpacks-community/kpack/webhook` +
+`@sha256:43fc8706c744f4686cc81d10dddc0ab9cd222d7d885904f3d6cc9c184a73cd84
   preresolved: true
 - image: index.docker.io/bitnami/postgresql@sha256:9762d9a80b90a5efe299d4848057ac5c45fb384570b36f60aad38fe2b1704bd6
   newImage: index.docker.io/bitnami/postgresql@sha256:9762d9a80b90a5efe299d4848057ac5c45fb384570b36f60aad38fe2b1704bd6
