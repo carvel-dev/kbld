@@ -6,7 +6,7 @@
 package e2e
 
 import (
-	"crypto/sha1"
+	"crypto/sha256"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -253,7 +253,7 @@ overrides:
   preresolved: true
 `
 
-	expectedPackagedSHA := "ca02098b7f6cee61836119233e3b43d1a92083b4"
+	expectedPackagedSHA256 := "e084f139ad114ef6c56dc7343f7d6bd8d2cd11a16e77e00aca97b5e5d18c3a56"
 
 	path := "/tmp/kbld-test-pkg-unpkg-successful-with-many-images"
 	defer os.RemoveAll(path)
@@ -262,21 +262,21 @@ overrides:
 		StdinReader: strings.NewReader(input),
 	})
 
-	actualSHA := sha1File(t, path)
+	actualSHA256 := sha256File(t, path)
 
-	// Assert that concurrently writing to tar doesn't affect sha
-	if actualSHA != expectedPackagedSHA {
-		t.Fatalf("Expected package sha to be same >>>%s<<< to match >>>%s<<<", actualSHA, expectedPackagedSHA)
+	// Assert that concurrently writing to tar doesn't affect sha256
+	if actualSHA256 != expectedPackagedSHA256 {
+		t.Fatalf("Expected package sha256 to be same >>>%s<<< to match >>>%s<<<", actualSHA256, expectedPackagedSHA256)
 	}
 
 	kbld.RunWithOpts([]string{"package", "-f", "-", "--output", path, "--concurrency=5"}, RunOpts{
 		StdinReader: strings.NewReader(input),
 	})
 
-	actualSHA = sha1File(t, path)
+	actualSHA256 = sha256File(t, path)
 
-	if actualSHA != expectedPackagedSHA {
-		t.Fatalf("Expected package sha to be same >>>%s<<< to match >>>%s<<<", actualSHA, expectedPackagedSHA)
+	if actualSHA256 != expectedPackagedSHA256 {
+		t.Fatalf("Expected package sha256 to be same >>>%s<<< to match >>>%s<<<", actualSHA256, expectedPackagedSHA256)
 	}
 
 	kbld.RunWithOpts([]string{
@@ -285,14 +285,14 @@ overrides:
 	}, RunOpts{StdinReader: strings.NewReader(input)})
 }
 
-func sha1File(t *testing.T, path string) string {
+func sha256File(t *testing.T, path string) string {
 	f, err := os.Open(path)
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer f.Close()
 
-	hs := sha1.New()
+	hs := sha256.New()
 	if _, err := io.Copy(hs, f); err != nil {
 		t.Fatal(err)
 	}
