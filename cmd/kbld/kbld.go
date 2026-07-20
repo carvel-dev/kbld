@@ -4,6 +4,7 @@
 package main
 
 import (
+	"fmt"
 	"io"
 	"log"
 	"math/rand"
@@ -26,11 +27,17 @@ func main() {
 	confUI := ui.NewConfUI(ui.NewNoopLogger())
 	defer confUI.Flush()
 
-	command := cmd.NewDefaultKbldCmd(confUI)
+	options := cmd.NewKbldOptions(confUI)
+	command := cmd.NewKbldCmd(options)
 
 	err := command.Execute()
 	if err != nil {
-		confUI.ErrorLinef("kbld: Error: %s", uierrs.NewMultiLineError(err))
+		multiLineErr := uierrs.NewMultiLineError(err)
+		if options.UIFlags.JSON {
+			_, _ = fmt.Fprintf(os.Stderr, "kbld: Error: %s\n", multiLineErr)
+		} else {
+			confUI.ErrorLinef("kbld: Error: %s", multiLineErr)
+		}
 		os.Exit(1)
 	}
 
