@@ -31,6 +31,8 @@ minikube docker-env | while read env; do
   echo $env | grep -E 'export*' | awk '{print $2}' | sed 's/"//g'
 done > $tempConfigFile
 
+docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+
 docker run \
 --privileged \
 --env-file $tempConfigFile \
