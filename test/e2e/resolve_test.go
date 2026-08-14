@@ -6,6 +6,7 @@
 package e2e
 
 import (
+	"bytes"
 	"io/ioutil"
 	"os"
 	"strings"
@@ -156,13 +157,16 @@ spec:
 - image: nginx@sha256:digest
 `
 
-	_, err := kbld.RunWithOpts([]string{"-f", "-", "--images-annotation=false"}, RunOpts{
-		StdinReader: strings.NewReader(input),
-		AllowError:  true,
+	var stderr bytes.Buffer
+	out, err := kbld.RunWithOpts([]string{"--json", "-f", "-", "--images-annotation=false"}, RunOpts{
+		StdinReader:  strings.NewReader(input),
+		StderrWriter: &stderr,
+		AllowError:   true,
 	})
 
-	expectedErr := "Expected valid digest reference, but found 'nginx@sha256:digest', reason: invalid checksum digest length"
-	require.Contains(t, err.Error(), expectedErr)
+	require.EqualError(t, err, "Execution error: stdout: '' stderr: '' error: 'exit status 1'")
+	require.Empty(t, out)
+	require.Equal(t, "kbld: Error: \n- Resolving image 'nginx@sha256:digest': Expected valid digest reference, but found 'nginx@sha256:digest', reason: invalid checksum digest length\n", stderr.String())
 }
 
 func TestResolveUnknownImage(t *testing.T) {
