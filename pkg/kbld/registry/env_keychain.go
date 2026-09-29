@@ -40,7 +40,7 @@ func (k *EnvKeychain) Resolve(target regauthn.Resource) (regauthn.Authenticator,
 	}
 
 	for _, info := range infos {
-		if info.Hostname == target.RegistryStr() {
+		if strings.EqualFold(info.Hostname, target.RegistryStr()) {
 			return regauthn.FromConfig(regauthn.AuthConfig{
 				Username:      info.Username,
 				Password:      info.Password,

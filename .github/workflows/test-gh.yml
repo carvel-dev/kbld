@@ -53,7 +53,7 @@ jobs:
       run: |
         set -e -x
 
-        minikube start --driver=docker --wait=all --mount --mount-string "$HOME:$HOME"
+        minikube start --driver=docker --container-runtime=docker --wait=all --mount --mount-string "$HOME:$HOME"
 
         # RELAX THE API REQUIREMENT
         # This reaches inside the minikube node, updates the daemon config, and restarts Docker

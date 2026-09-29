@@ -184,7 +184,9 @@ func NewConfigFromImagesLock(res ctlres.Resource) (Config, error) {
 	for _, image := range imagesLock.Images {
 		imgOrigins, err := NewOriginsFromString(image.Annotations[ImagesLockKbldOrigins])
 		if err != nil {
-			return Config{}, fmt.Errorf("Unmarshaling %s as %s annotation:  %s", res.Description(), ImagesLockKbldOrigins, err)
+			return Config{}, fmt.Errorf(
+				"Unmarshaling %s as %s annotation: %s",
+				res.Description(), ImagesLockKbldOrigins, err)
 		}
 		iOverride := ImageOverride{
 			ImageRef: ImageRef{

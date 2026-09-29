@@ -340,26 +340,140 @@ func (d Docker) Inspect(ref string) (InspectData, error) {
 	return data[0], nil
 }
 
-// lowerCaseRepository lowercases the registry and repository portions of ref
-// while preserving the tag (tags are case-sensitive in Docker registries).
+const (
+	notFound          = -1
+	registrySeparator = "/"
+	registryDotDelim  = "."
+	registryPortDelim = ":"
+)
+
+// lowerCaseRepository lowercases only the registry hostname while preserving
+// repository path and tag case (per RFC 1035/1123 case-insensitive names).
 func lowerCaseRepository(ref string) string {
-	// Walk slash-separated segments to identify the final component.
-	// The tag separator ':' can only appear in the last segment,
-	// never in the host.
-	var prefix string
-	tail := ref
-	for {
-		seg, rest, found := strings.Cut(tail, "/")
-		if !found {
-			break
-		}
-		prefix += seg + "/"
-		tail = rest
+	parsedRef, err := regname.ParseReference(ref)
+	if err == nil {
+		return tryLowercaseRegistryFromParsed(ref, parsedRef)
 	}
-	// tail is now the final path segment (e.g. "myimage" or "myimage:mytag")
-	name, tag, hasTag := strings.Cut(tail, ":")
-	if !hasTag {
+
+	lowerRef := strings.ToLower(ref)
+	parsedLower, err := regname.ParseReference(lowerRef)
+	if err == nil {
+		return tryLowercaseRegistryFromLowercased(ref, parsedLower)
+	}
+
+	return lowercaseRegistryBySlash(ref)
+}
+
+// tryLowercaseRegistryFromParsed handles the case where the original ref
+// parses successfully, checking if the registry is explicit in the original.
+func tryLowercaseRegistryFromParsed(ref string,
+	parsedRef regname.Reference) string {
+	// Determine if registry is explicit or implicit by checking if it appears
+	// literally in the original ref (case-insensitive).
+	refLower := strings.ToLower(ref)
+	registryStr := strings.ToLower(parsedRef.Context().RegistryStr())
+
+	// For explicit registries, look for the registry followed by a slash.
+	// This distinguishes "docker.io/lib..." (explicit docker.io) from
+	// "library/image" (implicit docker.io registry, "library" is namespace).
+	registryWithSlash := registryStr + registrySeparator
+	registryIdx := strings.Index(refLower, registryWithSlash)
+
+	if registryIdx == notFound {
+		// Try to detect explicit registry without the canonical suffix.
+		// E.g., "docker.io" appears in input but canonicalizes to
+		// "index.docker.io". Look for the first "/" and check if before it
+		// looks like a registry.
+		firstSlash := strings.Index(refLower, registrySeparator)
+		if firstSlash == notFound {
+			// No slash, bare image name (implicit registry).
+			return ref
+		}
+
+		// There's a slash. Check if part before it contains dots or colons
+		// (registry indicators).
+		beforeSlash := refLower[:firstSlash]
+		hasDot := strings.Contains(beforeSlash, registryDotDelim)
+		hasColon := strings.Contains(beforeSlash, registryPortDelim)
+		if !hasDot && !hasColon {
+			// Looks like a namespace, not a registry (implicit registry).
+			return ref
+		}
+
+		// Looks like an explicit registry. Lowercase just the registry part.
+		return strings.ToLower(ref[:firstSlash]) + ref[firstSlash:]
+	}
+
+	// Registry found with canonical suffix. Extract repository from original.
+	repoStartIdx := registryIdx + len(registryWithSlash)
+	originalRepo := ref[repoStartIdx:]
+
+	// Reconstruct with lowercased registry and original-case repository.
+	return registryStr + registrySeparator + originalRepo
+}
+
+// tryLowercaseRegistryFromLowercased handles the case where parsing the
+// original ref failed but parsing the lowercased version succeeds.
+func tryLowercaseRegistryFromLowercased(ref string,
+	_ regname.Reference) string {
+	firstSlash := strings.Index(ref, registrySeparator)
+	if firstSlash == notFound {
+		// No slash, bare image name (implicit registry).
+		return ref
+	}
+
+	// Check if the part before "/" is a registry (has dots or colons) or
+	// a namespace.
+	beforeSlash := ref[:firstSlash]
+	hasDot := strings.Contains(beforeSlash, registryDotDelim)
+	hasColon := strings.Contains(beforeSlash, registryPortDelim)
+
+	if !hasDot && !hasColon {
+		// Looks like a namespace, not a registry (implicit registry).
+		// Registry is implicit, preserve case completely.
+		return ref
+	}
+
+	// Looks like an explicit registry. Lowercase just the registry part.
+	return strings.ToLower(beforeSlash) + ref[firstSlash:]
+}
+
+// lowercaseRegistryBySlash is the fallback when both parsing attempts fail.
+// When neither ParseReference(ref) nor ParseReference(strings.ToLower(ref))
+// succeeds, use heuristic detection and aggressive case fixing to maintain
+// backward compatibility without throwing errors during error recovery.
+func lowercaseRegistryBySlash(ref string) string {
+	firstSlash := strings.Index(ref, registrySeparator)
+	if firstSlash == notFound {
+		// No slash, bare image name without explicit registry.
+		return ref
+	}
+
+	beforeSlash := ref[:firstSlash]
+
+	// Check if beforeSlash looks like a hostname (registry).
+	hasPort := strings.Contains(beforeSlash, registryPortDelim)
+	hasDot := strings.Contains(beforeSlash, registryDotDelim)
+	isLocalhost := strings.EqualFold(beforeSlash, "localhost")
+
+	if hasPort || hasDot || isLocalhost {
+		// Looks like a registry hostname, lowercase it.
+		result := strings.ToLower(beforeSlash) + ref[firstSlash:]
+		// If repo path still has uppercase (e.g., MyOrg/MyApp), fall back to
+		// fully lowercase to ensure parsing succeeds in error recovery.
+		repoHasUppercase := strings.ContainsAny(result[firstSlash:],
+			"ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+		if repoHasUppercase {
+			return strings.ToLower(ref)
+		}
+		return result
+	}
+
+	// Looks like a namespace/repository name. If it has uppercase that would
+	// cause parsing to fail, lowercase everything to recover.
+	if strings.ContainsAny(ref, "ABCDEFGHIJKLMNOPQRSTUVWXYZ") {
 		return strings.ToLower(ref)
 	}
-	return strings.ToLower(prefix+name) + ":" + tag
+
+	return ref
 }
