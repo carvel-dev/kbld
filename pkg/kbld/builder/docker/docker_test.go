@@ -91,5 +91,20 @@ func lowerCaseRepositoryTestCases() []struct {
 			input:    "LOCALHOST:5000/MyImage:Tag",
 			expected: "localhost:5000/MyImage:Tag",
 		},
+		{
+			name:     "explicit docker.io with uppercase repository",
+			input:    "Docker.io/MyOrg/MyImage:Tag",
+			expected: "docker.io/MyOrg/MyImage:Tag",
+		},
+		{
+			name:     "DOCKER.IO with uppercase repository",
+			input:    "DOCKER.IO/MyOrg/MyImage:Tag",
+			expected: "docker.io/MyOrg/MyImage:Tag",
+		},
+		{
+			name:     "implicit registry with index.docker.io in path",
+			input:    "MyOrg/index.docker.io-mirror:Tag",
+			expected: "MyOrg/index.docker.io-mirror:Tag",
+		},
 	}
 }
