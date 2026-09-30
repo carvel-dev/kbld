@@ -296,7 +296,9 @@ func (d Docker) determineRepoDigest(inspectData InspectData,
 
 	if len(digestStrs) != 1 {
 		prefixedLogger.Write([]byte("repo digests mismatch\n"))
-		return ImageDigest{}, fmt.Errorf("Expected to find same repo digest, but found %#v", inspectData.RepoDigests)
+		foundDigests := strings.Join(inspectData.RepoDigests, ", ")
+		return ImageDigest{}, fmt.Errorf(
+			"Expected to find same repo digest, but found %s", foundDigests)
 	}
 
 	for digest := range digestStrs {
