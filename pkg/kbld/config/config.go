@@ -210,7 +210,7 @@ func NewConfigFromImagesLock(res ctlres.Resource) (Config, error) {
 func (d Config) Validate() error {
 	if len(d.MinimumRequiredVersion) > 0 {
 		if d.MinimumRequiredVersion[0] == 'v' {
-			return fmt.Errorf("Validating minimum version: Must not have prefix 'v' (e.g. '0.8.0')")
+			return fmt.Errorf("Validating minimum version: must not have prefix 'v' (e.g. '0.8.0')")
 		}
 
 		userConstraint, err := semver.NewConstraint(">=" + d.MinimumRequiredVersion)
@@ -252,7 +252,7 @@ func (d Config) Validate() error {
 
 	for i, key := range d.Keys {
 		if len(key) == 0 {
-			return fmt.Errorf("Validating Destinations[%d]: Expected to be non-empty", i)
+			return fmt.Errorf("Validating Destinations[%d]: expected to be non-empty", i)
 		}
 	}
 
