@@ -347,6 +347,14 @@ const (
 	registryPortDelim = ":"
 )
 
+// LowerCaseRegistry lowercases only the registry hostname portion of an
+// image reference (preserving repository path and tag case), so that
+// callers outside this package can normalize refs before comparing them,
+// consistent with RFC 1035/1123 hostname case-insensitivity.
+func LowerCaseRegistry(ref string) string {
+	return lowerCaseRepository(ref)
+}
+
 // lowerCaseRepository lowercases only the registry hostname while preserving
 // repository path and tag case (per RFC 1035/1123 case-insensitive names).
 func lowerCaseRepository(ref string) string {

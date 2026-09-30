@@ -90,6 +90,35 @@ func TestMatcherMatches(t *testing.T) {
 			URL:      "docker.io/img",
 			Matched:  false,
 		},
+
+		// Registry hostname is case-insensitive (RFC 1035/1123): a
+		// mismatched hostname case between the manifest-scanned ImageRef and
+		// the user-authored config URL must still match.
+		{
+			ImageRef: ctlconf.ImageRef{Image: "Docker.IO/img"},
+			URL:      "docker.io/img",
+			Matched:  true,
+		}, {
+			ImageRef: ctlconf.ImageRef{Image: "docker.io/img"},
+			URL:      "DOCKER.IO/img",
+			Matched:  true,
+		}, {
+			ImageRef: ctlconf.ImageRef{ImageRepo: "DOCKER.IO/img"},
+			URL:      "docker.io/img:tag",
+			Matched:  true,
+		}, {
+			ImageRef: ctlconf.ImageRef{ImageRepo: "Localhost:3000/org/img"},
+			URL:      "localhost:3000/org/img:tag",
+			Matched:  true,
+		},
+
+		// Repository path case remains significant (documented design,
+		// unlike the registry hostname segment above).
+		{
+			ImageRef: ctlconf.ImageRef{ImageRepo: "docker.io/IMG"},
+			URL:      "docker.io/img",
+			Matched:  false,
+		},
 	}
 
 	for _, ex := range exs {
