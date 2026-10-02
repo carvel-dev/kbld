@@ -296,7 +296,9 @@ func (d Docker) determineRepoDigest(inspectData InspectData,
 
 	if len(digestStrs) != 1 {
 		prefixedLogger.Write([]byte("repo digests mismatch\n"))
-		return ImageDigest{}, fmt.Errorf("Expected to find same repo digest, but found %#v", inspectData.RepoDigests)
+		foundDigests := strings.Join(inspectData.RepoDigests, ", ")
+		return ImageDigest{}, fmt.Errorf(
+			"Expected to find same repo digest, but found %s", foundDigests)
 	}
 
 	for digest := range digestStrs {
@@ -346,6 +348,14 @@ const (
 	registryDotDelim  = "."
 	registryPortDelim = ":"
 )
+
+// LowerCaseRegistry lowercases only the registry hostname portion of an
+// image reference (preserving repository path and tag case), so that
+// callers outside this package can normalize refs before comparing them,
+// consistent with RFC 1035/1123 hostname case-insensitivity.
+func LowerCaseRegistry(ref string) string {
+	return lowerCaseRepository(ref)
+}
 
 // lowerCaseRepository lowercases only the registry hostname while preserving
 // repository path and tag case (per RFC 1035/1123 case-insensitive names).
