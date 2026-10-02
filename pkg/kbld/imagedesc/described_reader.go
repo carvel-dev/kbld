@@ -4,6 +4,8 @@
 package imagedesc
 
 import (
+	"fmt"
+
 	regv1 "github.com/google/go-containerregistry/pkg/v1"
 )
 
@@ -16,10 +18,10 @@ func NewDescribedReader(ids *ImageRefDescriptors, layerProvider LayerProvider) D
 	return DescribedReader{ids, layerProvider}
 }
 
-func (r DescribedReader) Read() []ImageOrIndex {
+func (r DescribedReader) Read() ([]ImageOrIndex, error) {
 	var result []ImageOrIndex
 
-	for _, td := range r.ids.Descriptors() {
+	for i, td := range r.ids.Descriptors() {
 		switch {
 		case td.Image != nil:
 			var img ImageWithRef = NewDescribedImage(*td.Image, r.layerProvider)
@@ -30,11 +32,14 @@ func (r DescribedReader) Read() []ImageOrIndex {
 			result = append(result, ImageOrIndex{Index: &idx})
 
 		default:
-			panic("Unknown item")
+			// Descriptors come from a manifest.json inside the tar, so an entry
+			// carrying neither an image nor an index is untrusted input rather
+			// than a broken invariant.
+			return nil, fmt.Errorf("Expected descriptor %d to have either an image or an image index", i)
 		}
 	}
 
-	return result
+	return result, nil
 }
 
 func (r DescribedReader) buildIndex(iitd ImageIndexDescriptor) ImageIndexWithRef {
