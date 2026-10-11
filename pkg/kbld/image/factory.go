@@ -7,6 +7,7 @@ import (
 	"fmt"
 
 	ctlbbz "carvel.dev/kbld/pkg/kbld/builder/bazel"
+	ctlbah "carvel.dev/kbld/pkg/kbld/builder/buildah"
 	ctlbdk "carvel.dev/kbld/pkg/kbld/builder/docker"
 	ctlbko "carvel.dev/kbld/pkg/kbld/builder/ko"
 	ctlbkb "carvel.dev/kbld/pkg/kbld/builder/kubectlbuildkit"
@@ -73,6 +74,7 @@ func (f Factory) New(url string) Image {
 		kubectlBuildkit := ctlbkb.NewKubectlBuildkit(f.logger)
 		ko := ctlbko.NewKo(f.logger)
 		bazel := ctlbbz.NewBazel(docker, f.logger)
+		buildah := ctlbah.New(f.logger)
 		maven := ctlbmvn.NewMavenJib(docker, f.logger)
 
 		builders := BuildersOpts{
@@ -82,6 +84,7 @@ func (f Factory) New(url string) Image {
 			KubectlBuildkit: kubectlBuildkit,
 			Ko:              ko,
 			Bazel:           bazel,
+			Buildah:         buildah,
 			Jib:             maven,
 		}
 

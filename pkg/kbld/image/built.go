@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 
 	ctlbbz "carvel.dev/kbld/pkg/kbld/builder/bazel"
+	ctlbah "carvel.dev/kbld/pkg/kbld/builder/buildah"
 	ctlbdk "carvel.dev/kbld/pkg/kbld/builder/docker"
 	ctlbko "carvel.dev/kbld/pkg/kbld/builder/ko"
 	ctlbkb "carvel.dev/kbld/pkg/kbld/builder/kubectlbuildkit"
@@ -26,6 +27,7 @@ type BuiltImage struct {
 	kubectlBuildkit ctlbkb.KubectlBuildkit
 	ko              ctlbko.Ko
 	bazel           ctlbbz.Bazel
+	buildah         ctlbah.Buildah
 	jib             ctlbmvn.Jib
 }
 
@@ -37,6 +39,7 @@ type BuildersOpts struct {
 	KubectlBuildkit ctlbkb.KubectlBuildkit
 	Ko              ctlbko.Ko
 	Bazel           ctlbbz.Bazel
+	Buildah         ctlbah.Buildah
 	Jib             ctlbmvn.Jib
 }
 
@@ -53,6 +56,7 @@ func NewBuiltImage(url string, buildSource ctlconf.Source,
 		kubectlBuildkit: builders.KubectlBuildkit,
 		ko:              builders.Ko,
 		bazel:           builders.Bazel,
+		buildah:         builders.Buildah,
 		jib:             builders.Jib,
 	}
 }
@@ -106,6 +110,11 @@ func (i BuiltImage) URL() (string, []ctlconf.Origin, error) {
 		url, err := i.dockerBuildx.BuildAndOptionallyPush(
 			urlRepo, i.buildSource.Path, i.imgDst, *i.buildSource.Docker.Buildx)
 		return url, origins, err
+
+	case i.buildSource.Buildah != nil:
+		tag, err := i.buildah.BuildAndPushImage(
+			urlRepo, i.buildSource.Path, i.imgDst, *i.buildSource.Buildah)
+		return tag, origins, err
 
 	case i.buildSource.Maven != nil:
 		dockerTmpRef, err := i.jib.Run(
