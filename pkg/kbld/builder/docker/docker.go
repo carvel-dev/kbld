@@ -344,6 +344,7 @@ func (d Docker) Inspect(ref string) (InspectData, error) {
 
 const (
 	notFound          = -1
+	noSuffix          = ""
 	registrySeparator = "/"
 	registryDotDelim  = "."
 	registryPortDelim = ":"
@@ -386,7 +387,7 @@ func lowercaseRegistryBySlash(ref string) string {
 func extractDigestSuffix(ref string) (main string, digestSuffix string) {
 	digestIdx := strings.Index(ref, "@")
 	if digestIdx == notFound {
-		return ref, ""
+		return ref, noSuffix
 	}
 	return ref[:digestIdx], ref[digestIdx:]
 }
@@ -402,11 +403,26 @@ func extractAndRemoveTagSuffix(
 	}
 
 	colonIdx := strings.Index(lastSegment, ":")
-	if colonIdx == notFound || looksLikeHostname(lastSegment[:colonIdx]) {
-		return ref, ""
+	if colonIdx == notFound {
+		return ref, noSuffix
 	}
 
-	// Remove :tag from ref and return separately
+	// If there's a slash, the last segment is in the repo path (not hostname),
+	// so any colon is a tag separator, not a port separator.
+	if lastSlashIdx != notFound {
+		refWithoutTag = ref[:len(ref)-len(lastSegment[colonIdx:])]
+		tagSuffix = lastSegment[colonIdx:]
+		return refWithoutTag, tagSuffix
+	}
+
+	// No slash: could be bare image name or registry with port.
+	// Only treat colon as port separator if the before-part looks like a
+	// hostname.
+	if looksLikeHostname(lastSegment[:colonIdx]) {
+		return ref, noSuffix
+	}
+
+	// Not a hostname, so colon is a tag separator
 	refWithoutTag = ref[:len(ref)-len(lastSegment[colonIdx:])]
 	tagSuffix = lastSegment[colonIdx:]
 	return refWithoutTag, tagSuffix

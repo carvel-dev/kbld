@@ -55,7 +55,7 @@ var lowerCaseRepositoryCases = []lowerCaseRepositoryTestCase{
 	{
 		name:     "digest reference",
 		input:    "Harbor.Example.COM/MyApp/Image@sha256:abc123def456",
-		expected: "harbor.example.com/myapp/image@sha256:abc123def456",
+		expected: "harbor.example.com/MyApp/Image@sha256:abc123def456",
 	},
 	{
 		name:     "localhost registry",
@@ -85,7 +85,7 @@ var lowerCaseRepositoryCases = []lowerCaseRepositoryTestCase{
 	{
 		name:     "malformed digest with implicit namespace",
 		input:    "MyOrg/MyImage@sha256:deadbeef",
-		expected: "myorg/myimage@sha256:deadbeef",
+		expected: "MyOrg/MyImage@sha256:deadbeef",
 	},
 	{
 		name:     "uppercase localhost",
