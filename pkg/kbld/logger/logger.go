@@ -10,6 +10,8 @@ import (
 	"sync"
 )
 
+const noBytesWritten = 0
+
 type Logger struct {
 	writer     io.Writer
 	writerLock *sync.Mutex
@@ -47,7 +49,7 @@ func (w *PrefixWriter) Write(data []byte) (int, error) {
 	// TODO does not deal with races of multitple writers
 	_, err := w.writer.Write(newData)
 	if err != nil {
-		return 0, fmt.Errorf("write err: %s", err)
+		return noBytesWritten, fmt.Errorf("Writing output: %s", err)
 	}
 
 	// return original data length

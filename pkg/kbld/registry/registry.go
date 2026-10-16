@@ -165,7 +165,8 @@ func newHTTPTransport(opts Opts) (*http.Transport, error) {
 			if certs, err := os.ReadFile(path); err != nil {
 				return nil, fmt.Errorf("Reading CA certificates from '%s': %s", path, err)
 			} else if ok := pool.AppendCertsFromPEM(certs); !ok {
-				return nil, fmt.Errorf("Adding CA certificates from '%s': failed", path)
+				return nil, fmt.Errorf(
+					"Failed to add CA certificates from '%s'", path)
 			}
 		}
 	}

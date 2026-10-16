@@ -69,7 +69,7 @@ func (f tarFile) openChunk(path string) (io.ReadCloser, error) {
 				Reader:  tf, Closer: file}, nil
 		}
 	}
-	return nil, fmt.Errorf("file %s not found in tar", path)
+	return nil, fmt.Errorf("File '%s' not found in tar", path)
 }
 
 func (f tarFileChunkReadCloser) Close() error {
