@@ -75,11 +75,13 @@ func redactURL(raw string) string {
 // other URLs with userinfo (user:password) and query parameters (tokens).
 func redactErrorMessage(errMsg string) string {
 	const notFound = -1
+	const startPos = 0
 
 	// Repeatedly find and redact URLs until none remain
+	searchPos := startPos
 	for {
-		// Find https:// or http://
-		idx := findScheme(errMsg)
+		// Find https:// or http:// starting from searchPos
+		idx := findSchemeFrom(errMsg, searchPos)
 		if idx == notFound {
 			break
 		}
@@ -91,19 +93,32 @@ func redactErrorMessage(errMsg string) string {
 		urlStr := errMsg[idx:endIdx]
 		redacted := redactURL(urlStr)
 		errMsg = errMsg[:idx] + redacted + errMsg[endIdx:]
+
+		// Continue searching from end of redacted URL, not the beginning
+		searchPos = idx + len(redacted)
 	}
 	return errMsg
 }
 
-// findScheme finds the start of http:// or https:// in a string.
-func findScheme(s string) int {
+// findSchemeFrom finds the start of http:// or https:// starting at offset.
+func findSchemeFrom(s string, startPos int) int {
 	const notFound = -1
 
-	idx := strings.Index(s, "https://")
-	if idx != notFound {
-		return idx
+	if startPos >= len(s) {
+		return notFound
 	}
-	return strings.Index(s, "http://")
+
+	idx := strings.Index(s[startPos:], "https://")
+	if idx != notFound {
+		return startPos + idx
+	}
+
+	idx = strings.Index(s[startPos:], "http://")
+	if idx != notFound {
+		return startPos + idx
+	}
+
+	return notFound
 }
 
 // findURLBoundary finds where a URL ends (at space, quote, bracket, etc).

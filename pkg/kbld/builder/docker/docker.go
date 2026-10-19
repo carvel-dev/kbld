@@ -348,6 +348,8 @@ const (
 	registrySeparator = "/"
 	registryDotDelim  = "."
 	registryPortDelim = ":"
+	localhostName     = "localhost"
+	emptyLength       = 0
 )
 
 // LowerCaseRegistry lowercases only the registry hostname while preserving
@@ -362,9 +364,9 @@ func LowerCaseRegistry(ref string) string {
 }
 
 
-// lowercaseRegistryBySlash lowercases registry hostnames while preserving
-// tags and digests. It finds all hostname-like parts (containing dots or
-// colons) and lowercases them, keeping the rest as-is.
+// lowercaseRegistryBySlash lowercases only the registry component while
+// preserving repository path case. Only the first component (before the
+// first slash) can be a registry; everything after is repository path.
 func lowercaseRegistryBySlash(ref string) string {
 	// Split into digestless part and digest suffix
 	mainPart, digestSuffix := extractDigestSuffix(ref)
@@ -372,15 +374,27 @@ func lowercaseRegistryBySlash(ref string) string {
 	// Split into tag-free part and tag suffix
 	refWithoutTag, tagSuffix := extractAndRemoveTagSuffix(mainPart)
 
-	// Lowercase all hostname-like parts
-	parts := strings.Split(refWithoutTag, registrySeparator)
-	for i, part := range parts {
-		if looksLikeHostname(part) {
-			parts[i] = strings.ToLower(part)
+	// Find the first slash
+	firstSlashIdx := strings.Index(refWithoutTag, registrySeparator)
+
+	if firstSlashIdx == notFound {
+		// No slash - entire thing could be bare image name or registry
+		// Only lowercase if it looks like a registry
+		if looksLikeRegistry(refWithoutTag) {
+			return strings.ToLower(refWithoutTag) + tagSuffix + digestSuffix
 		}
+		return refWithoutTag + tagSuffix + digestSuffix
 	}
 
-	return strings.Join(parts, registrySeparator) + tagSuffix + digestSuffix
+	// Has slash - only lowercase the registry component (before first slash)
+	registry := refWithoutTag[:firstSlashIdx]
+	path := refWithoutTag[firstSlashIdx:]
+
+	if looksLikeHostname(registry) {
+		registry = strings.ToLower(registry)
+	}
+
+	return registry + path + tagSuffix + digestSuffix
 }
 
 // extractDigestSuffix separates a ref into main part and @ digest suffix.
@@ -416,13 +430,18 @@ func extractAndRemoveTagSuffix(
 	}
 
 	// No slash: could be bare image name or registry with port.
-	// Only treat colon as port separator if the before-part looks like a
-	// hostname.
-	if looksLikeHostname(lastSegment[:colonIdx]) {
+	// Only treat colon as port separator if what follows is all digits
+	// (actual port number) or if it's "localhost".
+	afterColon := lastSegment[colonIdx+len(registryPortDelim):]
+	isPortNumber := isAllDigits(afterColon)
+	beforeColon := lastSegment[:colonIdx]
+	isLocalhost := strings.EqualFold(beforeColon, "localhost")
+
+	if isPortNumber || isLocalhost {
 		return ref, noSuffix
 	}
 
-	// Not a hostname, so colon is a tag separator
+	// Not a port separator, so colon is a tag separator
 	refWithoutTag = ref[:len(ref)-len(lastSegment[colonIdx:])]
 	tagSuffix = lastSegment[colonIdx:]
 	return refWithoutTag, tagSuffix
@@ -432,6 +451,35 @@ func extractAndRemoveTagSuffix(
 func looksLikeHostname(part string) bool {
 	hasDot := strings.Contains(part, registryDotDelim)
 	hasColon := strings.Contains(part, registryPortDelim)
-	isLocalhost := strings.EqualFold(part, "localhost")
+	isLocalhost := strings.EqualFold(part, localhostName)
 	return hasDot || hasColon || isLocalhost
+}
+
+// looksLikeRegistry checks if a bare reference (no slashes) looks like a
+// registry rather than a bare image name. Bare image names typically don't
+// have port numbers, and references with dots but no colons are ambiguous
+// (could be "registry.com" or "alpine.debug"), so we only treat as registry
+// if it has a colon (port indicator) or is "localhost".
+func looksLikeRegistry(part string) bool {
+	hasColon := strings.Contains(part, registryPortDelim)
+	isLocalhost := strings.EqualFold(part, localhostName)
+	return hasColon || isLocalhost
+}
+
+// isAllDigits checks if a string contains only decimal digits.
+func isAllDigits(s string) bool {
+	if len(s) == emptyLength {
+		return false
+	}
+	for _, ch := range s {
+		if !isDigit(ch) {
+			return false
+		}
+	}
+	return true
+}
+
+// isDigit checks if a rune is a decimal digit.
+func isDigit(ch rune) bool {
+	return ch >= '0' && ch <= '9'
 }
