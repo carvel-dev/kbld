@@ -9,7 +9,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
-	"strings"
+	"regexp"
 )
 
 type FileSource interface {
@@ -45,6 +45,10 @@ func (s LocalFileSource) Bytes() ([]byte, error) {
 	return os.ReadFile(s.path)
 }
 
+var urlSchemeRe = regexp.MustCompile(`https?://`)
+
+const schemeStartIdx = 0
+
 type HTTPFileSource struct {
 	url string
 }
@@ -74,17 +78,19 @@ func redactURL(raw string) string {
 // strings. Handles cases where error messages contain redirect URLs or
 // other URLs with userinfo (user:password) and query parameters (tokens).
 func redactErrorMessage(errMsg string) string {
-	const notFound = -1
 	const startPos = 0
 
 	// Repeatedly find and redact URLs until none remain
 	searchPos := startPos
 	for {
-		// Find https:// or http:// starting from searchPos
-		idx := findSchemeFrom(errMsg, searchPos)
-		if idx == notFound {
+		// Find http:// or https:// whichever comes first
+		loc := urlSchemeRe.FindStringIndex(errMsg[searchPos:])
+		if loc == nil {
 			break
 		}
+
+		// Adjust position to account for searchPos offset
+		idx := searchPos + loc[schemeStartIdx]
 
 		// Find URL boundary
 		endIdx := findURLBoundary(errMsg, idx)
@@ -94,31 +100,10 @@ func redactErrorMessage(errMsg string) string {
 		redacted := redactURL(urlStr)
 		errMsg = errMsg[:idx] + redacted + errMsg[endIdx:]
 
-		// Continue searching from end of redacted URL, not the beginning
+		// Continue searching from end of redacted URL
 		searchPos = idx + len(redacted)
 	}
 	return errMsg
-}
-
-// findSchemeFrom finds the start of http:// or https:// starting at offset.
-func findSchemeFrom(s string, startPos int) int {
-	const notFound = -1
-
-	if startPos >= len(s) {
-		return notFound
-	}
-
-	idx := strings.Index(s[startPos:], "https://")
-	if idx != notFound {
-		return startPos + idx
-	}
-
-	idx = strings.Index(s[startPos:], "http://")
-	if idx != notFound {
-		return startPos + idx
-	}
-
-	return notFound
 }
 
 // findURLBoundary finds where a URL ends (at space, quote, bracket, etc).
