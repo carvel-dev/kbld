@@ -57,10 +57,12 @@ var _ FileSource = HTTPFileSource{}
 
 func NewHTTPFileSource(path string) HTTPFileSource { return HTTPFileSource{path} }
 
-// redactURL masks userinfo and query parameters from a URL to prevent
+// redactURL masks userinfo, query parameters and fragments to prevent
 // exposing credentials in error messages. If URL parsing fails, returns
 // a safe placeholder.
 func redactURL(raw string) string {
+	const empty = ""
+
 	u, err := url.Parse(raw)
 	if err != nil {
 		return "<invalid URL>"
@@ -68,9 +70,11 @@ func redactURL(raw string) string {
 	if u.User != nil {
 		u.User = url.User("_redacted_")
 	}
-	if u.RawQuery != "" {
+	if u.RawQuery != empty {
 		u.RawQuery = "_redacted_"
 	}
+	u.Fragment = empty
+	u.RawFragment = empty
 	return u.String()
 }
 
@@ -108,10 +112,20 @@ func redactErrorMessage(errMsg string) string {
 
 // findURLBoundary finds where a URL ends (at space, quote, bracket, etc).
 func findURLBoundary(s string, start int) int {
+	bracketOpen := false
 	for i := start; i < len(s); i++ {
 		switch s[i] {
-		case '"', '\'', ' ', ']', ')', ',':
+		case '[':
+			bracketOpen = true
+		case ']':
+			if !bracketOpen {
+				return i
+			}
+			bracketOpen = false
+		case '"', '\'', ' ', ')', ',':
 			return i
+		default:
+			continue
 		}
 	}
 	return len(s)
@@ -133,7 +147,8 @@ func (s HTTPFileSource) Bytes() ([]byte, error) {
 
 	result, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, fmt.Errorf("Reading URL '%s': %s", redactURL(s.url), err)
+		return nil, fmt.Errorf("Reading URL '%s': %s",
+			redactURL(s.url), redactErrorMessage(err.Error()))
 	}
 
 	return result, nil
