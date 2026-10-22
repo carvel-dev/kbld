@@ -97,6 +97,9 @@ func (r GitRepo) runCmd(args []string) (string, string, error) {
 
 // GitRedactedRemoteURL redacts any user/password information in the URL
 func GitRedactedRemoteURL(url string) string {
+	// Query and fragment values are not needed to identify the repository.
+	url, _, _ = strings.Cut(url, "?")
+	url, _, _ = strings.Cut(url, "#")
 	pieces := strings.SplitN(url, "@", 2)
 	if len(pieces) == 1 {
 		return url

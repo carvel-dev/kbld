@@ -4,6 +4,7 @@
 package registry
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"strings"
@@ -76,7 +77,9 @@ func (k *EnvKeychain) collect() ([]envKeychainInfo, error) {
 		"HOSTNAME": func(info *envKeychainInfo, val string) error {
 			registry, err := regname.NewRegistry(val, regname.StrictValidation)
 			if err != nil {
-				return fmt.Errorf("Parsing registry hostname: %s (e.g. gcr.io, index.docker.io)", err)
+				return errors.New("Parsing registry hostname: invalid value; " +
+					"use a hostname such as gcr.io or index.docker.io " +
+					"without URL credentials, query or fragment")
 			}
 			info.Hostname = registry.RegistryStr()
 			return nil

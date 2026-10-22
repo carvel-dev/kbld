@@ -8,6 +8,8 @@ import (
 	"io"
 	"net/http"
 	"os"
+
+	"carvel.dev/kbld/internal/diagnostics"
 )
 
 type FileSource interface {
@@ -52,20 +54,22 @@ var _ FileSource = HTTPFileSource{}
 func NewHTTPFileSource(path string) HTTPFileSource { return HTTPFileSource{path} }
 
 func (s HTTPFileSource) Description() string {
-	return fmt.Sprintf("HTTP URL '%s'", s.url)
+	return fmt.Sprintf("HTTP URL '%s'", diagnostics.URL(s.url))
 }
 
 func (s HTTPFileSource) Bytes() ([]byte, error) {
 	resp, err := http.Get(s.url)
 	if err != nil {
-		return nil, fmt.Errorf("Requesting URL '%s': %s", s.url, err)
+		return nil, fmt.Errorf("Requesting URL '%s': %s",
+			diagnostics.URL(s.url), diagnostics.Error(err))
 	}
 
 	defer resp.Body.Close()
 
 	result, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, fmt.Errorf("Reading URL '%s': %s", s.url, err)
+		return nil, fmt.Errorf("Reading URL '%s': %s",
+			diagnostics.URL(s.url), diagnostics.Error(err))
 	}
 
 	return result, nil
