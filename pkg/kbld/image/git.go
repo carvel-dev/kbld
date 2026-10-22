@@ -6,6 +6,7 @@ package image
 import (
 	"bytes"
 	"fmt"
+	"os"
 	"os/exec"
 	"strings"
 )
@@ -88,6 +89,7 @@ func (r GitRepo) runCmd(args []string) (string, string, error) {
 
 	cmd := exec.Command("git", args...)
 	cmd.Dir = r.dirPath
+	cmd.Env = append(os.Environ(), "LC_ALL=C")
 	cmd.Stdout = &stdoutBuf
 	cmd.Stderr = &stderrBuf
 	err := cmd.Run()
