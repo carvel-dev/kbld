@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"regexp"
 
+	ctlbdk "carvel.dev/kbld/pkg/kbld/builder/docker"
 	ctlconf "carvel.dev/kbld/pkg/kbld/config"
 )
 
@@ -19,11 +20,19 @@ func NewMatcher(url string) Matcher { return Matcher{url} }
 func (m Matcher) Matches(ref ctlconf.ImageRef) bool {
 	switch {
 	case len(ref.Image) > 0:
-		return ref.Image == m.url
+		// Registry hostnames are case-insensitive (RFC 1035/1123); ref.Image
+		// comes from scanning the target manifest while m.url comes from the
+		// user's separately-authored kbld.yaml config, so a hostname-case
+		// mismatch between the two sources must not prevent a match.
+		lhs := ctlbdk.LowerCaseRegistry(ref.Image)
+		rhs := ctlbdk.LowerCaseRegistry(m.url)
+		return lhs == rhs
 
 	case len(ref.ImageRepo) > 0:
 		repo, _ := URLRepo(m.url)
-		return ref.ImageRepo == repo
+		lhs := ctlbdk.LowerCaseRegistry(ref.ImageRepo)
+		rhs := ctlbdk.LowerCaseRegistry(repo)
+		return lhs == rhs
 
 	default:
 		panic(fmt.Errorf("Missing image or imageRepo configuration"))
