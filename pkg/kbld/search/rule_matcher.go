@@ -4,8 +4,6 @@
 package search
 
 import (
-	"reflect"
-
 	ctlconf "carvel.dev/kbld/pkg/kbld/config"
 	ctlimg "carvel.dev/kbld/pkg/kbld/image"
 	ctlres "carvel.dev/kbld/pkg/kbld/resources"
@@ -43,14 +41,16 @@ func (m RuleMatcher) Matches(keyPath ctlres.Path, value interface{}) (bool, ctlc
 	if m.rule.ValueMatcher != nil {
 		switch {
 		case len(m.rule.ValueMatcher.Image) > 0:
-			if reflect.DeepEqual(m.rule.ValueMatcher.Image, value) {
+			if valueStr, ok := value.(string); ok &&
+				ctlimg.RegistryHostEqual(m.rule.ValueMatcher.Image, valueStr) {
 				valueMatched = true
 			}
 
 		case len(m.rule.ValueMatcher.ImageRepo) > 0:
 			if valueStr, ok := value.(string); ok {
 				repo, matchesImg := ctlimg.URLRepo(valueStr)
-				if matchesImg && m.rule.ValueMatcher.ImageRepo == repo {
+				expectedRepo := m.rule.ValueMatcher.ImageRepo
+				if matchesImg && ctlimg.RegistryHostEqual(expectedRepo, repo) {
 					valueMatched = true
 				}
 			}

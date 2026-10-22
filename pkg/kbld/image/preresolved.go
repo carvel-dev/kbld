@@ -18,7 +18,8 @@ func NewPreresolvedImage(url string, origins []ctlconf.Origin) PreresolvedImage 
 
 func (i PreresolvedImage) URL() (string, []ctlconf.Origin, error) {
 	for _, origin := range i.origins {
-		if origin.Preresolved != nil && origin.Preresolved.URL == i.url {
+		if origin.Preresolved != nil &&
+			RegistryHostEqual(origin.Preresolved.URL, i.url) {
 			imageOrigins := copyAndAppendOrigins(i.origins)
 			return i.url, imageOrigins, nil
 		}

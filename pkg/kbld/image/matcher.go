@@ -19,11 +19,11 @@ func NewMatcher(url string) Matcher { return Matcher{url} }
 func (m Matcher) Matches(ref ctlconf.ImageRef) bool {
 	switch {
 	case len(ref.Image) > 0:
-		return ref.Image == m.url
+		return RegistryHostEqual(ref.Image, m.url)
 
 	case len(ref.ImageRepo) > 0:
 		repo, _ := URLRepo(m.url)
-		return ref.ImageRepo == repo
+		return RegistryHostEqual(ref.ImageRepo, repo)
 
 	default:
 		panic(fmt.Errorf("Missing image or imageRepo configuration"))

@@ -21,16 +21,14 @@ func TestLowerCaseRepository(t *testing.T) {
 	}
 }
 
-func lowerCaseRepositoryTestCases() []struct {
+type repositoryTestCase struct {
 	name     string
 	input    string
 	expected string
-} {
-	return []struct {
-		name     string
-		input    string
-		expected string
-	}{
+}
+
+func lowerCaseRepositoryTestCases() []repositoryTestCase {
+	return []repositoryTestCase{
 		{
 			name:     "lowercase hostname, preserve path case",
 			input:    "Harbor.Example.COM/MyApp/Image:v1.0",
@@ -67,14 +65,12 @@ func lowerCaseRepositoryTestCases() []struct {
 			expected: "registry.io/Path/To/MyImage:Tag",
 		},
 		{
-			name:     "bare image name with tag",
-			input:    "MyImage:Tag",
-			expected: "MyImage:Tag",
+			name:  "bare image name with tag",
+			input: "MyImage:Tag", expected: "MyImage:Tag",
 		},
 		{
-			name:     "bare image name without tag",
-			input:    "MyImage",
-			expected: "MyImage",
+			name:  "bare image name without tag",
+			input: "MyImage", expected: "MyImage",
 		},
 		{
 			name:     "implicit registry with namespace",
