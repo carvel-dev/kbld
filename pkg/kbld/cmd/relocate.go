@@ -37,7 +37,8 @@ func NewRelocateCmd(o *RelocateOptions) *cobra.Command {
 	cmd := &cobra.Command{
 		Use: "relocate",
 		Long: `
-Command "relocate" is deprecated, please use 'imgpkg copy', learn more in https://carvel.dev/imgpkg/docs/latest/commands/#copy
+Command "relocate" is deprecated; use 'imgpkg copy' instead.
+Learn more: https://carvel.dev/imgpkg/docs/latest/commands/#copy
 
 Relocate images between two registries
 `,
@@ -56,7 +57,11 @@ Relocate images between two registries
 func (o *RelocateOptions) Run() error {
 	logger := ctllog.NewLogger(os.Stderr)
 	warningLogger := logger.NewPrefixedWriter("Warning: ")
-	err := warningLogger.WriteStr(`Command "relocate" is deprecated, please use 'imgpkg copy', learn more in https://carvel.dev/imgpkg/docs/latest/commands/#copy`)
+	err := warningLogger.WriteStr(
+		`Command "relocate" is deprecated; use 'imgpkg copy' instead.` +
+			"\nLearn more: " +
+			"https://carvel.dev/imgpkg/docs/latest/commands/#copy",
+	)
 	if err != nil {
 		return err
 	}

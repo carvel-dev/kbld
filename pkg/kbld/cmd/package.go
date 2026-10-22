@@ -40,7 +40,8 @@ func NewPackageCmd(o *PackageOptions) *cobra.Command {
 		Short:   "Package configuration and images into tarball",
 		Hidden:  true,
 		Long: `
-Command "package" is deprecated, please use 'imgpkg push', learn more in https://carvel.dev/imgpkg/docs/latest/commands/#push
+Command "package" is deprecated; use 'imgpkg push' instead.
+Learn more: https://carvel.dev/imgpkg/docs/latest/commands/#push
 
 Package configuration and images into tarball
 `,
@@ -56,7 +57,11 @@ Package configuration and images into tarball
 func (o *PackageOptions) Run() error {
 	logger := ctllog.NewLogger(os.Stderr)
 	warningLogger := logger.NewPrefixedWriter("Warning: ")
-	err := warningLogger.WriteStr(`Command "package" is deprecated, please use 'imgpkg push', learn more in https://carvel.dev/imgpkg/docs/latest/commands/#push`)
+	err := warningLogger.WriteStr(
+		`Command "package" is deprecated; use 'imgpkg push' instead.` +
+			"\nLearn more: " +
+			"https://carvel.dev/imgpkg/docs/latest/commands/#push",
+	)
 	if err != nil {
 		return err
 	}

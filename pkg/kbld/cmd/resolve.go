@@ -5,6 +5,7 @@ package cmd
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"strings"
@@ -64,7 +65,8 @@ func NewResolveCmd(o *ResolveOptions) *cobra.Command {
 
 func (o *ResolveOptions) Run() error {
 	if o.ImgpkgLockOutput != "" && o.LockOutput != "" {
-		return fmt.Errorf("Can only output one lockfile type, please provide only one of '--lock-output' or '--imgpkg-lock-output'")
+		return errors.New("Can only output one lockfile type; " +
+			"provide only one of '--lock-output' or '--imgpkg-lock-output'")
 	}
 	logger := ctllog.NewLogger(os.Stderr)
 	prefixedLogger := logger.NewPrefixedWriter("resolve | ")
