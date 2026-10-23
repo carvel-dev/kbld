@@ -10,18 +10,39 @@ import (
 	ctlimg "carvel.dev/kbld/pkg/kbld/image"
 )
 
+type imageFactory interface {
+	New(url string) ctlimg.Image
+}
+
 type ImageQueue struct {
-	imgFactory ctlimg.Factory
+	imgFactory imageFactory
 
 	outputImages     *ProcessedImages
 	outputImagesLock sync.Mutex
 
 	outputErrs     []error
 	outputErrsLock sync.Mutex
+
+	// failFast stops starting new images after the first failure.
+	// Images that are already being processed are allowed to finish.
+	failFast bool
 }
 
-func NewImageQueue(imgFactory ctlimg.Factory) *ImageQueue {
+func NewImageQueue(imgFactory imageFactory) *ImageQueue {
 	return &ImageQueue{imgFactory: imgFactory}
+}
+
+// FailFast makes the queue skip the images that have not been started yet
+// as soon as one image fails.
+func (b *ImageQueue) FailFast(enabled bool) *ImageQueue {
+	b.failFast = enabled
+	return b
+}
+
+func (b *ImageQueue) hasFailed() bool {
+	b.outputErrsLock.Lock()
+	defer b.outputErrsLock.Unlock()
+	return len(b.outputErrs) > 0
 }
 
 func (b *ImageQueue) Run(unprocessedImageURLs *UnprocessedImageURLs, numWorkers int) (*ProcessedImages, error) {
@@ -36,6 +57,9 @@ func (b *ImageQueue) Run(unprocessedImageURLs *UnprocessedImageURLs, numWorkers 
 	}
 
 	for _, unprocessedImageURL := range unprocessedImageURLs.All() {
+		if b.failFast && b.hasFailed() {
+			break
+		}
 		workWg.Add(1)
 		queueCh <- unprocessedImageURL
 	}
@@ -54,6 +78,10 @@ func (b *ImageQueue) worker(workWg *sync.WaitGroup, queueCh <-chan UnprocessedIm
 
 func (b *ImageQueue) work(workWg *sync.WaitGroup, unprocessedImageURL UnprocessedImageURL) {
 	defer workWg.Done()
+
+	if b.failFast && b.hasFailed() {
+		return
+	}
 
 	imgURL, origins, err := b.imgFactory.New(unprocessedImageURL.URL).URL()
 	if err != nil {
