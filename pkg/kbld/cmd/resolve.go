@@ -30,6 +30,7 @@ type ResolveOptions struct {
 	RegistryFlags     RegistryFlags
 	AllowedToBuild    bool
 	BuildConcurrency  int
+	FailFast          bool
 	ImagesAnnotation  bool
 	OriginsAnnotation bool
 	ImageMapFile      string
@@ -53,6 +54,7 @@ func NewResolveCmd(o *ResolveOptions) *cobra.Command {
 	o.RegistryFlags.Set(cmd)
 	cmd.Flags().BoolVar(&o.AllowedToBuild, "build", true, "Allow building of images")
 	cmd.Flags().IntVar(&o.BuildConcurrency, "build-concurrency", 4, "Set maximum number of concurrent builds")
+	cmd.Flags().BoolVar(&o.FailFast, "fail-fast", false, "Stop starting new image builds after the first failure")
 	cmd.Flags().BoolVar(&o.ImagesAnnotation, "images-annotation", true, "Annotate resources with images annotation")
 	cmd.Flags().BoolVar(&o.OriginsAnnotation, "origins-annotation", true, "Include origins annotation")
 	cmd.Flags().StringVar(&o.ImageMapFile, "image-map-file", "", "Set image map file (/cnab/app/relocation-mapping.json in CNAB)")
@@ -168,7 +170,7 @@ func (o *ResolveOptions) collectImageReferences(nonConfigRs []ctlres.Resource,
 }
 
 func (o *ResolveOptions) resolveImages(imageURLs *UnprocessedImageURLs, imgFactory ctlimg.Factory) (*ProcessedImages, error) {
-	queue := NewImageQueue(imgFactory)
+	queue := NewImageQueue(imgFactory).FailFast(o.FailFast)
 
 	resolvedImages, err := queue.Run(imageURLs, o.BuildConcurrency)
 	if err != nil {
