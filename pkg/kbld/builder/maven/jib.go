@@ -128,8 +128,15 @@ func (*Jib) runMaven(directory string, targetImage string,
 	cmd.Stdout = io.MultiWriter(&stdoutBuf, prefixedLogger)
 	cmd.Stderr = io.MultiWriter(&stderrBuf, prefixedLogger)
 
-	_, _ = prefixedLogger.Write([]byte(fmt.Sprintf(
-		"running command: %v\n", cmd)))
+	var numRawOpts int
+	if opts.RawOptions != nil {
+		numRawOpts = len(*opts.RawOptions)
+	}
+	msg := fmt.Sprintf(
+		"running command: mvn compile jib:dockerBuild -Dimage=%s "+
+			"(%d raw option(s) not shown)\n",
+		targetImage, numRawOpts)
+	_, _ = prefixedLogger.Write([]byte(msg))
 
 	return cmd.Run()
 }

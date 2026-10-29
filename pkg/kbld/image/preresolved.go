@@ -4,6 +4,7 @@
 package image
 
 import (
+	ctlbdk "carvel.dev/kbld/pkg/kbld/builder/docker"
 	ctlconf "carvel.dev/kbld/pkg/kbld/config"
 )
 
@@ -18,7 +19,9 @@ func NewPreresolvedImage(url string, origins []ctlconf.Origin) PreresolvedImage 
 
 func (i PreresolvedImage) URL() (string, []ctlconf.Origin, error) {
 	for _, origin := range i.origins {
-		if origin.Preresolved != nil && origin.Preresolved.URL == i.url {
+		if origin.Preresolved != nil &&
+			ctlbdk.LowerCaseRegistry(origin.Preresolved.URL) ==
+				ctlbdk.LowerCaseRegistry(i.url) {
 			imageOrigins := copyAndAppendOrigins(i.origins)
 			return i.url, imageOrigins, nil
 		}

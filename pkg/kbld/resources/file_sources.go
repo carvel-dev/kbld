@@ -7,7 +7,9 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"os"
+	"regexp"
 )
 
 type FileSource interface {
@@ -43,6 +45,10 @@ func (s LocalFileSource) Bytes() ([]byte, error) {
 	return os.ReadFile(s.path)
 }
 
+var urlSchemeRe = regexp.MustCompile(`https?://`)
+
+const schemeStartIdx = 0
+
 type HTTPFileSource struct {
 	url string
 }
@@ -51,21 +57,98 @@ var _ FileSource = HTTPFileSource{}
 
 func NewHTTPFileSource(path string) HTTPFileSource { return HTTPFileSource{path} }
 
+// redactURL masks userinfo, query parameters and fragments to prevent
+// exposing credentials in error messages. If URL parsing fails, returns
+// a safe placeholder.
+func redactURL(raw string) string {
+	const empty = ""
+
+	u, err := url.Parse(raw)
+	if err != nil {
+		return "<invalid URL>"
+	}
+	if u.User != nil {
+		u.User = url.User("_redacted_")
+	}
+	if u.RawQuery != empty {
+		u.RawQuery = "_redacted_"
+	}
+	u.Fragment = empty
+	u.RawFragment = empty
+	return u.String()
+}
+
+// redactErrorMessage redacts URLs with embedded credentials from error
+// strings. Handles cases where error messages contain redirect URLs or
+// other URLs with userinfo (user:password) and query parameters (tokens).
+func redactErrorMessage(errMsg string) string {
+	const startPos = 0
+
+	// Repeatedly find and redact URLs until none remain
+	searchPos := startPos
+	for {
+		// Find http:// or https:// whichever comes first
+		loc := urlSchemeRe.FindStringIndex(errMsg[searchPos:])
+		if loc == nil {
+			break
+		}
+
+		// Adjust position to account for searchPos offset
+		idx := searchPos + loc[schemeStartIdx]
+
+		// Find URL boundary
+		endIdx := findURLBoundary(errMsg, idx)
+
+		// Redact the URL in place
+		urlStr := errMsg[idx:endIdx]
+		redacted := redactURL(urlStr)
+		errMsg = errMsg[:idx] + redacted + errMsg[endIdx:]
+
+		// Continue searching from end of redacted URL
+		searchPos = idx + len(redacted)
+	}
+	return errMsg
+}
+
+// findURLBoundary finds where a URL ends (at space, quote, bracket, etc).
+func findURLBoundary(s string, start int) int {
+	bracketOpen := false
+	for i := start; i < len(s); i++ {
+		switch s[i] {
+		case '[':
+			bracketOpen = true
+		case ']':
+			if !bracketOpen {
+				return i
+			}
+			bracketOpen = false
+		case '"', '\'', ' ', ')', ',':
+			return i
+		default:
+			continue
+		}
+	}
+	return len(s)
+}
+
 func (s HTTPFileSource) Description() string {
-	return fmt.Sprintf("HTTP URL '%s'", s.url)
+	return fmt.Sprintf("HTTP URL '%s'", redactURL(s.url))
 }
 
 func (s HTTPFileSource) Bytes() ([]byte, error) {
 	resp, err := http.Get(s.url)
 	if err != nil {
-		return nil, fmt.Errorf("Requesting URL '%s': %s", s.url, err)
+		errMsg := redactErrorMessage(err.Error())
+		return nil, fmt.Errorf("Requesting URL '%s': %s",
+			redactURL(s.url), errMsg)
 	}
 
 	defer resp.Body.Close()
 
 	result, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, fmt.Errorf("Reading URL '%s': %s", s.url, err)
+		return nil, fmt.Errorf("Reading URL '%s': %s",
+			redactURL(s.url), redactErrorMessage(err.Error()))
 	}
 
 	return result, nil

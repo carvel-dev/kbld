@@ -41,7 +41,8 @@ func NewUnpackageCmd(o *UnpackageOptions) *cobra.Command {
 		Short:   "Unpackage configuration and images from tarball",
 		Hidden:  true,
 		Long: `
-Command "unpackage" is deprecated, please use 'imgpkg pull', learn more in https://carvel.dev/imgpkg/docs/latest/commands/#pull
+Command 'unpackage' is deprecated; use 'imgpkg pull' instead.
+Learn more: https://carvel.dev/imgpkg/docs/latest/commands/#pull
 
 Unpackage configuration and images from tarball
 `,
@@ -59,7 +60,9 @@ Unpackage configuration and images from tarball
 func (o *UnpackageOptions) Run() error {
 	logger := ctllog.NewLogger(os.Stderr)
 	warningLogger := logger.NewPrefixedWriter("Warning: ")
-	err := warningLogger.WriteStr(`Command "unpackage" is deprecated, please use 'imgpkg pull', learn more in https://carvel.dev/imgpkg/docs/latest/commands/#pull`)
+	msg := "Command 'unpackage' is deprecated; use 'imgpkg pull' instead. " +
+		"Learn more: https://carvel.dev/imgpkg/docs/latest/commands/#pull\n"
+	_, err := warningLogger.Write([]byte(msg))
 	if err != nil {
 		return err
 	}
