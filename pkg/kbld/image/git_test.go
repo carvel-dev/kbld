@@ -293,6 +293,42 @@ func TestGitRepoIsDirty(t *testing.T) {
 	}
 }
 
+func TestGitRepoLocalizedGit(t *testing.T) {
+	binDir := t.TempDir()
+	fakeGit := `#!/bin/sh
+[ "$1" = rev-parse ] && exit 0
+if [ "$LC_ALL" = C ]; then
+	case "$1" in
+	ls-remote) echo "fatal: No remote configured to list refs from." >&2 ;;
+	describe) echo "fatal: No names found, cannot describe anything." >&2 ;;
+	esac
+else
+	echo "fatal: Keine Namen gefunden, kann nichts beschreiben." >&2
+fi
+exit 128
+`
+	fakeGitPath := filepath.Join(binDir, "git")
+	err := os.WriteFile(fakeGitPath, []byte(fakeGit), os.ModePerm)
+	if err != nil {
+		t.Fatalf("Writing fake git: %s", err)
+	}
+
+	t.Setenv("PATH", binDir+string(os.PathListSeparator)+os.Getenv("PATH"))
+	t.Setenv("LANGUAGE", "de")
+	t.Setenv("LC_ALL", "de_DE.UTF-8")
+
+	gitRepo := ctlimg.NewGitRepo(t.TempDir())
+
+	url, err := gitRepo.RemoteURL()
+	if err != nil || url != ctlimg.GitRepoRemoteURLUnknown {
+		t.Fatalf("Expected unknown remote url: %s; %s", err, url)
+	}
+	tags, err := gitRepo.HeadTags()
+	if err != nil || tags != nil {
+		t.Fatalf("Expected no head tags: %s; %v", err, tags)
+	}
+}
+
 func runCmd(t *testing.T, cmdName string, args []string, dir string) string {
 	var stdoutBuf, stderrBuf bytes.Buffer
 
