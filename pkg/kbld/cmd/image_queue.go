@@ -28,7 +28,8 @@ type ImageQueue struct {
 	failFast bool
 }
 
-// NewImageQueue returns a queue that resolves images with images created by imgFactory.
+// NewImageQueue returns a queue that resolves images with images created
+// by imgFactory.
 func NewImageQueue(imgFactory imageFactory) *ImageQueue {
 	return &ImageQueue{imgFactory: imgFactory}
 }

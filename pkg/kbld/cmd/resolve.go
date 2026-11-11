@@ -53,7 +53,8 @@ func NewResolveCmd(o *ResolveOptions) *cobra.Command {
 	o.RegistryFlags.Set(cmd)
 	cmd.Flags().BoolVar(&o.AllowedToBuild, "build", true, "Allow building of images")
 	cmd.Flags().IntVar(&o.BuildConcurrency, "build-concurrency", 4, "Set maximum number of concurrent builds")
-	cmd.Flags().BoolVar(&o.FailFast, "fail-fast", false, "Stop starting new image builds after the first failure")
+	cmd.Flags().BoolVar(&o.FailFast, "fail-fast", false,
+		"Stop starting new image builds after the first failure")
 	cmd.Flags().BoolVar(&o.ImagesAnnotation, "images-annotation", true, "Annotate resources with images annotation")
 	cmd.Flags().BoolVar(&o.OriginsAnnotation, "origins-annotation", true, "Include origins annotation")
 	cmd.Flags().StringVar(&o.ImageMapFile, "image-map-file", "", "Set image map file (/cnab/app/relocation-mapping.json in CNAB)")
