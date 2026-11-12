@@ -1,4 +1,4 @@
-FROM golang:1.26.0
+FROM golang:1.27.4
 
 RUN apt-get update -y
 RUN apt-get install docker.io apt-transport-https ca-certificates gnupg python-is-python3 default-jdk-headless maven -y
