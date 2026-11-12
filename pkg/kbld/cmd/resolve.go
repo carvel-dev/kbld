@@ -57,6 +57,7 @@ func NewResolveCmd(o *ResolveOptions) *cobra.Command {
 	cmd.Flags().BoolVar(&o.OriginsAnnotation, "origins-annotation", true, "Include origins annotation")
 	cmd.Flags().StringVar(&o.ImageMapFile, "image-map-file", "", "Set image map file (/cnab/app/relocation-mapping.json in CNAB)")
 	cmd.Flags().StringVar(&o.LockOutput, "lock-output", "", "File path to emit configuration with resolved image references")
+	_ = cmd.Flags().MarkHidden("lock-output")
 	cmd.Flags().StringVar(&o.ImgpkgLockOutput, "imgpkg-lock-output", "", "File path to emit images lockfile with resolved image references")
 	cmd.Flags().BoolVar(&o.UnresolvedInspect, "unresolved-inspect", false, "List image references found in inputs")
 	cmd.Flags().StringVar(&o.Platform, "platform", "", "Apply platform selection to image indexes")
