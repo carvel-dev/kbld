@@ -28,15 +28,15 @@ jobs:
         # this might remove tools that are actually needed,
         # if set to "true" but frees about 6 GB
         tool-cache: true
-    - name: Set up Go 1.x
-      uses: actions/setup-go@v5
-      with:
-        go-version: '1.26'
     - name: Check out code into the Go module directory
       uses: actions/checkout@v4
       with:
         path: src/github.com/${{ github.repository }}
         fetch-depth: 0
+    - name: Set up Go 1.x
+      uses: actions/setup-go@v5
+      with:
+        go-version-file: src/github.com/${{ github.repository }}/go.mod
     - name: Install Carvel Tools
       uses: carvel-dev/setup-action@v1
       with:
