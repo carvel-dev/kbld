@@ -16,11 +16,14 @@ import (
 	ctlb "carvel.dev/kbld/pkg/kbld/builder"
 	ctllog "carvel.dev/kbld/pkg/kbld/logger"
 	regname "github.com/google/go-containerregistry/pkg/name"
+	"golang.org/x/sync/singleflight"
 )
 
 type Docker struct {
 	logger ctllog.Logger
 }
+
+var buildGroup singleflight.Group
 
 type BuildOpts struct {
 	// https://docs.docker.com/engine/reference/commandline/build/
@@ -53,6 +56,17 @@ func New(logger ctllog.Logger) Docker {
 }
 
 func (d Docker) Build(image, directory string, opts BuildOpts) (TmpRef, error) {
+	key := buildKey(directory, opts)
+	v, err, _ := buildGroup.Do(key, func() (interface{}, error) {
+		return d.build(image, directory, opts)
+	})
+	if err != nil {
+		return TmpRef{}, err
+	}
+	return v.(TmpRef), nil
+}
+
+func (d Docker) build(image, directory string, opts BuildOpts) (TmpRef, error) {
 	err := d.ensureDirectory(directory)
 	if err != nil {
 		return TmpRef{}, err
@@ -340,6 +354,29 @@ func (d Docker) Inspect(ref string) (InspectData, error) {
 	}
 
 	return data[0], nil
+}
+
+func buildKey(directory string, opts BuildOpts) string {
+	key := directory
+	if opts.Target != nil {
+		key += "|target=" + *opts.Target
+	}
+	if opts.Pull != nil {
+		key += fmt.Sprintf("|pull=%v", *opts.Pull)
+	}
+	if opts.NoCache != nil {
+		key += fmt.Sprintf("|no-cache=%v", *opts.NoCache)
+	}
+	if opts.File != nil {
+		key += "|file=" + *opts.File
+	}
+	if opts.Buildkit != nil {
+		key += fmt.Sprintf("|buildkit=%v", *opts.Buildkit)
+	}
+	if opts.RawOptions != nil {
+		key += "|raw=" + strings.Join(*opts.RawOptions, ",")
+	}
+	return key
 }
 
 const (
